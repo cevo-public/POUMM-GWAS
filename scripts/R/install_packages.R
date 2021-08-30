@@ -1,0 +1,6 @@
+# install.packages(devtools)
+# devtools::install_version("Rcpp", version = "1.0.6")
+install.packages("POUMM")
+install.packages("yaml")
+install.packages("tidyr")
+install.packages("ape")

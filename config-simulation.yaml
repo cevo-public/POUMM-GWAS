@@ -1,0 +1,46 @@
+# Integer for N, the number of individuals to simulate
+"N": 500
+
+# List of real numbers for g0, the initial viral trait value at the root
+g0:
+  - 4.5
+
+# List of real numbers for alpha, the selection strength parameter
+alpha:
+  - 0.1
+  - 60.0
+
+# List of real numbers for theta, the evolutionarily optimal viral trait value
+theta:
+  -4.5
+
+# Integer for M, the number of human SNPs with direct effect on trait
+M: 20
+
+# Integer for K, the total number of human SNPs to simulate
+K: 20
+
+# Integer for d, human ploidy
+d: 2
+
+# Real number for delta, the per-copy effect size on the trait for human SNPs
+delta:
+  - 0.2
+
+# List of real numbers for H2, the heritability of the trait due to the virus
+H2:
+  - 0.15
+  - 0.75
+
+# Real number for H2.h, the fraction of the total trait variance due to human SNPs; H2.h + max(H2) must be <= 1
+H2.h: 0.25
+
+# Real number for var.z, the total trait variance
+var.z:
+  - 0.73
+
+# Integer for N.reps, the number of simulated data sets to generate for each unique combination of parameters
+N.reps: 2
+
+# Boolean for whether (True) to infer POUMM parameters from simulated data or (False) use true values
+is.MLE: True
