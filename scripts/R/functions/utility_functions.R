@@ -39,14 +39,9 @@ writeParametersToStdOut <- function(params) {
 
 makeDataFrameFromMapplyResults <- function(mapply.results) {
   dataframe <- as.data.frame(t(as.data.frame(mapply.results)))
+  cols_to_unnest <- colnames(dataframe)
   dataframe$runID <- 1:dim(dataframe)[1]
-  dataframe <- tidyr::unnest(dataframe, cols = c(
-    p, sigma, RMSE.z.v, RMSE.v.MWA.v, RMSE.v.OU.v, MAPE.z.v, MAPE.v.MWA.v,
-    MAPE.v.OU.v, UMBRAE.v.MWA.z, UMBRAE.v.OU.z, RMSE.z.h, RMSE.h.MWA.h,
-    RMSE.h.OU.h, MAPE.z.h, MAPE.h.MWA.h, MAPE.h.OU.h, UMBRAE.h.MWA.z,
-    UMBRAE.h.OU.z, g0.AVG, alpha.MLE, sigma.MLE, theta.MLE, sigmae.MLE,
-    g0, alpha, theta, sigmae, K, M, delta, H2.h, H2, var.z, empirical.H2,
-    empirical.H2.h))
+  dataframe <- tidyr::unnest(dataframe, cols = all_of(cols_to_unnest))
   return(dataframe)
 }
 

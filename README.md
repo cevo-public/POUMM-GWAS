@@ -10,42 +10,52 @@ Simulate data under the POUMM using a randomly generated, HIV-like phylogeny and
 
 ### Requirements
 * Docker
+* Specified parameter values/ranges in [config-simulation.yaml](config-simulation-full.yaml)
 
 ### Instructions
 
-* Build the container specified in the [Dockerfile](Dockerfile): `docker build -t simulate-poumm .`
-* Edit the parameter values/ranges in [config-simulation.yaml](config-simulation.yaml)
+* Build the containers specified in the Dockerfiles:
+  ```
+  docker build -t simulate-poumm-accuracy -f Dockerfile-simulate-poumm-accuracy .
+  docker build -t simulate-poumm-gwas -f Dockerfile-simulate-poumm-gwas .
+  ```
 * To run locally:
   ```
   mkdir -p output
   docker run \
-  -v output:/output \
-  -v config-simulation.yaml:/config-simulation.yaml \
-  simulate-accuracy
+  -v /Users/nadeaus/Repos/poumm-gwas/output:/output \
+  -v /Users/nadeaus/Repos/poumm-gwas/config-simulation.yaml:/config-simulation.yaml \
+  simulate-poumm-accuracy
+  docker run \
+  -v /Users/nadeaus/Repos/poumm-gwas/output:/output \
+  -v /Users/nadeaus/Repos/poumm-gwas/config-simulation.yaml:/config-simulation.yaml \
+  simulate-poumm-gwas
   ```
 * To run on Euler:
-  * Push the image to the ETHZ repository:
+  * Push the images to the ETHZ repository:
   ```
-  docker build -t registry.ethz.ch/nadeaus/poumm-gwas .
-  docker push registry.ethz.ch/nadeaus/poumm-gwas
+  docker build -t registry.ethz.ch/nadeaus/poumm-gwas/simulate-poumm-accuracy -f Dockerfile-simulate-poumm-accuracy .
+  docker build -t registry.ethz.ch/nadeaus/poumm-gwas/simulate-poumm-gwas -f Dockerfile-simulate-poumm-gwas .
+  docker push registry.ethz.ch/nadeaus/poumm-gwas/simulate-poumm-accuracy
+  docker push registry.ethz.ch/nadeaus/poumm-gwas/simulate-poumm-gwas
   ```
-  * Log in to Euler, then pull the image from gitlab and convert it to a singularity image in an interactive job
+  * Log in to Euler, clone this repository, navigate to top-level directory
+  * Pull the images from gitlab and convert them to singularity images in interactive jobs:
   ```
   module load eth_proxy
-  bsub -I -W 0:05 -o singularity_build_%J.log "singularity build --docker-login poumm-gwas.sif docker://registry.ethz.ch/poumm-gwas:latest"
+  bsub -I -W 0:05 -o singularity_build_%J.log "singularity build --docker-login simulate-poumm-accuracy.sif docker://registry.ethz.ch/nadeaus/poumm-gwas/simulate-poumm-accuracy:latest"
   # Enter username and then password for ETH gitlab (no prompt will come, just enter them and wait until job ends)
+  bsub -I -W 0:05 -o singularity_build_%J.log "singularity build --docker-login simulate-poumm-gwas.sif docker://registry.ethz.ch/nadeaus/poumm-gwas/simulate-poumm-gwas:latest"
   ```
-  * Clone this repository, navigate to top-level directory
-  * Run the singularity image in an Euler job:
+  * Run the singularity images in Euler jobs:
   ```
-  mkdir -p simulation_output
-  bsub -N -o poumm-gwas_%J.log \
-  "singularity run --bind config-simulation.yaml:config-simulation.yaml --bind simulation_output:output poumm-gwas.sif"
+  mkdir -p output
+  bsub -N -o simulate-poumm-accuracy_%J.log \
+  "singularity run --bind config-simulation.yaml:/config-simulation.yaml --bind output:/output simulate-poumm-accuracy.sif"
+  bsub -N -o simulate-poumm-gwas_%J.log \
+  "singularity run --bind config-simulation.yaml:/config-simulation.yaml --bind output:/output simulate-poumm-gwas.sif"
   ```
-
-[comment]: <> (* `Rscript simulate_for_gwas_tpr`: simulate data under the POUMM given an HIV-like phylogeny and specified parameter values/ranges. Fit the POUMM, estimate environmental part of trait, do GWAS.)
-
-
+  
 [comment]: <> (## Application)
 
 [comment]: <> (### Data)

@@ -1,40 +1,5 @@
 # ==============================================================================
 # Control functions for testing GWAS methods on simulated data
-
-### FOR TESTING:
-# N <- 50
-# tree <- ape::rtree(N)
-# g0 <- 4
-# alpha <- 30
-# theta <- 4
-# sigma <- 5
-# M <- 10
-# K <- 100
-# d <- 2
-# p <- 0.2
-# delta <- 0.2
-# var.z <- 0.6
-# H2 = 0.75
-# is.MLE = T
-# plink.path = "/Users/nadeaus/Documents/PLINK/plink"
-# out = "~/Downloads"
-# chunk.size <- 10
-# filename <- "test"
-
-# N = 500
-# g0 = 4.5
-# alpha = 0.1
-# theta = 4.5
-# M = 20
-# K = 20
-# d = 2
-# p = 0.05
-# H2 = 0.75
-# H2.h = 0.25
-# var.z = 0.5
-# N.reps = 20
-# is.MLE <- T
-
 # ==============================================================================
 
 addSimulationParamsToResults <- function(df, epidemic, g0, alpha, theta, K, M, H2, H2.h, var.z, is.MLE) {
@@ -140,7 +105,7 @@ simulateVHEZValues <- function(tree, N, g0, alpha, theta, M, K, d, p = NA, delta
 }
 
 simulateVEHZValuesError <- function(tree, N, g0, alpha, theta, M, K, d, p = NA, delta = NA, H2, H2.h, var.z, is.MLE = T) {
-  print(paste0("Simulating data and fitting POUMM with these parameters: alpha=", alpha, ", H2=", H2, ", H2.h=", H2.h, ", var.z=", var.z))
+  print(paste0("Simulating for accuracy with these parameters: alpha=", alpha, ", H2=", H2, ", H2.h=", H2.h, ", var.z=", var.z))
   # Simulate data
   epidemic <- simulateEpidemic(
     tree = tree,
@@ -209,7 +174,6 @@ simulateGWASPValuesWithPLINK <- function(tree, N, g0, alpha, theta, M, K, d, p =
   } else {
     runID <- "NA"
   }
-  source("functions/PLINK_utility_functions.R")
 
   # Simulate data
   epidemic <- simulateEpidemic(
@@ -292,8 +256,7 @@ simulateGWASPValuesWithPLINK <- function(tree, N, g0, alpha, theta, M, K, d, p =
 }
 
 simulateGWASPValues <- function(tree, N, g0, alpha, theta, M, K, d, p = NA, delta = NA, H2, H2.h, var.z, is.MLE = T) {
-  source("functions/GWAS_utility_functions.R")
-
+  print(paste0("Simulating for GWAS + POUMM TPR with these parameters: alpha=", alpha, ", H2=", H2, ", H2.h=", H2.h, ", var.z=", var.z))
   # Simulate data
   epidemic <- simulateEpidemic(
     tree = tree,
@@ -324,6 +287,7 @@ simulateGWASPValues <- function(tree, N, g0, alpha, theta, M, K, d, p = NA, delt
 }
 
 simulatePGLSPValues <- function(tree, N, g0, alpha, theta, M, K, d, p = NA, delta = NA, H2, H2.h, var.z, is.MLE = T, is.estimatePOUMMparams = T) {
+  print(paste0("Simulating for GWAS + PGLS TPR with these parameters: alpha=", alpha, ", H2=", H2, ", H2.h=", H2.h, ", var.z=", var.z))
   # Simulate data
   epidemic <- simulateEpidemic(
     tree = tree,
