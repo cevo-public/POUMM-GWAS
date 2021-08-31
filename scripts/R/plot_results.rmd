@@ -1,0 +1,71 @@
+---
+title: "Plot results"
+author: nadeaus
+date: 31.08.21
+output: html_notebook
+---
+
+Setup
+```{r}
+require(dplyr)
+require(ggplot2)
+source("scripts/R/functions/plot_functions.R")
+accuracy_simulation_results <- read.delim("output/2021-08-30_estimator_accuracy_MLE.txt")
+```
+
+Simulation accuracy heatmap
+```{r}
+# Summarize results for plotting
+error.cols <- c("RMSE.z.h", "RMSE.h.MWA.h")
+
+data.long <- do.call(
+  what = tidyr::gather,
+  args = c(error.cols, list(data = accuracy_simulation_results, key = "inference.method", value = "error")))
+
+data.summary <- as.data.frame(
+  data.long %>%
+    dplyr::group_by(inference.method, alpha, H2, var.z, p) %>%
+    dplyr::summarise(mean.error = mean(error), sd.error = sd(error), N.reps = dplyr::n()))
+
+# Create facet variable labels for plot
+data.summary$inference.method <- factor(
+  data.summary$inference.method,
+  levels = c("RMSE.h.MWA.h", "RMSE.z.h"),
+  labels = c("'Estimated env. part of spVL: '*bolditalic(hat(e))",
+             "'Measured spVL, scaled: '*bolditalic(z) - bold(bar(z))"))
+
+# Plot RMSE
+rmse_plot <- plotHeatmap(
+  df = data.summary,
+  N.sim = data.summary$N.reps[[1]],
+  is.MLE = T,
+  scale.limits = c(0, 1.5),
+  legend.name = "RMSE",
+  midpoint = 0.75,
+  fill.hi = RColorBrewer::brewer.pal(name = 'PiYG', n = 3)[1],
+  fill.lo = RColorBrewer::brewer.pal(name = 'PiYG', n = 3)[3],
+  fill.mid = RColorBrewer::brewer.pal(name = 'PiYG', n = 3)[2],
+  x.var = "alpha",
+  y.var = "H2",
+  fill.var = "mean.error",
+  facet.x = "inference.method",
+  facet.y = NA,
+  is.oob.squish = F,
+  is.real.scale = F,
+  labeller = label_parsed) +
+  labs(x = expression("Selection strength (" * alpha * ")"),
+       y = expression("spVL heritability (" * italic('H'^2) * ")"),
+       title = "A") +
+  theme(
+    text = element_text(size = 8),
+    panel.border = element_rect(colour = "black", size = 0.5, fill = NA),
+    strip.background = element_rect(colour = "black", size = 0.5))
+
+show(rmse_plot)
+
+ggsave(plot = rmse_plot,
+       filename = "manuscript/figures/simulation_RMSE.png",
+       width = 4.25,
+       height = 2,  # maintain height as 2 for consistent font size in manuscript
+       units = "in")
+```

@@ -8,6 +8,14 @@ g0:
 # List of real numbers for alpha, the selection strength parameter
 alpha:
   - 0.1
+  - 0.5
+  - 1.0
+  - 5.0
+  - 10.0
+  - 20.0
+  - 30.0
+  - 40.0
+  - 50.0
   - 60.0
 
 # List of real numbers for theta, the evolutionarily optimal viral trait value
@@ -30,6 +38,11 @@ delta:
 # List of real numbers for H2, the heritability of the trait due to the virus
 H2:
   - 0.15
+  - 0.25
+  - 0.35
+  - 0.45
+  - 0.55
+  - 0.65
   - 0.75
 
 # Real number for H2.h, the fraction of the total trait variance due to human SNPs; H2.h + max(H2) must be <= 1
@@ -40,7 +53,7 @@ var.z:
   - 0.73
 
 # Integer for N.reps, the number of simulated data sets to generate for each unique combination of parameters
-N.reps: 2
+N.reps: 20
 
 # Boolean for whether (True) to infer POUMM parameters from simulated data or (False) use true values
 is.MLE: True

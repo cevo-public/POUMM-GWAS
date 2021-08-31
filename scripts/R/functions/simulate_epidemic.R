@@ -24,9 +24,6 @@
 # TODO: p-values dataframe has duplicated columns from merge
 # ==============================================================================
 
-source("functions/POUMM_utility_functions.R")
-source("functions/utility_functions.R")
-
 simulateEpidemic <- function(tree, N, g0, alpha, theta, M, K, d, p = NA, delta = NA, H2, H2.h, var.z, is.MLE = T) {
   # Simulate data for GWAS
   sigma <- calculateSigmaFromParameterization(

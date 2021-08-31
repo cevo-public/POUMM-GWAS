@@ -9,12 +9,13 @@ require(yaml)
 source("scripts/R/functions/simulate_epidemic.R")
 source("scripts/R/functions/simulation_control_functions.R")
 source("scripts/R/functions/utility_functions.R")
+source("scripts/R/functions/POUMM_utility_functions.R")
 
 # Set seed for replicability of simulation
 set.seed(1)
 
 # Read parameters for data simulation from config file
-config_values <- yaml::read_yaml(file = "config-simulation.yaml")
+config_values <- yaml::read_yaml(file = "../../config-simulation.yaml")
 N <- config_values$N
 
 # Designate output file

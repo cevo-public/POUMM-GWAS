@@ -2,17 +2,14 @@
 FROM rocker/r-base:latest
 
 ## install R-packages
-COPY install_packages.R .
+COPY scripts/R/install_packages.R .
 RUN Rscript install_packages.R
 
-## create directories
-RUN mkdir -p functions
-RUN mkdir -p analysis
+## create output directory
 RUN mkdir -p output
 
-## copy files for analysis
-COPY functions/* functions
-COPY analysis/simulate_for_estimator_accuracy.R analysis/simulate_for_estimator_accuracy.R
+## copy analysis scripts
+COPY scripts/ scripts
 
 ## run script
-CMD Rscript analysis/simulate_for_estimator_accuracy.R
+CMD Rscript scripts/R/simulate_for_estimator_accuracy.R
