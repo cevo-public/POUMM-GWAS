@@ -7,12 +7,17 @@ output: html_notebook
 
 Setup
 ```{r}
+knitr::opts_knit$set(root.dir = "/Users/nadeaus/Repos/poumm-gwas")
+```
+
+
+```{r}
 require(dplyr)
 require(ggplot2)
 source("scripts/R/functions/plot_functions.R")
+source("scripts/R/functions/utility_functions.R")
 accuracy_simulation_results <- read.delim("output/2021-08-31_estimator_accuracy_MLE.txt")
-
-View(accuracy_simulation_results %>% filter(alpha == 5))
+tpr_simulation_results <- read.delim("output/2021-08-31_GWAS_TPR_MLE.txt")
 ```
 
 Simulation accuracy heatmap
@@ -71,3 +76,120 @@ ggsave(plot = rmse_plot,
        height = 2,  # maintain height as 2 for consistent font size in manuscript
        units = "in")
 ```
+
+Simulation accuracy heatmap annotated with inferred POUMM values for HIV spVL
+```{r}
+rmse_plot_with_hiv_values <- rmse_plot +
+  annotate(
+    geom = "point",
+    x = 8.046, y = 3.9)  # values are hand-calculated because the breaks scale is defined as seq(0.5, n.breaks - 0.5, 1) in plotting function
+
+show(rmse_plot_with_hiv_values)
+
+ggsave(plot = rmse_plot_with_hiv_values,
+       filename = "manuscript/figures/simulation_RMSE_with_HIV_value_highlighted.png",
+       width = 4.25,
+       height = 2,  # maintain height as 2 for consistent font size in manuscript
+       units = "in")
+```
+
+Simulation TPR heatmap
+```{r}
+data <- tidyr::gather(
+  data = tpr_simulation_results,
+  key = "inference.method",
+  value = "p.value",
+  h.plus.e.p.value, norm.z.p.value, h.OU.p.value, h.MWA.p.value)
+
+# Calculate TPR for each simulation
+sig.level <- correctSignificanceLevelForMultTesting(
+  significance.level = 0.05,
+  significance.correction = "Bonferroni",
+  N.tests = 20)
+data$TP <- ifelse(
+  data$p.value < sig.level & data$is.causal.variant, T, F)
+data$FP <- ifelse(
+  data$p.value < sig.level & !(data$is.causal.variant), T, F)
+data.TPR <- as.data.frame(
+  data %>%
+    dplyr::group_by(runID, inference.method, alpha, sigma, H2, var.z, p, delta) %>%
+    dplyr::summarise(
+      TPR = sum(TP, na.rm = T)/sum(is.causal.variant),
+      FP = sum(FP), K = dplyr::n(),
+      N.noncausal.variants = sum(!(is.causal.variant))))
+
+# Summarize replicate simulations
+data.summary <- as.data.frame(
+  data.TPR %>%
+    dplyr::group_by(inference.method, alpha, sigma, H2, var.z, p, delta) %>%
+    dplyr::summarise(
+      mean.TPR = mean(TPR),
+      sd.TPR = sd(TPR),
+      mean.FP = mean(FP),
+      sd.FP = sd(FP),
+      N.noncausal.variants = mean(N.noncausal.variants),
+      N.sim = dplyr::n()))
+
+# Create facet variable labels for plot
+data.summary$inference.method <- factor(
+  data.summary$inference.method,
+  levels = c("h.plus.e.p.value", "h.MWA.p.value", "h.OU.p.value", "norm.z.p.value"),
+  labels = c("e", "italic(hat(e))", "hat(e)[OU]", "'scaled spVL'"))
+
+# Plot TPR 
+tpr_plot <- makeTPRPlot(
+  df = data.summary[
+    data.summary$inference.method %in% 
+      c("e", "italic(hat(e))", "'scaled spVL'"), ],
+  is.MLE = T,
+  midpoint = 0.5,
+  fill.lo = RColorBrewer::brewer.pal(name = 'RdBu', n = 3)[3],
+  fill.hi = RColorBrewer::brewer.pal(name = 'RdBu', n = 3)[1],
+  fill.mid = RColorBrewer::brewer.pal(name = 'RdBu', n = 3)[2]) +
+  facet_grid(. ~ inference.method,
+             labeller = label_parsed) +
+  labs(x = expression("Selection strength (" * alpha * ")"),
+       y = expression("spVL heritability (" * 'H'^2 * ")"),
+       title = "B") +
+  theme(
+    text = element_text(size = 8),
+    panel.border = element_rect(colour = "black", size = 0.5, fill = NA),
+    strip.background = element_rect(colour = "black", size = 0.5))
+
+show(tpr_plot)
+
+ggsave(plot = tpr_plot,
+       filename = "manuscript/figures/simulation_TPR.png",
+       width = 5.25,
+       height = 2,  # maintain height as 2 for consistent font size in manuscript
+       units = "in")
+```
+TPR heatmap annotated with inferred POUMM values for HIV spVL
+```{r}
+tpr_plot_with_hiv_values <- tpr_plot +
+annotate(
+geom = "point",
+x = 8.046, y = 3.9)  # values are hand-calculated because the breaks scale is defined as seq(0.5, n.breaks - 0.5, 1) in plotting function
+
+show(tpr_plot_with_hiv_values)
+
+ggsave(plot = tpr_plot_with_hiv_values,
+filename = "manuscript/figures/simulation_TPR_with_HIV_value_highlighted.png",
+width = 5.25,
+height = 2,  # maintain height as 2 for consistent font size in manuscript
+units = "in")
+```
+
+Combined figure
+```{r}
+png(
+  filename = "manuscript/figures/simulation_results.png",
+  width = 5, height = 4, unit = "in", res = 300)
+gridExtra::grid.arrange(
+  rmse_plot_with_hiv_values, tpr_plot_with_hiv_values,
+  nrow = 2,
+  layout_matrix = rbind(c(NA, 1, 1, 1),
+                        c(2, 2, 2, 2)))
+dev.off()
+```
+
