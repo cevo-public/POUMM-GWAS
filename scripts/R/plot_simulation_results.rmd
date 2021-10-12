@@ -1,5 +1,5 @@
 ---
-title: "Plot results"
+title: "Plot simulation results"
 author: nadeaus
 date: 31.08.21
 output: html_notebook
