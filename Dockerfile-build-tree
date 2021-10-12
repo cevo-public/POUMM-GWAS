@@ -1,0 +1,25 @@
+# Build with: docker build -t build-tree -f Dockerfile-build-tree .
+# Run with:  docker run --volume=/Volumes/stadler/SHCSData/data/newfasta2019-10-25.fas:/sequences.fasta:ro --volume=`pwd`/output:/output build-tree
+
+# Base image https://hub.docker.com/_/debian
+FROM debian:buster
+
+## Update packages
+RUN apt-get update && apt-get -y upgrade
+
+## Install MUSCLE: https://www.drive5.com/muscle/manual/
+RUN apt-get install -y wget
+RUN wget https://www.drive5.com/muscle/downloads3.8.31/muscle3.8.31_i86linux64.tar.gz
+RUN tar xvzf muscle3.8.31_i86linux64.tar.gz
+
+## Install IQ-TREE:
+RUN apt-get --assume-yes install iqtree
+
+## create output directory
+RUN mkdir -p output
+
+## Copy in scripts
+COPY scripts/ scripts
+
+## run scripts
+ENTRYPOINT ["bash", "/scripts/bash/build-tree.sh"]
