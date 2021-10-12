@@ -1,4 +1,5 @@
 *.iml
+config-simulation-*.yaml
 .DS_Store
 .idea
 data
