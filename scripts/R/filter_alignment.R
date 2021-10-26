@@ -1,4 +1,4 @@
-# This script is to filter the HIV pol sequence alignment to focal and outgroup subtypes only, annotate outgroup sequences
+# This script is to filter the HIV pol sequence alignment to focal and outgroup subtypes only, annotate sequences with date, trait value and focal/outgroup status.
 # Data file is newfasta2019-10-25.fas which contains 2012 pol sequences corresponding to 2012/2125 genotyped samples (the remaining host genotypes are not associated with a pol sequence)
 # The sequences are not aligned (some are longer than others) even though gap characters have been introduced --> what does this mean??
 # Dates in the fasta file correspond to "sampledate" in the subtyping data.
