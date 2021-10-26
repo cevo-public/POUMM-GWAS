@@ -56,37 +56,65 @@ Simulate data under the POUMM using a randomly generated, HIV-like phylogeny and
   "singularity run --bind config-simulation.yaml:/config-simulation.yaml --bind output:/output simulate-poumm-gwas.sif"
   ```
   
-[comment]: <> (## Application)
+## Apply method to GWAS for host genetic determinants of HIV spVL 
 
-[comment]: <> (### Data)
+### Data
+Data cannot be published due to privacy protections. See the [Swiss HIV Cohort Study (SHCS)](http://www.shcs.ch/) for more information.
 
-[comment]: <> (* Host genetic data provided by the Swiss HIV Cohort Study &#40;SHCS&#41;.)
+* Host genetic data provided by the SHCS.
 
-[comment]: <> (  * genotypes &#40;spVL.shcs.rs.bed, pVL.shcs.rs.bim, and pVL.shcs.rs.fam&#41;)
+  * genotypes (spVL.shcs.rs.bed, pVL.shcs.rs.bim, and pVL.shcs.rs.fam)
 
-[comment]: <> (  * HLA genotypes imputed with SNP2HLA &#40;spVL.shcs.rs.hla.bed, spVL.shcs.rs.hla.bim, spVL.shcs.rs.hla.fam&#41;)
+  * HLA genotypes imputed with SNP2HLA (spVL.shcs.rs.hla.bed, spVL.shcs.rs.hla.bim, spVL.shcs.rs.hla.fam)
 
-[comment]: <> (* SHCS cohort scores along top principle components from genotype matrix of merged SHCS and HapMap data. Provided by Christian Thorball.)
+* SHCS cohort scores along top principal components from genotype matrix of merged SHCS and HapMap data. Provided by Christian Thorball.
 
-[comment]: <> (* Viral load measurements provided by the SHCS.)
+* Viral load measurements and other clinical data provided by the SHCS.
 
-[comment]: <> (* Viral genetic data provided by the SHCS.)
+* Viral genetic data provided by the SHCS.
 
-[comment]: <> (  * pol gene sequences &#40;newfasta2019-10-25.fas&#41;)
+  * pol gene sequences (newfasta2019-10-25.fas)
 
-[comment]: <> (  * Viral subtypes)
+  * Viral subtypes
 
-[comment]: <> (### Analysis)
+### Calculate spVL and prepare sequence data, metadata
+* ``` Rscript scripts/R/calculate_spvl.R``` produces spVL values calculated a few different ways. They are compared in `output/spvl_calculation_comparison.png`. I use the mean of viral load measurements taken before treatment start for further analysis.
+* ```Rscript scripts/R/filter_alignment.R``` attaches spVL and subtype data to the pol sequence data. I filter to only subtype B sequences with spVL values (focal) and A sequences (outgroup). The sequence header format is `<patient id>_<collection date %Y-%m-%d>_<'outgroup' or 'focal'>_<spVL value>`.
 
-[comment]: <> (* generate_alignment.sh: Align pol sequences with MAFFT.)
+### Build pathogen phylogeny
+* Build container, mount volume with prepared sequence data, run container.
+* This is done locally because I don't have sudo permissions to run Docker on the server where the data lives.
+``` 
+cd /Users/nadeaus/Repos/poumm-gwas
+docker build -t build-tree -f Dockerfile-build-tree .
+# Connect to smb://d.ethz.ch/groups/bsse/stadler/
+docker run \
+--volume=/Volumes/stadler/SHCSData/data/newfasta2019-10-25.fas:/sequences.fasta:ro \
+--volume=`pwd`/output:/output build-tree
+```
 
-[comment]: <> (* build_tree.sh: Construct pol phylogeny with IQTREE.)
+* ```Rscript scripts/R/root_tree.R``` roots the phylogeny with type "A" sequences as the outgroup, then removes the outgroup.
 
-[comment]: <> (* root_tree.R: Root the phylogeny and remove the outgroup.)
-
-[comment]: <> (* calculate_spvl.R: Calculate spVL based on viral load measurements.)
+### Fit the POUMM
+* Fit the POUMM to the phylogeny and calculated spVL values, generating maximum-likelihood parameter estimates
 
 [comment]: <> (* fit_poumm.R: Fit the POUMM to the phylogeny and spVL trait values.)
+
+### Apply phylogenetic correction to spVL trait
+* Generate alternate GWAS endpoint using POUMM estimates and spVL trait values.
+
+### Prepare human genotype data
+* Get list of individuals of SHCS individuals of European ancestry based on principle component scores compared to HapMap individuals.
+* Get list of individuals carrying subtype B HIV.
+* Add sex information to .fam file.
+* Filter and QC host genetic data using PLINK.
+* Get SNP frequencies and missingness reports for filtered data.
+* Add alternate GWAS endpoint to .fam file.
+* Get top 5 principal components of host genetic variation.
+
+### Run comparative GWAS
+* Run GWAS using PLINK.
+* Filter PLINK results to SNPs only, not covariates and add p-value, beta columns.
 
 [comment]: <> (* correct_spvl.R: Generate alternate GWAS endpoint using POUMM estimates and spVL trait values.)
 

@@ -1,5 +1,5 @@
 # Build with: docker build -t build-tree -f Dockerfile-build-tree .
-# Run with:  docker run --volume=/Volumes/stadler/SHCSData/data/newfasta2019-10-25.fas:/sequences.fasta:ro --volume=`pwd`/output:/output build-tree
+# Run with:  docker run --volume=`pwd`/output/sequences.fasta:/sequences.fasta:ro --volume=`pwd`/output:/output build-tree
 
 # Base image https://hub.docker.com/_/debian
 FROM debian:buster

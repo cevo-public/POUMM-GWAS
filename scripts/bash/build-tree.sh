@@ -1,11 +1,8 @@
 #!/bin/bash
 # This script generates an alignment, builds a tree.
-
-# Data file is newfasta2019-10-25.fas which contains 2012 pol sequences corresponding to 2012/2125 genotyped samples (the remaining host genotypes are not associated with a pol sequence)
-# The sequences are not aligned (some are longer than others) even though gap characters have been introduced --> what does this mean??
+# Run with: bash /scripts/bash/build-tree.sh
 
 # Generate alignment from fasta file
-### PUT IN RIGHT ALIGNMENT!
 ./muscle3.8.31_i86linux64 \
 -in sequences.fasta \
 -out output/pathogen.fasta \
