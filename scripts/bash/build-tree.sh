@@ -9,11 +9,11 @@
 -fasta \
 -maxiters 3
 
-# Build a ML tree with the GTR+F+R4 model and 100 bootstrap replicates
+# Build a ML tree with the GTR+F+R4 model and (TODO) 100 bootstrap replicates
 iqtree \
 -s output/pathogen.fasta \
 -m GTR+F+R4 \
-#-b 100 \
+-redo \
 -pre output/pathogen \
 -nt AUTO
 
