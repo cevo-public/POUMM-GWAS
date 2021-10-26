@@ -117,7 +117,7 @@ spvl_values <- rbind(
 names_from = spvl_method,
 values_from = spVL)
 
-write.csv(x = spvl_values, file = paste(OUTDIR, "spvl_values.csv", sep = "/"))
+write.csv(x = spvl_values, file = paste(OUTDIR, "spvl_values.csv", sep = "/"), row.names = F)
 
 p <- ggplot(data = spvl_values,
        aes(x = spvl_lenient_filter_first_measurement,
