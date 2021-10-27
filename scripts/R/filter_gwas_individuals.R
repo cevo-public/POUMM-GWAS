@@ -3,6 +3,7 @@
 
 library(dplyr)
 library(gridExtra)
+library(ggplot2)
 
 OUTDIR <- "output"
 DATADIR <- "/Volumes/stadler/SHCSData/data"
@@ -70,10 +71,9 @@ write.csv(x = gwas_individual_filtering_summary,
           row.names = F)
 
 gwas_individuals_to_keep <- gwas_metadata %>% filter(is_european, Pop == "Test")
-print(paste("Keeping", length(unique(gwas_individuals_to_keep$id)), "individuals for GWAS based on ancestry, viral subtype."))
+print(paste("Keeping", length(unique(gwas_individuals_to_keep$id)), "individuals for GWAS."))
 
 write.csv(
   x = gwas_individuals_to_keep %>% select(id),
   file = paste(OUTDIR, "gwas_individuals_to_keep.csv", sep = "/"),
-  row.names = F,
-  col.names = F)
+  row.names = F)

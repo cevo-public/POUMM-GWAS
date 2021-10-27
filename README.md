@@ -79,13 +79,13 @@ Data cannot be published due to privacy protections. See the [Swiss HIV Cohort S
 
 ### Calculate spVL and prepare sequence data, metadata
 * ``` Rscript scripts/R/calculate_spvl.R``` produces spVL values calculated a few different ways. They are compared in `output/spvl_calculation_comparison.png`. I use the mean of viral load measurements taken before treatment start for further analysis.
-* ```Rscript scripts/R/filter_alignment.R``` attaches spVL and subtype data to the pol sequence data. I filter to only subtype B sequences with spVL values (focal) and A sequences (outgroup). The sequence header format is `<patient id>_<collection date %Y-%m-%d>_<'outgroup' or 'focal'>_<spVL value>`.
+* ```Rscript scripts/R/filter_sequences.R``` attaches spVL and subtype data to the pol sequence data. I filter to only subtype B sequences with spVL values (focal) and A sequences (outgroup) of at least 750 non-gap, non-N characters. The sequence header format is `<patient id>_<collection date %Y-%m-%d>_<'outgroup' or 'focal'>_<spVL value>`.
 
 ### Build pathogen phylogeny
 * Build container, mount volume with prepared sequence data, run container.
 * This is done locally because I don't have sudo permissions to run Docker on the server where the data lives.
+* The script generates an alignment, trims characters after position 1505, and constructs and approximate maximum-likelihood tree.
 ``` 
-cd /Users/nadeaus/Repos/poumm-gwas
 docker build -t build-tree -f Dockerfile-build-tree .
 # Connect to smb://d.ethz.ch/groups/bsse/stadler/
 docker run \
@@ -104,12 +104,16 @@ docker run \
 * Generate alternate GWAS endpoint using POUMM estimates and spVL trait values.
 
 ### Prepare human genotype data
-* Get list of individuals of SHCS individuals of European ancestry based on principle component scores compared to HapMap individuals.
-* Get list of individuals carrying subtype B HIV.
-* Add sex information to .fam file.
-* Filter and QC host genetic data using PLINK.
-* Get SNP frequencies and missingness reports for filtered data.
-* Add alternate GWAS endpoint to .fam file.
+* `scripts/R/filter_gwas_individuals.R` generates a list of SHCS individuals of European descent carrying subtype B HIV. The output is `output/gwas_individuals_to_keep.csv`.
+* Filter the host genotype files based on individuals to keep, variant thresholds.
+```
+docker build -t prep-gwas-files -f Dockerfile-prep-gwas-files .
+# Connect to smb://d.ethz.ch/groups/bsse/stadler/
+docker run \
+--volume=/Volumes/stadler/SHCSData/data:/data:ro \
+--volume=`pwd`/output:/output prep-gwas-files
+```
+* Adjust the .fam file: add POUMM-calcuated GWAS trait values.
 * Get top 5 principal components of host genetic variation.
 
 ### Run comparative GWAS

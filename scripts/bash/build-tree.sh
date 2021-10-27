@@ -9,9 +9,13 @@
 -fasta \
 -maxiters 3
 
+# Trim the alignment, first removing wrapping
+sed -e 's/\(^>.*$\)/#\1#/' output/pathogen.fasta | tr -d "\r" | tr -d "\n" | sed -e 's/$/#/' | tr "#" "\n" | sed -e '/^$/d' > output/pathogen_oneline.fasta
+cut -c 1-1505 output/pathogen_oneline.fasta > output/pathogen_trimmed.fasta
+
 # Build a ML tree with the GTR+F+R4 model and (TODO) 100 bootstrap replicates
 iqtree \
--s output/pathogen.fasta \
+-s output/pathogen_trimmed.fasta \
 -m GTR+F+R4 \
 -redo \
 -pre output/pathogen \
