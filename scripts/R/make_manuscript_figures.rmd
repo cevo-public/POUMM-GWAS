@@ -46,6 +46,7 @@ tree <- ape::read.tree(file = paste(OUTDIR, "pathogen_no_outgroup.newick", sep =
 traits <- read.csv(file = paste(OUTDIR, "poumm_corrected_traits.csv", sep = "/"))
 tree <- treeio::full_join(tree, traits, by = "label")
 POUMM_fit <- get(load(file = paste(OUTDIR, "POUMM_fit.RData", sep = "/")))
+pc_scores <- read.csv(file = paste(OUTDIR, "shcs_vs_hapmap_pc_scores.csv"))
 ```
 
 Model illustration
@@ -334,14 +335,28 @@ ggsave(plot = p, filename = paste(FIGDIR, "poumm_parameter_estimates.png", sep =
        width = linewidth, height = height, units = "cm")
 ```
 
-Estimated trait values
-```{r}
-
-```
-
 PCA of cohort genotypes
 ```{r}
+# Plot combined SHCS and HapMap samples along the first few PCs
+pop_colors <- RColorBrewer::brewer.pal(n = 11, name = "Set3")
+names(pop_colors) <- unique(pc_scores$Population)
+swap_col <- pop_colors[9]
+pop_colors[9] <- pop_colors[4]
+pop_colors[4] <- swap_col
 
+p1 <- ggplot(
+        data = pc_scores %>% pivot_longer(cols = c(PC2, PC3), names_to = "PC_number", values_to = "PC_value"),
+        aes(x = PC1, y = PC_value, fill = Population, color = is_european)) +
+        geom_point(pch=21, size=3) +
+        shared_theme +
+        scale_fill_manual(values = pop_colors) +
+        scale_color_manual(values = c("transparent", "black")) +
+        labs(y = element_blank()) +
+        guides(color = "none") +
+        facet_grid(PC_number ~ .)
+
+ggsave(plot = p1, filename = paste(FIGDIR, "host_genotype_pca.png", sep = "/"),
+       width = linewidth, height = height, units = "cm")
 ```
 
 Manhattan plot of GWAS results

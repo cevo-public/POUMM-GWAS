@@ -4,6 +4,7 @@
 library(dplyr)
 library(gridExtra)
 library(ggplot2)
+library(tidyr)
 
 FIGDIR <- "figures"
 OUTDIR <- "output"
@@ -73,6 +74,11 @@ write.csv(x = gwas_individual_filtering_summary,
 
 gwas_individuals_to_keep <- gwas_metadata %>% filter(is_european, Pop == "Test")
 print(paste("Keeping", length(unique(gwas_individuals_to_keep$id)), "individuals for GWAS."))
+
+write.csv(
+  x = pc_scores,
+  file = paste(OUTDIR, "shcs_vs_hapmap_pc_scores.csv"),
+  row.names = F)
 
 write.table(
   x = gwas_individuals_to_keep %>% select(id) %>% mutate(fid = id),  # two-column format for IID, FID otherwise PLINK throws out all samples
