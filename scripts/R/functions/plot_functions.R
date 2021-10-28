@@ -305,11 +305,6 @@ makeTPRPlot <- function(df, is.MLE, scale.limits = c(0, 1),
     fill.var = "mean.TPR",
     facet.y = facet.y,
     is.real.scale = F)
-  if (is.MLE) {
-    p <- p + ggtitle("MLE")
-  } else {
-    p <- p + ggtitle("no MLE")
-  }
   return(p)
 }
 
