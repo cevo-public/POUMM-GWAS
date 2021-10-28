@@ -557,21 +557,16 @@ Therefore, we can expect the RMSE for $\bm{z} - \bm{\bar{z}}$ as an estimate for
 
 \begin{figure}[H]
 	\centering
-	\begin{subfigure}[b]{0.75\textwidth}
-		\includegraphics[width=\linewidth]{output/200207_POUMM_posteriors_zoomed.png}
+		\includegraphics[width=\linewidth]{figures/poumm_parameter_estimates.png}
 		\caption{Marginal posterior distributions.}
-	\end{subfigure}
-~
-	\begin{subfigure}[b]{0.75\textwidth}
-		\includegraphics[width=\linewidth]{figures/200207_POUMM_traces.png}
-		\caption{MCMC trace plots.}
-	\end{subfigure}
-	\caption{POUMM parameter inference.}\label{fig:poumm-fit}
+\label{fig:poumm-parameters}
 \end{figure}
 
 \begin{figure}
-	\includegraphics[width=\linewidth]{figures/200207_spvl_on_tree}
-	\caption{Inferred viral phylogeny with tips colored by estimated viral part of spVL, non-viral part of spVL, and measured total spVL.}
+\includegraphics[width = 0.3\linewidth]{figures/pathogen_tree_with_trait.png}
+\includegraphics[width = 0.3\linewidth]{figures/pathogen_tree_with_phylo-estimated_env_trait.png}
+\includegraphics[width = 0.3\linewidth]{figures/pathogen_tree_with_phylo-estimated_pathogen_trait.png}
+	\caption{Inferred viral phylogeny with tips colored by measured total spVL, estimated non-viral part of spVL, and estimated viral part of spVL.}
 	\label{fig:spvl-on-tree}
 \end{figure}
 
@@ -599,11 +594,10 @@ Therefore, we can expect the RMSE for $\bm{z} - \bm{\bar{z}}$ as an estimate for
 			\hline
 			Variant filter & Number of variants remaining \\
 			\hline 
-			Raw data & 76,979,521 \\
-			Missing call rate $>$ 0.01 & -69,526,564 \\
-			Hardy-Weinburg p-value $<$ 5x10$^-5$ & -535 \\
-			Minor allele frequency $<$ 0.01 & -2,897,654 \\
-			Variants for GWAS & 4,554,768 \\ \hline			
+			Raw data & 76979521 \\
+			Missing genotype rate $>$ 0.01 & 7452957 \\
+			Hardy-Weinburg exact test p-value $<$ 5x10$^-5$ & 7452425 \\
+			Minor allele frequency $<$ 0.01 & 4556770 \\ \hline			
 		\end{tabular}
 		\caption{Number of variants for GWAS after sequential filtering steps.}
 		\label{tab:variant-filtering}
@@ -611,14 +605,14 @@ Therefore, we can expect the RMSE for $\bm{z} - \bm{\bar{z}}$ as an estimate for
 \end{table}
 
 \begin{figure}[H]
-	\includegraphics[width=\linewidth]{figures/pca_plot}
-	\caption{Thresholds for exclusion of individuals of non-Western European ancestry. The lower plots are filtered to show only European HapMap samples and the rectangles show thresholds for sample exclusion.}
+	\includegraphics[width=\linewidth]{figures/host_genotype_pca.png}
+	\caption{SHCS individuals and HapMap3 individuals plotted along the top three principle components of genetic variation. Points with black borders are within the thresholds used to select individuals of likely European ancestry.}
 	\label{fig:PCA}
 \end{figure}
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.75\linewidth]{figures/200207_qq_plots.png}
+	\includegraphics[width=0.75\linewidth]{figures_archived/200207_qq_plots.png}
 	\caption{Quartile-quartile plots from association tests.}
 	\label{fig:qq-plots}
 \end{figure}
