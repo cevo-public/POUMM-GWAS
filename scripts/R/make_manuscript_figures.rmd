@@ -45,6 +45,7 @@ tpr_simulation_results <- read.delim("output/2021-08-31_GWAS_TPR_MLE.txt")
 tree <- ape::read.tree(file = paste(OUTDIR, "pathogen_no_outgroup.newick", sep = "/"))
 traits <- read.csv(file = paste(OUTDIR, "poumm_corrected_traits.csv", sep = "/"))
 tree <- treeio::full_join(tree, traits, by = "label")
+POUMM_fit <- get(load(file = paste(OUTDIR, "POUMM_fit.RData", sep = "/")))
 ```
 
 Model illustration
@@ -317,7 +318,20 @@ dev.off()
 
 POUMM parameter estimates
 ```{r}
-
+# Generate figures, write out estimates
+plots <- plot(POUMM_fit, doZoomIn = TRUE, doPlot = F)
+p <- plots$densplot +
+        scale_fill_manual(
+                values = RColorBrewer::brewer.pal(n = 3, name = diverging_palette),
+                aesthetics = c("fill", "color"),
+                labels = c("Prior", "Chain 1", "Chain 2"),
+                name = element_blank()) +
+        theme_bw() +
+        labs(x = "Value", y = "Density") +
+        scale_y_continuous(expand = c(0, 0)) +
+        theme(legend.position = "bottom")
+ggsave(plot = p, filename = paste(FIGDIR, "poumm_parameter_estimates.png", sep = "/"),
+       width = linewidth, height = height, units = "cm")
 ```
 
 Estimated trait values
