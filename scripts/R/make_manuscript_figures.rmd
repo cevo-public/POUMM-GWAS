@@ -51,15 +51,16 @@ generate_trait_trajectory <- function(v0, alpha, theta, sigma, N_steps) {
 # Generate tree
 set.seed(10)
 tree <- ape::rtree(n = 3)
+tree$edge.length <- tree$edge.length * 6
 node_times <- POUMM::nodeTimes(tree)
 edge_colors = RColorBrewer::brewer.pal(n = 4, name = diverging_palette)
 
 # Define OU process
-scale_factor <- 1000
-v0 <- 3.98
-theta <- 4.38
-alpha <- 30.15 / scale_factor
-sigma <- 3.56 / sqrt(scale_factor)
+scale_factor <- 40  # 1000
+v0 <- 3.5
+theta <- 4.5
+alpha <- 50 / scale_factor
+sigma <- 3 / sqrt(scale_factor)
 
 # Initialize data structures
 traceplot <- as.data.frame(matrix(ncol = 4, nrow = 0))
