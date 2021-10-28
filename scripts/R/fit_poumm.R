@@ -1,6 +1,7 @@
 # This script is to fit the POUMM.
 # Run as: Rscript scripts/R/fit_poumm.R
 
+FIGDIR <- "figures"
 OUTDIR <- "output"
 
 N_SAMPLES_MCMC <- 4E6
@@ -79,7 +80,7 @@ p <- plots$densplot +
   labs(x = "Value", y = "Density") +
   scale_y_continuous(expand = c(0, 0)) +
   theme(legend.position = "bottom")
-ggsave(plot = p, filename = paste(OUTDIR, "poumm_parameter_estimates.png", sep = "/"), width = 6, height = 4, units = "in")
+ggsave(plot = p, filename = paste(FIGDIR, "poumm_parameter_estimates.png", sep = "/"), width = 6, height = 4, units = "in")
 
 estimates <- summary(POUMM_fit)[stat %in% c("alpha", "theta", "sigma", "sigmae", "g0", "H2tMean")]
 estimates_pretty <- estimates %>%

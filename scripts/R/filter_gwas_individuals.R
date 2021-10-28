@@ -5,6 +5,7 @@ library(dplyr)
 library(gridExtra)
 library(ggplot2)
 
+FIGDIR <- "figures"
 OUTDIR <- "output"
 DATADIR <- "/Volumes/stadler/SHCSData/data"
 
@@ -57,7 +58,7 @@ p1 <- ggplot(
   guides(color = "none") +
   facet_grid(PC_number ~ .)
 
-ggsave(plot = p1, filename = paste(OUTDIR, "host_genotype_pca.png", sep = "/"))
+ggsave(plot = p1, filename = paste(FIGDIR, "host_genotype_pca.png", sep = "/"))
 
 # Get list of samples filtered based on European ancestry
 gwas_individual_filtering_summary <- gwas_metadata %>%

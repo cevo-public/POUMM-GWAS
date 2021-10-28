@@ -5,6 +5,7 @@ library(ggplot2)
 library(ggtree)
 library(tidyr)
 
+FIGDIR <- "figures"
 OUTDIR <- "output"
 DATADIR <- "/Volumes/stadler/SHCSData/data"
 TREE_FN <- "pathogen.treefile"
@@ -21,14 +22,14 @@ tip_data <- data.frame(
 p <- ggtree(tr = tree) %<+% tip_data +
   geom_tippoint(aes(color = is_outgroup))
 
-ggsave(plot = p, paste(OUTDIR, "pathogen_tree_with_outgroup.png", sep = "/"), height = 10, width = 7, units = "in")
+ggsave(plot = p, paste(FIGDIR, "pathogen_tree_with_outgroup.png", sep = "/"), height = 10, width = 7, units = "in")
 
 # Plot tree with trait
 p2 <- ggtree(tr = tree) %<+% tip_data +
   geom_tippoint(aes(color = as.numeric(trait))) +
   scale_color_gradient(low = "green", high = "red", name = "Trait value")
 
-ggsave(plot = p2, paste(OUTDIR, "pathogen_tree_with_trait.png", sep = "/"), height = 10, width = 7, units = "in")
+ggsave(plot = p2, paste(FIGDIR, "pathogen_tree_with_trait.png", sep = "/"), height = 10, width = 7, units = "in")
 
 # Root the tree
 paste("Rooting tree according to outgroup and writing to file")

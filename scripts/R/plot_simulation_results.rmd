@@ -71,7 +71,7 @@ rmse_plot <- plotHeatmap(
 show(rmse_plot)
 
 ggsave(plot = rmse_plot,
-       filename = "manuscript/figures/simulation_RMSE.png",
+       filename = "figures/simulation_RMSE.png",
        width = 4.25,
        height = 2,  # maintain height as 2 for consistent font size in manuscript
        units = "in")
@@ -87,7 +87,7 @@ rmse_plot_with_hiv_values <- rmse_plot +
 show(rmse_plot_with_hiv_values)
 
 ggsave(plot = rmse_plot_with_hiv_values,
-       filename = "manuscript/figures/simulation_RMSE_with_HIV_value_highlighted.png",
+       filename = "figures/simulation_RMSE_with_HIV_value_highlighted.png",
        width = 4.25,
        height = 2,  # maintain height as 2 for consistent font size in manuscript
        units = "in")
@@ -159,7 +159,7 @@ tpr_plot <- makeTPRPlot(
 show(tpr_plot)
 
 ggsave(plot = tpr_plot,
-       filename = "manuscript/figures/simulation_TPR.png",
+       filename = "figures/simulation_TPR.png",
        width = 5.25,
        height = 2,  # maintain height as 2 for consistent font size in manuscript
        units = "in")
