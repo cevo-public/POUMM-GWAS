@@ -305,12 +305,13 @@ png(file = paste(FIGDIR, "spvl_on_tree.png", sep = "/"),
     height = height, width = linewidth,
     units = "cm",
     res = 300)
-plot_grid(v_tree + theme(legend.position = "none"),
+plot_grid(spvl_tree_same_scale + theme(legend.position = "none"),
           h_tree + theme(legend.position = "none"),
-          spvl_tree_same_scale + theme(legend.position = "none"),
-          get_legend(v_tree), get_legend(h_tree), get_legend(spvl_tree_same_scale),
+          v_tree + theme(legend.position = "none"),
+          get_legend(spvl_tree_same_scale), get_legend(h_tree), get_legend(v_tree),
           nrow = 2, align = "v", axis = "tb",
-          rel_heights = c(3, 1))
+          rel_heights = c(3, 1),
+          labels = c("A", "B", "C", "", "", ""))
 dev.off()
 ```
 
