@@ -73,7 +73,10 @@ write.csv(x = gwas_individual_filtering_summary,
 gwas_individuals_to_keep <- gwas_metadata %>% filter(is_european, Pop == "Test")
 print(paste("Keeping", length(unique(gwas_individuals_to_keep$id)), "individuals for GWAS."))
 
-write.csv(
+write.table(
   x = gwas_individuals_to_keep %>% select(id),
-  file = paste(OUTDIR, "gwas_individuals_to_keep.csv", sep = "/"),
-  row.names = F)
+  file = paste(OUTDIR, "gwas_individuals_to_keep.txt", sep = "/"),
+  row.names = F,
+  col.names = F,
+  sep = "\t",
+  quote = F)
