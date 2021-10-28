@@ -74,7 +74,7 @@ gwas_individuals_to_keep <- gwas_metadata %>% filter(is_european, Pop == "Test")
 print(paste("Keeping", length(unique(gwas_individuals_to_keep$id)), "individuals for GWAS."))
 
 write.table(
-  x = gwas_individuals_to_keep %>% select(id),
+  x = gwas_individuals_to_keep %>% select(id) %>% mutate(fid = id),  # two-column format for IID, FID otherwise PLINK throws out all samples
   file = paste(OUTDIR, "gwas_individuals_to_keep.txt", sep = "/"),
   row.names = F,
   col.names = F,

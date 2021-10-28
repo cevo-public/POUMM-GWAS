@@ -1,0 +1,23 @@
+# Build with: docker build -t prep-gwas-files -f Dockerfile-prep-gwas-files .
+# Run with:  docker run --volume=/Volumes/stadler/SHCSData/data:/data:ro --volume=`pwd`/output:/output prep-gwas-files
+
+# Base image https://hub.docker.com/_/debian
+FROM debian:buster
+
+## Update packages
+RUN apt-get update && apt-get -y upgrade
+
+## Install PLINK2: https://www.cog-genomics.org/plink/2.0/
+RUN apt-get install -y wget
+RUN apt-get install unzip
+RUN wget https://s3.amazonaws.com/plink2-assets/alpha2/plink2_linux_avx2.zip
+RUN unzip plink2_linux_avx2.zip
+
+## create output directory
+RUN mkdir -p output
+
+## Copy in scripts
+COPY scripts/ scripts
+
+## run scripts
+ENTRYPOINT ["bash", "/scripts/bash/prep-gwas-files.sh"]
