@@ -196,7 +196,7 @@ rmse_plot <- plotHeatmap(
         labs(x = expression("Selection strength (" * alpha * ")"),
              y = expression("spVL heritability (" * italic('H'^2) * ")")) +
         shared_theme +
-        theme(axis.text.x = element_text(angle = 90)) +
+        theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
         geom_point(data = spvl_data, fill = "black")
 
 data <- tidyr::gather(
@@ -250,7 +250,7 @@ tpr_plot <- makeTPRPlot(
         labs(x = expression("Selection strength (" * alpha * ")"),
              y = expression("spVL heritability (" * 'H'^2 * ")")) +
         shared_theme +
-        theme(axis.text.x = element_text(angle = 90)) +
+        theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
         geom_point(data = spvl_data, fill = "black")
 
 top_row <- plot_grid(NULL, rmse_plot, rel_widths = c(1, 3.25), labels = c("", "A"))
