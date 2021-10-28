@@ -1,0 +1,172 @@
+---
+title: "Make manuscript figures"
+output: html_notebook
+---
+
+This script is to make cleaner, consistently formatted figures for the manuscript.
+
+Load libraries
+```{r}
+library(ggtree)
+library(ggplot2)
+library(dplyr)
+library(POUMM)
+library(ape)
+library(cowplot)
+
+FIGDIR <- "figures"
+```
+
+Define formatting
+```{r}
+diverging_palette <- "Set2"
+gradient_palette <- "PiYG"
+shared_theme <- theme_bw()
+single_col_width <- 8.7  # cm
+double_col_width <- 11.4  # cm
+
+gv_name <- "Pathogen part of trait"
+gh_name <- "Host part of trait"
+e_name <- "Non-pathogen part of trait"
+```
+
+Load data
+```{r}
+
+```
+
+Model illustration
+```{r}
+# Simulate many OU trajectories along tree
+generate_trait_trajectory <- function(v0, alpha, theta, sigma, N_steps) {
+  POUMM::rTrajectoryOU(
+    z0 = v0,
+    t = 1,
+    alpha = alpha,
+    theta = theta,
+    sigma = sigma,
+    steps = N_steps)
+}
+
+# Generate tree
+set.seed(10)
+tree <- ape::rtree(n = 3)
+node_times <- POUMM::nodeTimes(tree)
+edge_colors = RColorBrewer::brewer.pal(n = 4, name = diverging_palette)
+
+# Define OU process
+scale_factor <- 1000
+v0 <- 3.98
+theta <- 4.38
+alpha <- 30.15 / scale_factor
+sigma <- 3.56 / sqrt(scale_factor)
+
+# Initialize data structures
+traceplot <- as.data.frame(matrix(ncol = 4, nrow = 0))
+colnames(traceplot) <- c("lineage", "time", "v", "color")
+v_nodes <- rep(v0, length(node_times))
+
+# Generate OU trajectory for each edge on tree
+for (j in 1:nrow(tree$edge)) {
+  from = tree$edge[j, 1]
+  to = tree$edge[j, 2]
+  N_steps = round(tree$edge.length[j]*scale_factor) - 1
+  print(paste(N_steps, "steps on branch", j))
+
+  trajectory <- POUMM::rTrajectoryOU(
+    z0 = v_nodes[from],
+    t = 0.01,
+    alpha = alpha,
+    theta = theta,
+    sigma = sigma,
+    steps = N_steps)
+
+  v_nodes[to] <- trajectory[N_steps]
+  v <- c(v_nodes[from], trajectory)
+
+  new_data <- data.frame(
+    lineage = rep(j, N_steps + 1),
+    time = seq(node_times[from], node_times[to], length.out = N_steps + 1),
+    v = v,
+    color = rep(edge_colors[j], N_steps + 1))
+  traceplot <- rbind(traceplot, new_data)
+}
+
+mu_OU <- function(t) v0 * exp(-alpha * t) + theta * (1 - exp(-alpha * t))
+
+OU_plot <- ggplot(
+  data = traceplot,
+  aes(x = time, y = v, group = lineage, color = I(color))) +
+  geom_line(size = 1.25) +
+  labs(
+    x = expression('Substitutions site'^-1 * ' year'^-1),
+    y = expression(italic(g)[v])) +
+  shared_theme +
+  stat_function(fun = mu_OU, color = "black", linetype = "dashed")
+
+#TODO: I have no idea how the edge coloring works, this is a really shitty hardcoded soln
+tree_data = data.frame(node = c(1, 2, 3, 4, 5), color = c(edge_colors[2], edge_colors[3], edge_colors[4], "blue", edge_colors[1]))
+
+tree_plot <- ggtree::ggtree(
+  tree,
+  ladderize = F,
+  size = 1.5) %<+% tree_data + aes(color = I(color)) +
+  labs(x = expression('Substitutions site'^-1 * ' year'^-1))
+
+e_data <- data.frame(x = c(-1, 1))
+
+e_plot <-  ggplot(data = e_data, aes(x)) +
+  stat_function(fun = dnorm,
+                n = 101,
+                args = list(mean = 0, sd = 0.2),
+                size = 1) +
+  ylab("Density") +
+  shared_theme +
+  labs(x = expression(italic(e)))
+
+# Align OU and tree plots
+left_side <- plot_grid(OU_plot, tree_plot, align = "v", axis = "lr", nrow = 2, rel_heights = c(2, 1), labels = c("A", "C"))
+right_side <- plot_grid(NULL, e_plot, NULL, nrow = 3, rel_heights = c(1, 2, 1), labels = c("", "B", ""))
+
+png(
+  filename = paste(FIGDIR, "model_figure.png", sep = "/"),
+  width = double_col_width, height = single_col_width, units = "cm", res = 300)
+  plot_grid(left_side, NULL, right_side, ncol = 3, rel_widths = c(1.5, 0.2, 1))
+dev.off()
+
+```
+
+Simulation results
+```{r}
+
+```
+
+Inferred phylogeny
+```{r}
+
+```
+
+POUMM parameter estimates
+```{r}
+
+```
+
+Estimated trait values
+```{r}
+
+```
+
+PCA of cohort genotypes
+```{r}
+
+```
+
+Manhattan plot of GWAS results
+```{r}
+
+```
+
+Q-Q plot of GWAS results
+```{r}
+
+```
