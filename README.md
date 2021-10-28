@@ -95,16 +95,13 @@ docker run \
 
 * ```Rscript scripts/R/root_tree.R``` roots the phylogeny with type "A" sequences as the outgroup, then removes the outgroup.
 
-### Fit the POUMM
-* Fit the POUMM to the phylogeny and calculated spVL values, generating maximum-likelihood parameter estimates
-
-[comment]: <> (* fit_poumm.R: Fit the POUMM to the phylogeny and spVL trait values.)
-
-### Apply phylogenetic correction to spVL trait
-* Generate alternate GWAS endpoint using POUMM estimates and spVL trait values.
+### Fit the POUMM, apply phylogenetic correction to spVL trait
+* ```fit_poumm.R``` fits the POUMM to the phylogeny and calculated spVL values, generating maximum-likelihood parameter estimates.
+* ```correct_trait.R``` generates estimates for individual-specific viral, environmental parts of trait using POUMM parameters and trait values.
+* ```make_gwas_phenotypes_file.R``` generates a phenotype file for GWAS with raw and estaimated environmental-only trait values.
 
 ### Prepare human genotype data
-* `scripts/R/filter_gwas_individuals.R` generates a list of SHCS individuals of European descent carrying subtype B HIV. The output is `output/gwas_individuals_to_keep.csv`.
+* `scripts/R/filter_gwas_individuals.R` generates a list of SHCS individuals of European descent carrying subtype B HIV.
 * Filter the host genotype files based on individuals to keep, variant thresholds.
 ```
 docker build -t prep-gwas-files -f Dockerfile-prep-gwas-files .
@@ -120,19 +117,11 @@ docker run \
 * Run GWAS using PLINK.
 * Filter PLINK results to SNPs only, not covariates and add p-value, beta columns.
 
-[comment]: <> (* correct_spvl.R: Generate alternate GWAS endpoint using POUMM estimates and spVL trait values.)
-
-[comment]: <> (* get_europeans_to_keep.R: Get list of individuals of SHCS individuals of European ancestry based on principle component scores compared to HapMap individuals.)
-
-[comment]: <> (* generate_no_b_hosts_list.R: Get list of individuals carrying subtype B HIV.)
-
 [comment]: <> (* add_sex_to_fam_SN.R: Add sex information to .fam file.)
 
 [comment]: <> (* filter_genotype_data_and_add_sex: Filter and QC host genetic data using PLINK.)
 
 [comment]: <> (* summarize_data.sh: Get SNP frequencies and missingness reports for filtered data.)
-
-[comment]: <> (* make_pheno_file.R: Add alternate GWAS endpoint to .fam file.)
 
 [comment]: <> (* generate_pc_covariates.sh: Get top 5 principal components of host genetic variation.)
 

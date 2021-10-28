@@ -1,11 +1,14 @@
 # This script is to apply phylogenetic correction to spVL using POUMM parameters.
-# Run as: Run as: /home/nadeaus/programs/R-3.6.2/bin/Rscript /links/groups/stadler/SHCSData/analysis/200207_redo_whole_pipeline/correct_spvl.R
+# Run as: Run as: Rscript scripts/R/correct_trait.R
 
 OUTDIR <- "output"
 DATADIR <- "/Volumes/stadler/SHCSData/"
 
 require(ape)
 require(POUMM)
+require(dplyr)
+require(ggtree)
+require(ggplot2)
 
 source("scripts/R/functions/POUMM_utility_functions.R")
 
@@ -44,3 +47,15 @@ write.csv(
   file = paste(OUTDIR, "poumm_corrected_traits.csv", sep = "/"),
   row.names = F)
 
+# Plot tree with phylo-corrected trait
+p <- ggtree(tr = tree) %<+% inference_results +
+  geom_tippoint(aes(color = as.numeric(v.MWA))) +
+  scale_color_gradient(low = "green", high = "red", name = "Phylo-estimated\npathogen trait value")
+
+ggsave(plot = p, paste(OUTDIR, "pathogen_tree_with_phylo-estimated_pathogen_trait.png", sep = "/"), height = 10, width = 7, units = "in")
+
+p2 <- ggtree(tr = tree) %<+% inference_results +
+  geom_tippoint(aes(color = as.numeric(h.MWA))) +
+  scale_color_gradient(low = "green", high = "red", name = "Phylo-estimated\nenvironmental trait value")
+
+ggsave(plot = p2, paste(OUTDIR, "pathogen_tree_with_phylo-estimated_env_trait.png", sep = "/"), height = 10, width = 7, units = "in")
