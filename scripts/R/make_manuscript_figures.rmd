@@ -120,7 +120,7 @@ OU_plot <- ggplot(
       aes(x = time, y = v, group = lineage, color = I(color))) +
       geom_line(size = 1.25) +
       labs(
-        x = expression('Substitutions site'^-1 * ' year'^-1),
+        x = element_blank(),
         y = expression(italic(g)[v])) +
       shared_theme +
       stat_function(fun = mu_OU, color = "black", linetype = "dashed")
@@ -146,13 +146,13 @@ e_plot <-  ggplot(data = e_data, aes(x)) +
       labs(x = expression(italic(e)))
 
 # Align OU and tree plots
-left_side <- plot_grid(OU_plot, tree_plot, align = "v", axis = "lr", nrow = 2, rel_heights = c(2, 1), labels = c("A", "C"))
+left_side <- plot_grid(OU_plot, tree_plot, align = "v", axis = "lr", nrow = 2, rel_heights = c(3, 1), labels = c("A", "C"))
 right_side <- plot_grid(NULL, e_plot, NULL, nrow = 3, rel_heights = c(1, 2, 1), labels = c("", "B", ""))
 
 png(
       filename = paste(FIGDIR, "model_figure.png", sep = "/"),
-      width = linewidth, height = height, units = "cm", res = 300)
-      plot_grid(left_side, NULL, right_side, ncol = 3, rel_widths = c(1.5, 0.2, 1))
+      width = linewidth * 2/3, height = height * 2/3, units = "cm", res = 300)
+      plot_grid(left_side, NULL, right_side, ncol = 3, rel_widths = c(1.5, 0.1, 1))
 dev.off()
 
 ```
