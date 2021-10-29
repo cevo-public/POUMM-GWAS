@@ -77,7 +77,7 @@ print(paste("Keeping", length(unique(gwas_individuals_to_keep$id)), "individuals
 
 write.csv(
   x = pc_scores,
-  file = paste(OUTDIR, "shcs_vs_hapmap_pc_scores.csv"),
+  file = paste(OUTDIR, "shcs_vs_hapmap_pc_scores.csv", sep = "/"),
   row.names = F)
 
 write.table(
