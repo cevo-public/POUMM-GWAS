@@ -263,12 +263,14 @@ Next, we characterized the evolutionary scenarios under which our framework can 
 
 \subsection{GWAS on the Swiss HIV Cohort}
 
-Finally, we applied our framework to empirical data from the Swiss HIV Cohort Study (SHCS). In the ``standard GWAS" we followed a typical GWAS methodology,  i.e. regressing measured spVL ($\bm{z}$) on variant dosage for each sampled host genetic variant. In the ``GWAS with phylogenetic correction", we use our proposed framework, i.e. regressing the estimated environmental part of spVL ($\bm{\hat{e}}$) on variant dosage. In agreement with previous GWAS for host genetic determinants of spVL, the top associations were in the MHC and \emph{CCR5} regions for both GWAS (figure \ref{fig:gwas-results}). 
+Finally, we applied our framework to empirical data from the Swiss HIV Cohort Study (SHCS). We used data from 1,392 individuals in Switzerland infected with subtype B HIV-1 between 1994 and 2018. The SHCS provided viral load measurements, $pol$ gene sequences, and human genotype data for these individuals. We followed the framework outlined above to estimate the pathogen and non-pathogen effects on spVL for the cohort individuals from these data. Figure \ref{fig:spvl-on-tree} shows the calculated 
+
+We ran two sets of GWAS association tests on the same host genotype data to compare our framework with a more standard approach. In both GWAS, we regressed a trait value on dosage for each candidate host genetic variant to identify host variants correlated with trait values across the cohort. The two GWAS differ in the trait value used. In the ``GWAS with standard trait value'' we used the unmodified trait value, measured spVL. In the ``GWAS with estimated non-pathogen part of trait'' we used our estimates for the non-pathogen effects on spVL. Figure \ref{fig:gwas-results}A shows that results are qualitatively similar between the two GWAS. Figure \ref{fig:gwas-results}B shows how the strength of association changed for some variants in the MHC and \emph{CCR5} regions. Regardless, these regions were consistent in having variants with the strongest signals of association from across the genome.
 
 \begin{figure}[H]
 	\begin{center}
 		\includegraphics[width=0.7\linewidth]{figures/gwas_results}
-		\caption{Association results for standard GWAS and GWAS with a phylogenetic correction applied to the same data for HIV-1 set-point viral load. The pullout plots give regional association results from the GWAS with phylogenetic correction in the \emph{CCR5} region (positions 45.4 - 47Mb on chromosome 3) and the MHC region (positions 29.5 - 33.5Mb on chromosome 6). Base positions are with reference to genome build GRCh37. The color scale in the regional association plot is the difference in -log$_{10}$ p-value between the GWAS with phylogenetic correction and the standard GWAS. Red color means the phylogenetic correction decreased variant significance and blue color means the phylogenetic correction increased variant significance. The dashed lines show genome-wide significance (p-value = 5x10$^{-8}$).}
+		\caption{Results from comparative GWAS. Association results for standard GWAS and GWAS with a phylogenetic correction applied to the same data for HIV-1 set-point viral load. The pullout plots give regional association results from the GWAS with phylogenetic correction in the \emph{CCR5} region (positions 45.4 - 47Mb on chromosome 3) and the MHC region (positions 29.5 - 33.5Mb on chromosome 6). Base positions are with reference to genome build GRCh37. The color scale in the regional association plot is the difference in -log$_{10}$ p-value between the GWAS with phylogenetic correction and the standard GWAS. Red color means the phylogenetic correction decreased variant significance and blue color means the phylogenetic correction increased variant significance. The dashed lines show genome-wide significance (p-value = 5x10$^{-8}$).}
 		\label{fig:gwas-results}
 	\end{center}
 \end{figure}
@@ -557,6 +559,15 @@ Therefore, we can expect the RMSE for $\bm{z} - \bm{\bar{z}}$ as an estimate for
 		\caption{Posterior distributions compared to the prior for POUMM parameter estimates based on Swiss data. We ran two different MCMC chains to ensure the estimates converged. The black point on the x-axis shows the posterior mean value, which was used to estimate the pathogen- and non-pathogen effects on spVL.}
 \label{fig:poumm-parameters}
 \end{figure}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width = \linewidth]{figures/spvl_calculation_comparison.png}
+	\caption{A comparison of different ways to calculate spVL based on viral load measurements provided by the SHCS.}
+	\label{fig:spvl-on-tree}
+	\end{center}
+\end{figure}
+
 
 \begin{figure}[H]
 \begin{center}
