@@ -276,7 +276,7 @@ tpr_plot <- makeTPRPlot(
         fill.mid = RColorBrewer::brewer.pal(name = 'RdBu', n = 3)[2]) +
         facet_grid(. ~ inference.method, labeller = label_wrap_gen(width = 25)) +
         labs(x = expression("Selection strength (" * alpha * ")"),
-             y = expression("spVL heritability (" * 'H'^2 * ")")) +
+             y = expression("spVL heritability (" * italic('H'^2) * ")")) +
         shared_theme +
         theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
         geom_point(data = spvl_data, fill = "black")
@@ -416,6 +416,8 @@ ggsave(plot = p, filename = paste(FIGDIR, "qq_plots.png", sep = "/"),
 
 Manhattan plot of GWAS results
 ```{r}
+pt_size <- 1
+
 # Add genome position to data
 chr_lengths <- gwas_results %>%
         group_by(CHROM) %>%
@@ -428,8 +430,7 @@ gwas_results_annotated <- gwas_results_annotated %>%
         arrange(CHROM, POS) %>%
         mutate(BP_position = CHR_start + POS)
 
-# This is a super hacky way to get labels in between x ticks
-# Hadley Wickam disapproves :/
+# This is maybe not the best way, but makes sure tick marks and labels are at the center of each chromosome
 max_BP_position <- max(gwas_results_annotated[gwas_results_annotated$CHROM == 22, "BP_position"])
 x_axis_ticks <- chr_starts
 x_axis_ticks <- rbind(
@@ -438,19 +439,6 @@ x_axis_ticks <- rbind(
                 CHROM = c(23, 24),
                 CHR_start = c(max_BP_position, max_BP_position + 1000)))
 x_axis_ticks$midpoint <- x_axis_ticks$CHR_start + (lead(x_axis_ticks$CHR_start) - x_axis_ticks$CHR_start)/2
-x_axis_ticks[x_axis_ticks$CHROM == 22, "midpoint"] <-
-        x_axis_ticks[x_axis_ticks$CHROM == 22, "CHR_start"] +
-                (max(gwas_results_annotated[gwas_results_annotated$CHROM == 22, "BP_position"]) -
-                        x_axis_ticks[x_axis_ticks$CHROM == 22, "CHR_start"]) / 2
-x_axis_ticks_tmp <- tidyr::pivot_longer(
-        data = x_axis_ticks,
-        cols = c("midpoint", "CHR_start"),
-        names_to = "marker",
-        values_to = "tick_position") %>%
-        mutate(CHROM = as.character(as.integer(CHROM)))
-x_axis_ticks_tmp[seq(from = 2, to = 46, by = 2), "CHROM"] <- ""
-x_axis_ticks_tmp[x_axis_ticks_tmp$CHROM == "23", "CHROM"] <- ""
-x_axis_ticks_tmp[x_axis_ticks_tmp$CHROM == "24", "CHROM"] <- ""
 
 # Format data for plotting
 results_long <- tidyr::pivot_longer(
@@ -468,29 +456,27 @@ results_long$gwas_type <- factor(
 
 # Make comparative GWAS overview plot
 overview_comparison <- ggplot(
-        data = results_long,
+        data = results_long %>% sample_n(size = 10000),  ###
         aes(x = BP_position, y = -log10(P))) +
-        geom_point(aes(color = CHROM %% 2 == 0)) +
-        scale_color_manual(values = c("grey", "black")) +
+        geom_point(aes(color = CHROM %% 2 == 0), size = pt_size) +
+        scale_color_manual(values = c("grey", "dark grey")) +
         scale_x_continuous(
-                breaks = x_axis_ticks$tick_position,
+                breaks = x_axis_ticks$midpoint,
                 labels = x_axis_ticks$CHROM,
-                limits = c(0, NA),
-                expand = c(0, 0)) +
+                expand = c(0.01, 0.01),  # neccessary to fit chrom 23 label on
+                guide = guide_axis(n.dodge = 2)) +  # makes the x-axis labels alternate hi/lo
         scale_y_continuous(limits = c(0, 16), expand = c(0, 0)) +
         labs(x = "Chromosome", y = expression('-Log'[10]*'(p)')) +
         geom_hline(
                 yintercept = -log10(genome_wide_significance),
-                linetype = "dotted") +
-        theme_bw() +
+                linetype = "dashed") +
+        shared_theme +
         theme(
-                panel.border = element_rect(colour = "black", size = 0.5, fill = NA),
                 panel.grid.major.x = element_blank(),
-                axis.ticks.x = element_line(color = rep(c(NA, "black"), 23)),
                 panel.grid.minor.x = element_blank(),
                 legend.position = "none",
-                plot.margin = unit(c(5.5, 5.5, 25, 5.5), "pt"),
-                axis.text.x = element_text(size = 6)) +
+                axis.text.x = element_text(size = 5)
+        ) +
         facet_grid(. ~ gwas_type)
 
 # Make plot showing p-value changes in the CCR5 and MHC regions
@@ -504,9 +490,9 @@ regional_results$CHROM <- factor(
         labels = c("italic(CCR5)*' region'", "'MHC region'"))
 
 p_vals_regional <- ggplot(
-        data = regional_results,
+        data = regional_results  %>% sample_n(size = 100),  ###
         aes(x = POS/1E6, y = -log10(P_corrected))) +
-        geom_point(aes(color = -neg_log10_P_standard_minus_corrected)) +
+        geom_point(aes(color = -neg_log10_P_standard_minus_corrected), size = pt_size) +
         scale_color_gradient2(
                 name = expression(Delta*'[-Log'[10]*'(p)]'),
                 low = "#B2182B",
@@ -519,24 +505,20 @@ p_vals_regional <- ggplot(
                 y = expression('-Log'[10]*'(p)')) +
         geom_hline(
                 yintercept = -log10(genome_wide_significance),
-                linetype = "dotted") +
-        theme_bw() +
+                linetype = "dashed") +
+        shared_theme +
         theme(
-                panel.border = element_rect(colour = "black", size = 0.5, fill = NA),
                 panel.grid.major.x = element_blank(),
-                axis.ticks.x = element_line(color = rep(c(NA, "black"), 23)),
-                panel.grid.minor.x = element_blank(),
-                plot.margin = unit(c(25, 5.5, 5.5, 5.5), "pt")) +
+                panel.grid.minor.x = element_blank()) +
         facet_grid(. ~ CHROM, labeller = label_parsed, scales = "free")
 
 # Assemble the plots as subplots
+aligned_plots <- align_plots(overview_comparison, p_vals_regional, align = "h", axis = "tb")
+
 png(
         filename = paste(FIGDIR, "gwas_results.png", sep = "/"),
         width = linewidth, height = height, unit = "cm", res = 300)
-gridExtra::grid.arrange(
-        overview_comparison,
-        p_vals_regional,
-        nrow = 2, heights = c(1.5, 2))
+plot_grid(aligned_plots[[1]], aligned_plots[[2]], nrow = 2, labels = c("A", "B"))
 dev.off()
 ```
 
