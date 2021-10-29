@@ -53,6 +53,7 @@ POUMM_fit <- get(load(file = paste(OUTDIR, "POUMM_fit.RData", sep = "/")))
 poumm_parameter_estimates <- read.csv(file = paste(OUTDIR, "poumm_parameter_estimates.csv", sep = "/"))
 pc_scores <- read.csv(file = paste(OUTDIR, "shcs_vs_hapmap_pc_scores.csv", sep = "/"))
 gwas_results <- read.delim(file = paste(OUTDIR, "gwas_results.pvals.effectsize.txt", sep = "/"), sep = "", header = T)
+spvl_values <- read.csv(file = paste(OUTDIR, "spvl_values.csv", sep = "/"))
 ```
 
 Model illustration
@@ -358,11 +359,24 @@ ggsave(plot = p, filename = paste(FIGDIR, "poumm_parameter_estimates.png", sep =
 Estimated trait values
 TODO: think about some way of depicting phylogenetic relationships here too?
 ```{r}
-p <- ggplot(data = traits, aes(x = trait, y = h.MWA)) +
+p <- ggplot(data = spvl_values,
+            aes(x = spvl_lenient_filter_first_measurement,
+                y = spvl_lenient_filter_mean_measurement,
+                color = spvl_strict_filter_mean_measurement)) +
+        scale_color_gradient(low = "green", high = "red", name = "Mean measurement\nwith stricter filtering") +
+        coord_equal() +
+        geom_point() +
+        labs(x = "First measurement", y = "Mean measurement") +
+        shared_theme
+
+ggsave(plot = p, filename = paste(FIGDIR, "spvl_calculation_comparison.png", sep = "/"),
+       width = linewidth * 2/3, height = height * 2/3, units = "cm")
+
+p1 <- ggplot(data = traits, aes(x = trait, y = h.MWA)) +
       geom_point() +
       shared_theme +
       labs(x = "Calculated spVL trait", y = ehat_name)
-p2 <- ggExtra::ggMarginal(p, type="histogram")
+p2 <- ggExtra::ggMarginal(p1, type="histogram")
 ggsave(plot = p2, filename = paste(FIGDIR, "trait_values.png", sep = "/"),
       width = linewidth * 2/3, height = height * 2/3, units = "cm")
 ```
