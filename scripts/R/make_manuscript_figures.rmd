@@ -50,6 +50,7 @@ tree <- ape::read.tree(file = paste(OUTDIR, "pathogen_no_outgroup.newick", sep =
 traits <- read.csv(file = paste(OUTDIR, "poumm_corrected_traits.csv", sep = "/"))
 tree <- treeio::full_join(tree, traits, by = "label")
 POUMM_fit <- get(load(file = paste(OUTDIR, "POUMM_fit.RData", sep = "/")))
+poumm_parameter_estimates <- read.csv(file = paste(OUTDIR, "poumm_parameter_estimates.csv", sep = "/"))
 pc_scores <- read.csv(file = paste(OUTDIR, "shcs_vs_hapmap_pc_scores.csv", sep = "/"))
 gwas_results <- read.delim(file = paste(OUTDIR, "gwas_results.pvals.effectsize.txt", sep = "/"), sep = "", header = T)
 ```
@@ -159,10 +160,24 @@ dev.off()
 Simulation results
 ```{r}
 # Get POUMM values for HIV spVL to annotate plot with
+H2_estimate <- poumm_parameter_estimates[poumm_parameter_estimates$stat == "H2tMean", "PostMean"]
+alpha_estimate <- poumm_parameter_estimates[poumm_parameter_estimates$stat == "alpha", "PostMean"]
+
+# Breaks scale is defined as seq(0.5, n.breaks - 0.5, 1) in plotting function, need to translate real values to breaks scale
+get_xval_for_sim_plots <- function(real_vals, estimate) {
+      alpha_vals <-
+      base_val <- rev(real_vals[real_vals < estimate])[1]
+      next_val <- real_vals[real_vals > estimate][1]
+      base_xval <- which(real_vals == base_val)
+      next_xval <- which(real_vals == next_val)
+      xval <- base_xval - 0.5 + (next_xval - base_xval) * (estimate - base_val) / (next_val - base_val)
+      return(xval)
+}
+
 spvl_data <- data.frame(
         inference.method = "h.MWA.p.value",
-        H2 = 3.9,
-        alpha = 8.046)  # values are hand-calculated because the breaks scale is defined as seq(0.5, n.breaks - 0.5, 1) in plotting function
+        H2 = get_xval_for_sim_plots(real_vals = c(0.15, 0.25, 0.35, 0.45, 0.55, 0.65, 0.75), estimate = H2_estimate),
+        alpha = get_xval_for_sim_plots(real_vals = c(0.1, 0.5, 1, 5, 10, 20, 30, 40, 50, 60), estimate = alpha_estimate))
 
 spvl_data$inference.method <- factor(
         spvl_data$inference.method,
