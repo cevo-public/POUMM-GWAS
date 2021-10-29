@@ -14,6 +14,7 @@ library(POUMM)
 library(ape)
 library(cowplot)
 library(treeio)
+library(ggExtra)
 
 FIGDIR <- "figures"
 OUTDIR <- "output"
@@ -36,6 +37,9 @@ e_name <- "Non-pathogen part of trait"
 gvhat_name <- "Estimated pathogen part of trait"
 ehat_name <- "Estimated non-pathogen part of trait"
 z_minus_zbar_name <- "Scaled trait value"
+standard_gwas_name <- "GWAS with standard trait value"
+corrected_gwas_name <- "GWAS with estimated non-pathogen part of trait"
+genome_wide_significance <- 5E-8
 ```
 
 Load data
@@ -46,20 +50,21 @@ tree <- ape::read.tree(file = paste(OUTDIR, "pathogen_no_outgroup.newick", sep =
 traits <- read.csv(file = paste(OUTDIR, "poumm_corrected_traits.csv", sep = "/"))
 tree <- treeio::full_join(tree, traits, by = "label")
 POUMM_fit <- get(load(file = paste(OUTDIR, "POUMM_fit.RData", sep = "/")))
-pc_scores <- read.csv(file = paste(OUTDIR, "shcs_vs_hapmap_pc_scores.csv"))
+pc_scores <- read.csv(file = paste(OUTDIR, "shcs_vs_hapmap_pc_scores.csv", sep = "/"))
+gwas_results <- read.delim(file = paste(OUTDIR, "gwas_results.pvals.effectsize.txt", sep = "/"), sep = "", header = T)
 ```
 
 Model illustration
 ```{r}
 # Simulate many OU trajectories along tree
 generate_trait_trajectory <- function(v0, alpha, theta, sigma, N_steps) {
-  POUMM::rTrajectoryOU(
-    z0 = v0,
-    t = 1,
-    alpha = alpha,
-    theta = theta,
-    sigma = sigma,
-    steps = N_steps)
+      POUMM::rTrajectoryOU(
+            z0 = v0,
+            t = 1,
+            alpha = alpha,
+            theta = theta,
+            sigma = sigma,
+            steps = N_steps)
 }
 
 # Generate tree
@@ -83,70 +88,70 @@ v_nodes <- rep(v0, length(node_times))
 
 # Generate OU trajectory for each edge on tree
 for (j in 1:nrow(tree$edge)) {
-  from = tree$edge[j, 1]
-  to = tree$edge[j, 2]
-  N_steps = round(tree$edge.length[j]*scale_factor) - 1
-  print(paste(N_steps, "steps on branch", j))
+      from = tree$edge[j, 1]
+      to = tree$edge[j, 2]
+      N_steps = round(tree$edge.length[j]*scale_factor) - 1
+      print(paste(N_steps, "steps on branch", j))
 
-  trajectory <- POUMM::rTrajectoryOU(
-    z0 = v_nodes[from],
-    t = 0.01,
-    alpha = alpha,
-    theta = theta,
-    sigma = sigma,
-    steps = N_steps)
+      trajectory <- POUMM::rTrajectoryOU(
+            z0 = v_nodes[from],
+            t = 0.01,
+            alpha = alpha,
+            theta = theta,
+            sigma = sigma,
+            steps = N_steps)
 
-  v_nodes[to] <- trajectory[N_steps]
-  v <- c(v_nodes[from], trajectory)
+      v_nodes[to] <- trajectory[N_steps]
+      v <- c(v_nodes[from], trajectory)
 
-  new_data <- data.frame(
-    lineage = rep(j, N_steps + 1),
-    time = seq(node_times[from], node_times[to], length.out = N_steps + 1),
-    v = v,
-    color = rep(edge_colors[j], N_steps + 1))
-  traceplot <- rbind(traceplot, new_data)
+      new_data <- data.frame(
+            lineage = rep(j, N_steps + 1),
+            time = seq(node_times[from], node_times[to], length.out = N_steps + 1),
+            v = v,
+            color = rep(edge_colors[j], N_steps + 1))
+      traceplot <- rbind(traceplot, new_data)
 }
 
 mu_OU <- function(t) v0 * exp(-alpha * t) + theta * (1 - exp(-alpha * t))
 
 OU_plot <- ggplot(
-  data = traceplot,
-  aes(x = time, y = v, group = lineage, color = I(color))) +
-  geom_line(size = 1.25) +
-  labs(
-    x = expression('Substitutions site'^-1 * ' year'^-1),
-    y = expression(italic(g)[v])) +
-  shared_theme +
-  stat_function(fun = mu_OU, color = "black", linetype = "dashed")
+      data = traceplot,
+      aes(x = time, y = v, group = lineage, color = I(color))) +
+      geom_line(size = 1.25) +
+      labs(
+        x = expression('Substitutions site'^-1 * ' year'^-1),
+        y = expression(italic(g)[v])) +
+      shared_theme +
+      stat_function(fun = mu_OU, color = "black", linetype = "dashed")
 
 #TODO: I have no idea how the edge coloring works, this is a really shitty hardcoded soln
 tree_data = data.frame(node = c(1, 2, 3, 4, 5), color = c(edge_colors[2], edge_colors[3], edge_colors[4], "blue", edge_colors[1]))
 
 tree_plot <- ggtree::ggtree(
-  tree,
-  ladderize = F,
-  size = 1.5) %<+% tree_data + aes(color = I(color)) +
-  labs(x = expression('Substitutions site'^-1 * ' year'^-1))
+      tree,
+      ladderize = F,
+      size = 1.5) %<+% tree_data + aes(color = I(color)) +
+      labs(x = expression('Substitutions site'^-1 * ' year'^-1))
 
 e_data <- data.frame(x = c(-1, 1))
 
 e_plot <-  ggplot(data = e_data, aes(x)) +
-  stat_function(fun = dnorm,
-                n = 101,
-                args = list(mean = 0, sd = 0.2),
-                size = 1) +
-  ylab("Density") +
-  shared_theme +
-  labs(x = expression(italic(e)))
+      stat_function(fun = dnorm,
+                    n = 101,
+                    args = list(mean = 0, sd = 0.2),
+                    size = 1) +
+      ylab("Density") +
+      shared_theme +
+      labs(x = expression(italic(e)))
 
 # Align OU and tree plots
 left_side <- plot_grid(OU_plot, tree_plot, align = "v", axis = "lr", nrow = 2, rel_heights = c(2, 1), labels = c("A", "C"))
 right_side <- plot_grid(NULL, e_plot, NULL, nrow = 3, rel_heights = c(1, 2, 1), labels = c("", "B", ""))
 
 png(
-  filename = paste(FIGDIR, "model_figure.png", sep = "/"),
-  width = linewidth, height = height, units = "cm", res = 300)
-  plot_grid(left_side, NULL, right_side, ncol = 3, rel_widths = c(1.5, 0.2, 1))
+      filename = paste(FIGDIR, "model_figure.png", sep = "/"),
+      width = linewidth, height = height, units = "cm", res = 300)
+      plot_grid(left_side, NULL, right_side, ncol = 3, rel_widths = c(1.5, 0.2, 1))
 dev.off()
 
 ```
@@ -335,6 +340,18 @@ ggsave(plot = p, filename = paste(FIGDIR, "poumm_parameter_estimates.png", sep =
        width = linewidth, height = height, units = "cm")
 ```
 
+Estimated trait values
+TODO: think about some way of depicting phylogenetic relationships here too?
+```{r}
+p <- ggplot(data = traits, aes(x = trait, y = h.MWA)) +
+      geom_point() +
+      shared_theme +
+      labs(x = "Calculated spVL trait", y = ehat_name)
+p2 <- ggExtra::ggMarginal(p, type="histogram")
+ggsave(plot = p2, filename = paste(FIGDIR, "trait_values.png", sep = "/"),
+      width = linewidth * 2/3, height = height * 2/3, units = "cm")
+```
+
 PCA of cohort genotypes
 ```{r}
 # Plot combined SHCS and HapMap samples along the first few PCs
@@ -359,12 +376,172 @@ ggsave(plot = p1, filename = paste(FIGDIR, "host_genotype_pca.png", sep = "/"),
        width = linewidth, height = height, units = "cm")
 ```
 
-Manhattan plot of GWAS results
-```{r}
-
-```
-
 Q-Q plot of GWAS results
 ```{r}
+qq_data_standard <- data.frame(
+        observed_log10p = -log10(sort(gwas_results$P_standard, decreasing = F)),
+        expected_log10p = -log10(ppoints(nrow(gwas_results))),
+        gwas_type = standard_gwas_name)
+qq_data_phylo <- data.frame(
+        observed_log10p = -log10(sort(gwas_results$P_corrected, decreasing = F)),
+        expected_log10p = -log10(ppoints(nrow(gwas_results))),
+        gwas_type = corrected_gwas_name)
+qq_results <- rbind(qq_data_standard, qq_data_phylo)
 
+p <- ggplot(data = qq_results, aes(x = expected_log10p, y = observed_log10p)) +
+        geom_point() +
+        geom_abline(slope = 1, intercept = 0, linetype = "dashed",
+                    color = RColorBrewer::brewer.pal(n = 3, name = diverging_palette)[[1]]) +
+        facet_wrap(. ~ gwas_type) +
+        labs(x = expression("expected log"[10]*"(p)"), y = expression("observed log"[10]*"(p)")) +
+        shared_theme
+ggsave(plot = p, filename = paste(FIGDIR, "qq_plots.png", sep = "/"),
+       width = linewidth, height = height * 2/3, units = "cm")
+```
+
+Manhattan plot of GWAS results
+```{r}
+# Add genome position to data
+chr_lengths <- gwas_results %>%
+        group_by(CHROM) %>%
+        summarise(chr_len = max(POS))
+chr_starts <- chr_lengths %>%
+        mutate(CHR_start = cumsum(as.numeric(chr_len)) - chr_len) %>%
+        select(-chr_len)
+gwas_results_annotated <- left_join(gwas_results, chr_starts, by = "CHROM")
+gwas_results_annotated <- gwas_results_annotated %>%
+        arrange(CHROM, POS) %>%
+        mutate(BP_position = CHR_start + POS)
+
+# This is a super hacky way to get labels in between x ticks
+# Hadley Wickam disapproves :/
+max_BP_position <- max(gwas_results_annotated[gwas_results_annotated$CHROM == 22, "BP_position"])
+x_axis_ticks <- chr_starts
+x_axis_ticks <- rbind(
+        x_axis_ticks,
+        data.frame(
+                CHROM = c(23, 24),
+                CHR_start = c(max_BP_position, max_BP_position + 1000)))
+x_axis_ticks$midpoint <- x_axis_ticks$CHR_start + (lead(x_axis_ticks$CHR_start) - x_axis_ticks$CHR_start)/2
+x_axis_ticks[x_axis_ticks$CHROM == 22, "midpoint"] <-
+        x_axis_ticks[x_axis_ticks$CHROM == 22, "CHR_start"] +
+                (max(gwas_results_annotated[gwas_results_annotated$CHROM == 22, "BP_position"]) -
+                        x_axis_ticks[x_axis_ticks$CHROM == 22, "CHR_start"]) / 2
+x_axis_ticks_tmp <- tidyr::pivot_longer(
+        data = x_axis_ticks,
+        cols = c("midpoint", "CHR_start"),
+        names_to = "marker",
+        values_to = "tick_position") %>%
+        mutate(CHROM = as.character(as.integer(CHROM)))
+x_axis_ticks_tmp[seq(from = 2, to = 46, by = 2), "CHROM"] <- ""
+x_axis_ticks_tmp[x_axis_ticks_tmp$CHROM == "23", "CHROM"] <- ""
+x_axis_ticks_tmp[x_axis_ticks_tmp$CHROM == "24", "CHROM"] <- ""
+
+# Format data for plotting
+results_long <- tidyr::pivot_longer(
+        data = gwas_results_annotated,
+        cols = c("P_standard", "P_corrected"),
+        names_to = "gwas_type",
+        names_prefix = "P_",
+        values_to = "P")
+
+# Fix facet labels for plotting
+results_long$gwas_type <- factor(
+        results_long$gwas_type,
+        levels = c("standard", "corrected"),
+        labels = c(standard_gwas_name, corrected_gwas_name))
+
+# Make comparative GWAS overview plot
+overview_comparison <- ggplot(
+        data = results_long,
+        aes(x = BP_position, y = -log10(P))) +
+        geom_point(aes(color = CHROM %% 2 == 0)) +
+        scale_color_manual(values = c("grey", "black")) +
+        scale_x_continuous(
+                breaks = x_axis_ticks$tick_position,
+                labels = x_axis_ticks$CHROM,
+                limits = c(0, NA),
+                expand = c(0, 0)) +
+        scale_y_continuous(limits = c(0, 16), expand = c(0, 0)) +
+        labs(x = "Chromosome", y = expression('-Log'[10]*'(p)')) +
+        geom_hline(
+                yintercept = -log10(genome_wide_significance),
+                linetype = "dotted") +
+        theme_bw() +
+        theme(
+                panel.border = element_rect(colour = "black", size = 0.5, fill = NA),
+                panel.grid.major.x = element_blank(),
+                axis.ticks.x = element_line(color = rep(c(NA, "black"), 23)),
+                panel.grid.minor.x = element_blank(),
+                legend.position = "none",
+                plot.margin = unit(c(5.5, 5.5, 25, 5.5), "pt"),
+                axis.text.x = element_text(size = 6)) +
+        facet_grid(. ~ gwas_type)
+
+# Make plot showing p-value changes in the CCR5 and MHC regions
+regional_results<- gwas_results_annotated %>% filter(
+        (CHROM == 3 & POS >= 45.5E6 & POS <= 47E6) | (CHROM == 6 & POS >= 29.5E6 & POS <= 33.5E6))
+
+# Fix facet labels for plotting
+regional_results$CHROM <- factor(
+        regional_results$CHROM,
+        levels = c("3", "6"),
+        labels = c("italic(CCR5)*' region'", "'MHC region'"))
+
+p_vals_regional <- ggplot(
+        data = regional_results,
+        aes(x = POS/1E6, y = -log10(P_corrected))) +
+        geom_point(aes(color = -neg_log10_P_standard_minus_corrected)) +
+        scale_color_gradient2(
+                name = expression(Delta*'[-Log'[10]*'(p)]'),
+                low = "#B2182B",
+                mid = "#FFFFBF",
+                high = "#2166AC",
+                midpoint = 0) +
+        scale_y_continuous(limits = c(0, 16), expand = c(0, 0)) +
+        labs(
+                x = "Base position (Mb)",
+                y = expression('-Log'[10]*'(p)')) +
+        geom_hline(
+                yintercept = -log10(genome_wide_significance),
+                linetype = "dotted") +
+        theme_bw() +
+        theme(
+                panel.border = element_rect(colour = "black", size = 0.5, fill = NA),
+                panel.grid.major.x = element_blank(),
+                axis.ticks.x = element_line(color = rep(c(NA, "black"), 23)),
+                panel.grid.minor.x = element_blank(),
+                plot.margin = unit(c(25, 5.5, 5.5, 5.5), "pt")) +
+        facet_grid(. ~ CHROM, labeller = label_parsed, scales = "free")
+
+# Assemble the plots as subplots
+png(
+        filename = paste(FIGDIR, "gwas_results.png", sep = "/"),
+        width = linewidth, height = height, unit = "cm", res = 300)
+gridExtra::grid.arrange(
+        overview_comparison,
+        p_vals_regional,
+        nrow = 2, heights = c(1.5, 2))
+dev.off()
+```
+
+Debugging
+```{r}
+# Are trait values very different from what was inferred last time?
+old_traits <- read.delim(file = "/Users/nadeaus/Polybox/200207_phenotypes.txt", sep = "", header = T)
+trait_comparison <- merge(
+        x = old_traits, y = traits,
+        by.x = "IID", by.y = "id",
+        all = T)
+
+ggplot(data = trait_comparison, aes(x = total_spvl, y = trait)) + geom_point()  # calculated spVL indistinguishable
+ggplot(data = trait_comparison, aes(x = corrected_spvl, y = h.MWA)) + geom_point()  # corrected spVL very similar, well correlated
+
+# What about GWAS phenotypes file?
+gwas_phenotypes <- read.delim(file = "output/gwas_phenotypes.txt", sep = "", header = T)
+gwas_pheno_comparison <- merge(
+        x = old_traits, y = gwas_phenotypes,
+        by = "IID",
+        all = T)
+ggplot(data = gwas_pheno_comparison, aes(x = corrected_spvl, y = h.MWA)) + geom_point()  # also well correlated but previous GWAS had more samples?
 ```
