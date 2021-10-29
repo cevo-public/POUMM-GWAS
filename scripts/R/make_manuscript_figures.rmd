@@ -525,23 +525,3 @@ gridExtra::grid.arrange(
 dev.off()
 ```
 
-Debugging
-```{r}
-# Are trait values very different from what was inferred last time?
-old_traits <- read.delim(file = "/Users/nadeaus/Polybox/200207_phenotypes.txt", sep = "", header = T)
-trait_comparison <- merge(
-        x = old_traits, y = traits,
-        by.x = "IID", by.y = "id",
-        all = T)
-
-ggplot(data = trait_comparison, aes(x = total_spvl, y = trait)) + geom_point()  # calculated spVL indistinguishable
-ggplot(data = trait_comparison, aes(x = corrected_spvl, y = h.MWA)) + geom_point()  # corrected spVL very similar, well correlated
-
-# What about GWAS phenotypes file?
-gwas_phenotypes <- read.delim(file = "output/gwas_phenotypes.txt", sep = "", header = T)
-gwas_pheno_comparison <- merge(
-        x = old_traits, y = gwas_phenotypes,
-        by = "IID",
-        all = T)
-ggplot(data = gwas_pheno_comparison, aes(x = corrected_spvl, y = h.MWA)) + geom_point()  # also well correlated but previous GWAS had more samples?
-```

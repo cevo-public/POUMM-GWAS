@@ -37,7 +37,7 @@ head -1 output/${DATA_PREFIX}.h.MWA.glm.linear > output/${DATA_PREFIX}.h.MWA.glm
 grep -h 'ADD' output/${DATA_PREFIX}.h.MWA.glm.linear >> output/${DATA_PREFIX}.h.MWA.glm.linear.nocovariates
 
 # Paste results from both trait values together
-paste "output/${DATA_PREFIX}.trait.glm.linear.nocovariates" "output/${DATA_PREFIX}.h.MWA.glm.linear.nocovariates" | awk '{print $1, $2, $3, $9, $12, $22, $25}' > output/gwas_results.txt
+paste "output/${DATA_PREFIX}.trait.glm.linear.nocovariates" "output/${DATA_PREFIX}.h.MWA.glm.linear.nocovariates" | awk '{print $1, $2, $3, $9, $12, $21, $24}' > output/gwas_results.txt
 HEADER="CHROM POS ID BETA_standard P_standard BETA_corrected P_corrected"
 sed -i.bak "1 s/^.*$/$HEADER/" output/gwas_results.txt
 
