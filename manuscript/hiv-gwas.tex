@@ -12,6 +12,7 @@
 \usepackage{float} % to enforce figure positioning in subsection they're declared in
 \usepackage{amsmath}
 \usepackage{longtable} % for table that spans multiple pages
+\usepackage[singlelinecheck=false]{caption} % to left-justify single-line table captions
 
 % Tikz preamble from Michael Landis
 \usepackage{amssymb} %maths
@@ -346,101 +347,6 @@ Again following the procedure of \citet{McLaren2015}, we imputed common HLA geno
 
 Whenever possible, we tried to parameterize our simulation model for spVL using empirical data. We set the total variance in spVL to 0.73 log copies$^2$ mL$^{-2}$ based on UK cohort data \parencite{Mitov2018}. After allotting 25\% of this variance to the host part of spVL $g_h$ (following \citealt{McLaren2015}), we partitioned the remaining variance between the viral part $g_v$ and the environmental part $\epsilon$ in different ratios to assess estimator performance across a range of spVL heritabilities. $g_h$ was simulated as the sum of contributions from 20 causal host genetic variants, 10 of which had an effect size of 0.2 log copies mL$^{-1}$ and 10 of which had an effect size of -0.2 log copies mL$^{-1}$. Host genetic variants were generated from a binomial distribution with probability $p$ calculated such that $g_h$ had the appropriate variance (see table \ref{tab:sim-params}). We generated a random viral phylogeny with branch lengths on the same time scale as a previously inferred UK cohort HIV tree \parencite{Hodcroft2014} using the R package ape \parencite{Paradis2018}. $g_v$ was simulated by running an OU process along the phylogeny using the R package POUMM \parencite{Mitov2017a-POUMM} and sampling values at the tips. For the OU parameters $\theta$ and $g_{0}$ we used 4.5 log copies mL$^{-1}$, similar to values previously inferred for HIV (table \ref{tab:POUMMparams}). To assess our estimator's performance under a range of evolutionary scenarios, we co-varied the OU parameters for selection strength, $\alpha$, and intensity of random fluctuations, $\sigma$, so that different proportions of the variability in $g_v$ were attributable to selection and drift, respectively. Finally, the environmental component of spVL $\epsilon$ was generated from a normal distribution with mean 0.
 
-\begin{figure}[H]
-	\begin{tikzpicture}
-	
-	% Variance 
-	\begin{scope}[xshift = 0cm, yshift = 0cm]
-	\node[anchor = west] (alabel) at (-1, 4) {a) Variance partitioning};
-	\node[constnode] (H2h) at (0, 0) {0.25};
-	\node[constnode] (varz) at ($(H2h) + (1.8, 0)$) {$\sigma^2_z$};
-	\node[constnode] (H2) at ($(H2h) + (3.6, 0)$) {$H^2_{\bar{t}}$};
-	\node[detnode] (varh) at ($(H2h) + (0.9, 1.5)$) {$\sigma^2_{g_h}$};
-	\node[detnode] (varv) at ($(varz) + (0.9, 1.5)$) {\tiny $\sigma^2_{g_{v}}(\bar{t})$};
-	\node[detnode] (vare) at ($(varh) + (0.9, 1.5)$) {$\sigma^2_{\epsilon}$};
-	\draw[taro] (H2h) -- (varh);
-	\draw[taro] (varz) -- (varh);
-	\draw[taro] (varz) -- (varv);
-	\draw[taro] (H2) -- (varv);
-	\draw[taro] (varh) -- (vare);
-	\draw[taro] (varv) -- (vare);
-	\draw[taro] (varz) -- (vare);
-	\end{scope}
-	
-	% Virus
-	\begin{scope}[xshift = 6cm, yshift = -0.5cm]
-	\node[anchor = west] (blabel) at (-1, 4.5) {b) Viral part of spVL};
-	\node[constnode] (theta) at (0, 1.5) {$\theta$};
-	\node[constnode] (g0) at (1.8, 1.5) {$g_{0}$};
-	\node[constnode] (alpha) at (3.6, 1.5) {$\alpha$};
-	\node[detnode] (sigma) at (5.4, 1.5) {$\sigma$};
-	\node[constnode] (tree) at (7.2, 1.5) {$\Psi$};
-	\node[detnode] (varv) at (3.6+0.9, 0) {\tiny $\sigma^2_{g_{v}}(\bar{t})$};
-	\node[constnode] (tbar) at (3.6+0.9+1.8, 0) {$\bar{t}$};
-	\node[snode] (v) at (3.6, 3.25) {$\vec{g_v}$};
-	\draw[taro] (theta) -- (v);
-	\draw[taro] (g0) -- (v);
-	\draw[taro] (alpha) -- (v);
-	\draw[taro] (sigma) -- (v);
-	\draw[taro] (tree) -- (v);
-	\draw[taro] (varv) -- (sigma);
-	\draw[taro] (tbar) -- (sigma);
-	\draw[taro] (tbar) -- (tree);
-	\draw[taro] (alpha) -- (sigma);
-	\node[white] (varpic) at (3.6+0.9, -1.75) {};
-	\draw[taro] (varpic) -- (varv);
-	\node (vdist) at ($(v) + (1.8, 0.3)$) {Normal};
-	\draw (v) -- (vdist);
-	\draw[decoration={brace, mirror, raise=18pt}, sloped, decorate] (7.2, 1.5 - .5) -- node[below = 18pt] {OU parameters} (7.2, 1.5 + .5);
-	\end{scope}
-	
-	% Host 
-	\begin{scope}[xshift = 0cm, yshift = -9cm]
-	\node[anchor = west] (clabel) at (-1, 5.55) {c) Host part of spVL};
-	\node[constnode] (d) at (1.8, 1.5) {2};
-	\node[detnode] (p) at (3.6, 1.5) {$p$};
-	\node[snode] (G) at (1.8, 3) {$G$};
-	\node[rectangle, dashed, very thick, inner sep=4mm, draw=black!100, fit = (G) ] (Gplate) {};
-	\node[anchor=north west, inner sep=3pt] at (Gplate.north west) {\tiny $N\times M$};
-	\node[detnode] (varh) at (3.6, 0) {$\sigma^2_{g_h}$};
-	\node[constnode] (delta) at (3.6, 3) {$\delta$};
-	\node[detnode] (h) at (3.6, 4.5) {$\vec{g_h}$};
-	\node[constnode] (M) at (5.4, 3) {$M$};
-	\draw[taro] (d) -- (G);
-	\draw[taro] (p) -- (G);
-	\draw[taro] (varh) -- (p);
-	\draw[taro] (delta) -- (p);
-	\draw[taro] (M) -- (p);
-	\draw[taro] (M) -- (h);
-	\draw[taro] (delta) -- (h);
-	\draw[taro] (G) -- (h);
-	\node[white] (varpic) at (3.6, -1.5) {};
-	\draw[taro] (varpic) -- (varh);
-	\node (hdist) at ($(h) + (2.7, 0.3)$) {$\approx$ Normal};
-	\draw (h) -- (hdist);
-	\node (gdist) at ($(G) + (-2, 0.6)$) {Binomial};
-	\draw (G) -- (gdist);
-	\end{scope}
-	
-	% Environment
-	\begin{scope}[xshift = 10cm, yshift = -6.5cm]
-	\node[anchor = west] (dlabel) at (-1, 3) {d) Environmental part of spVL};
-	\node[detnode] (vare) at (0, 0) {$\sigma^2_{\epsilon}$};
-	\node[constnode] (zero) at ($(vare) + (1.8, 0)$) {0};
-	\node[snode] (e) at ($(vare) + (1.8/2, 1.5)$) {$\vec{\epsilon}$};
-	\draw[taro] (zero) -- (e);
-	\draw[taro] (vare) -- (e);
-	\node[white] (varpic) at (0, -1.5) {};
-	\draw[taro] (varpic) -- (vare);
-	\node (edist) at ($(e) + (1.8, 0.3)$) {Normal};
-	\draw (e) -- (edist);
-	\end{scope}
-	
-	\end{tikzpicture}
-	\caption{A graphical representation of the simulation model. Variables in solid squares are constant in the simulation scheme, whereas variables in solid circles are realizations of random variables and variables in dashed circles are determined as a function of other variables. Arrows represent dependencies among variables and the dashed square represents repetition \parencite{Hohna2014}.}
-	\label{fig:sim-design}
-\end{figure}
-
 \begin{table}[H]
 	\begin{tabular}{p{1.5cm}ll} \toprule 
 		Variable & Expression & Definition \\ \midrule 
@@ -539,22 +445,102 @@ We can calculate the variance due to these two effects because the total varianc
 
 Therefore, we can expect the RMSE for $\bm{z} - \bm{\bar{z}}$ as an estimate for $\bm{h}$ to be around $\sqrt{0.55} \approx 0.74$. 
 
+\newpage
 
-\begin{table}[H]
-	\begin{center}
-		\begin{tabular}{cccc} \hline 
-			Parameter & MLE & Maximum posterior probability & 95\% HPD \\ \hline 
-			${g_{0}}$ & 4.17 & 4.23 & 2.73, 5.88 \\
-			$\theta$ & 4.32 & 4.33 & 4.25, 4.42 \\
-			$\sigma$ & 5.15 & 4.98 & 3.45, 6.61 \\
-			$\alpha$ & 45.46 & 43.98 & 23.80, 63.36 \\
-			$\sigma_e$ & 0.55 & 0.56 & 0.49, 0.63 \\ 
-			$H^2_{\bar{t}}$ & 0.49 & 0.47 & 0.33, 0.60 \\ \hline
-		\end{tabular}
-		\caption{Inferred POUMM parameters.}
-		\label{tab:POUMM-parameters}
-	\end{center}
-\end{table}
+\begin{figure}[H]
+	\begin{tikzpicture}
+	
+	% Variance 
+	\begin{scope}[xshift = 0cm, yshift = 0cm]
+	\node[anchor = west] (alabel) at (-1, 4) {A. Variance partitioning};
+	\node[constnode] (H2h) at (0, 0) {0.25};
+	\node[constnode] (varz) at ($(H2h) + (1.8, 0)$) {$\sigma^2_z$};
+	\node[constnode] (H2) at ($(H2h) + (3.6, 0)$) {$H^2_{\bar{t}}$};
+	\node[detnode] (varh) at ($(H2h) + (0.9, 1.5)$) {$\sigma^2_{g_h}$};
+	\node[detnode] (varv) at ($(varz) + (0.9, 1.5)$) {\tiny $\sigma^2_{g_{v}}(\bar{t})$};
+	\node[detnode] (vare) at ($(varh) + (0.9, 1.5)$) {$\sigma^2_{\epsilon}$};
+	\draw[taro] (H2h) -- (varh);
+	\draw[taro] (varz) -- (varh);
+	\draw[taro] (varz) -- (varv);
+	\draw[taro] (H2) -- (varv);
+	\draw[taro] (varh) -- (vare);
+	\draw[taro] (varv) -- (vare);
+	\draw[taro] (varz) -- (vare);
+	\end{scope}
+	
+	% Virus
+	\begin{scope}[xshift = 6cm, yshift = -0.5cm]
+	\node[anchor = west] (blabel) at (-1, 4.5) {B. Viral part of spVL};
+	\node[constnode] (theta) at (0, 1.5) {$\theta$};
+	\node[constnode] (g0) at (1.8, 1.5) {$g_{0}$};
+	\node[constnode] (alpha) at (3.6, 1.5) {$\alpha$};
+	\node[detnode] (sigma) at (5.4, 1.5) {$\sigma$};
+	\node[constnode] (tree) at (7.2, 1.5) {$\Psi$};
+	\node[detnode] (varv) at (3.6+0.9, 0) {\tiny $\sigma^2_{g_{v}}(\bar{t})$};
+	\node[constnode] (tbar) at (3.6+0.9+1.8, 0) {$\bar{t}$};
+	\node[snode] (v) at (3.6, 3.25) {$\vec{g_v}$};
+	\draw[taro] (theta) -- (v);
+	\draw[taro] (g0) -- (v);
+	\draw[taro] (alpha) -- (v);
+	\draw[taro] (sigma) -- (v);
+	\draw[taro] (tree) -- (v);
+	\draw[taro] (varv) -- (sigma);
+	\draw[taro] (tbar) -- (sigma);
+	\draw[taro] (tbar) -- (tree);
+	\draw[taro] (alpha) -- (sigma);
+	\node[white] (varpic) at (3.6+0.9, -1.75) {};
+	\draw[taro] (varpic) -- (varv);
+	\node (vdist) at ($(v) + (1.8, 0.3)$) {Normal};
+	\draw (v) -- (vdist);
+	\draw[decoration={brace, mirror, raise=18pt}, sloped, decorate] (7.2, 1.5 - .5) -- node[below = 18pt] {OU parameters} (7.2, 1.5 + .5);
+	\end{scope}
+	
+	% Host 
+	\begin{scope}[xshift = 0cm, yshift = -9cm]
+	\node[anchor = west] (clabel) at (-1, 5.55) {C. Host part of spVL};
+	\node[constnode] (d) at (1.8, 1.5) {2};
+	\node[detnode] (p) at (3.6, 1.5) {$p$};
+	\node[snode] (G) at (1.8, 3) {$G$};
+	\node[rectangle, dashed, very thick, inner sep=4mm, draw=black!100, fit = (G) ] (Gplate) {};
+	\node[anchor=north west, inner sep=3pt] at (Gplate.north west) {\tiny $N\times M$};
+	\node[detnode] (varh) at (3.6, 0) {$\sigma^2_{g_h}$};
+	\node[constnode] (delta) at (3.6, 3) {$\delta$};
+	\node[detnode] (h) at (3.6, 4.5) {$\vec{g_h}$};
+	\node[constnode] (M) at (5.4, 3) {$M$};
+	\draw[taro] (d) -- (G);
+	\draw[taro] (p) -- (G);
+	\draw[taro] (varh) -- (p);
+	\draw[taro] (delta) -- (p);
+	\draw[taro] (M) -- (p);
+	\draw[taro] (M) -- (h);
+	\draw[taro] (delta) -- (h);
+	\draw[taro] (G) -- (h);
+	\node[white] (varpic) at (3.6, -1.5) {};
+	\draw[taro] (varpic) -- (varh);
+	\node (hdist) at ($(h) + (2.7, 0.3)$) {$\approx$ Normal};
+	\draw (h) -- (hdist);
+	\node (gdist) at ($(G) + (-2, 0.6)$) {Binomial};
+	\draw (G) -- (gdist);
+	\end{scope}
+	
+	% Environment
+	\begin{scope}[xshift = 10cm, yshift = -6.5cm]
+	\node[anchor = west] (dlabel) at (-1, 3) {D. Environmental part of spVL};
+	\node[detnode] (vare) at (0, 0) {$\sigma^2_{\epsilon}$};
+	\node[constnode] (zero) at ($(vare) + (1.8, 0)$) {0};
+	\node[snode] (e) at ($(vare) + (1.8/2, 1.5)$) {$\vec{\epsilon}$};
+	\draw[taro] (zero) -- (e);
+	\draw[taro] (vare) -- (e);
+	\node[white] (varpic) at (0, -1.5) {};
+	\draw[taro] (varpic) -- (vare);
+	\node (edist) at ($(e) + (1.8, 0.3)$) {Normal};
+	\draw (e) -- (edist);
+	\end{scope}
+	
+	\end{tikzpicture}
+	\caption{A graphical representation of the simulation model. Variables in solid squares are constant in the simulation scheme, whereas variables in solid circles are realizations of random variables and variables in dashed circles are determined as a function of other variables. Arrows represent dependencies among variables and the dashed square represents repetition \parencite{Hohna2014}.}
+	\label{fig:sim-design}
+\end{figure}
 
 \begin{figure}[H]
 	\centering
@@ -571,40 +557,6 @@ Therefore, we can expect the RMSE for $\bm{z} - \bm{\bar{z}}$ as an estimate for
 	\end{center}
 \end{figure}
 
-\begin{table}[H]
-    \begin{center}
-    \begin{tabular}{lc}
-    \hline
-    Sample filter & Number of samples remaining \\
-    \hline
-    Subtype B pol sequences & 1516 \\
-    With paired spVL measurement & 1516 \\
-    $>$ 750 characters in sequence & 1493 \\
-    Individual is of European ancestry & 1396 \\
-    Kinship coefficient $>$ 0.09375 & TODO \\ 
-    \hline
-    \end{tabular}
-    \caption{Number of samples for GWAS after sequential filtering steps.}
-    \label{tab:sample-filtering}
-    \end{center}
-\end{table}
-
-\begin{table}[H]
-	\begin{center}
-		\begin{tabular}{lc}
-			\hline
-			Variant filter & Number of variants remaining \\
-			\hline 
-			Raw data & 76979521 \\
-			Missing genotype rate $>$ 0.01 & 7452957 \\
-			Hardy-Weinburg exact test p-value $<$ 5x10$^-5$ & 7452425 \\
-			Minor allele frequency $<$ 0.01 & 4556770 \\ \hline			
-		\end{tabular}
-		\caption{Number of variants for GWAS after sequential filtering steps.}
-		\label{tab:variant-filtering}
-	\end{center}
-\end{table}
-
 \begin{figure}[H]
 	\includegraphics[width=\linewidth]{figures/host_genotype_pca.png}
 	\caption{SHCS individuals and HapMap3 individuals plotted along the top three principle components of genetic variation. Points with black borders are within the thresholds used to select individuals of likely European ancestry.}
@@ -613,13 +565,98 @@ Therefore, we can expect the RMSE for $\bm{z} - \bm{\bar{z}}$ as an estimate for
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.75\linewidth]{figures_archived/200207_qq_plots.png}
+	\includegraphics[width=\linewidth]{figures_archived/200207_qq_plots.png}
 	\caption{Quartile-quartile plots from association tests.}
 	\label{fig:qq-plots}
 \end{figure}
 
+\end{doublespace}  % don't doublspace tables
+
 \newpage
-\begin{longtable}[H]{p{3cm}p{1cm}p{2cm}p{1cm}p{2cm}p{1cm}p{2cm}} % {lrrrrrr}{lrrrrrr}
+
+\begin{table}[H]
+\caption{POUMM parameter estimates for spVL based on Swiss data. HPD = Highest posterior density.}
+	\begin{tabular}{lccc} \hline 
+	Parameter & Posterior mean & 95\% HPD \\ \hline 
+	${g_{0}}$ & 4.23 & (1.72, 6.71) \\
+	$\theta$ & 4.47 & (4.37, 4.58) \\
+	$\sigma$ & 5.25 & (2.37, 7.9) \\
+	$\alpha$ & 57.65 & (19.49, 95.2) \\
+	$\sigma_e$ & 0.54 & (0.43, 0.65) \\ 
+	$H^2_{\bar{t}}$ & 0.45 & (0.24, 0.67) \\ \hline
+	\end{tabular}
+	\label{tab:POUMM-parameters}
+\end{table}
+
+\begin{table}[H]
+\caption{POUMM parameter estimates for spVL from previous studies.}
+	\begin{tabular}{lcccp{0.35\linewidth}}
+	\hline 
+	Parameter & Value & Uncertainty & Reference & Notes \\
+	\hline 
+	$v_0$ & 5.54 & (4.04 - 7.25) HPD & \citealt{Mitov2018} & 8,483 UK HIV cohort individuals, $pol$ tree \\
+	$\theta$ & 4.45 & (4.41 - 4.49) HPD & \citealt{Mitov2018} & \\
+	$\theta$ &  4.0 & (1.6 - 4.3) 95\% CI & \citealt{Bertels2018} & 3,036 SHCS individuals, $pol$ tree \\
+	$\theta$ & 4.1 & (3.5 - 4.9) 95\% CI & \citealt{Blanquart2017} & 1,581 subtype B individuals from Europe, whole genome tree \\
+	$\alpha$ & 28.78 & (16.64 - 46.93) HPD & \citealt{Mitov2018} & \\
+	$\alpha$ & 32.7 & (0.03 - 57.6) 95\% CI & \citealt{Bertels2018} & \\
+	$\alpha$ & 7.6 & (1.2 - 10) 95\% CI & \citealt{Blanquart2017} & **limited $\alpha$ to $\le$ 10 \\
+	$\sigma$ & 2.97 & (1.95 - 4.37) HPD & \citealt{Mitov2018} & \\
+	$\sigma$ & 1.3 & (0.66 -1.87) 95\% CI &  \citealt{Blanquart2017} & \\
+	$\sigma_e$ & 0.77 & (0.73, 0.8) HPD & \citealt{Mitov2018} & \\
+	$\sigma_e$ & 0.61 & (0.54, 0.65) 95\% CI &  \citealt{Blanquart2017} & \\
+	\hline 
+	\end{tabular}
+	\label{tab:POUMMparams}
+\end{table}
+
+\begin{table}[H]
+\caption{Summary statistics for log spVL in previously sampled populations. $\bar{z}$ is average spVL (log copies/mL) and $\sigma^2_z$ is variance in measured spVL ( log $\textrm{copies}^2/\textrm{mL}^2$). Values from \protect\citet{Blanquart2017, Mitov2018} are empirical; values from \protect\cite{Bonhoeffer2015} were estimated by fitting a normal distribution to the data.}
+	\begin{tabular}{lcc} \hline 
+	Measurement & Value & Reference \\ \hline 
+	$\bar{z}$ & $\approx$ 4.5 & \citealt{Mitov2018} \\
+	$\bar{z}$ &  4.4 & \citealt{Blanquart2017} \\
+	$\bar{z}$ & $\approx$ 4.5 & \citealt{Bonhoeffer2015} \\
+	$\sigma^2_z$ &  0.73 &  \citealt{Mitov2018} \\
+	$\sigma^2_z$ &  0.50 & \citealt{Blanquart2017} \\
+	$\sigma^2_z$ & $\approx$ 0.5 & \citealt{Bonhoeffer2015} \\ \hline 
+	\end{tabular}
+	\label{tab:spVLmeasurements}
+\end{table}
+%\todo{I guessed at bar(z) from figure in Mitov2018, search supplement for exact}
+
+\begin{table}[H]
+\caption{Number of samples for GWAS after sequential filtering steps.}
+    \begin{tabular}{lc}
+    \hline
+    Sample filter & Number of samples remaining \\
+    \hline
+    Subtype B pol sequences & 1516 \\
+    With paired spVL measurement & 1516 \\
+    $>$ 750 characters in sequence & 1493 \\
+    Individual is of European ancestry & 1396 \\
+    Kinship coefficient $>$ 0.09375 & 1392 \\ 
+    \hline
+    \end{tabular}
+    \label{tab:sample-filtering}
+\end{table}
+
+\begin{table}[H]
+\caption{Number of variants for GWAS after sequential filtering steps.}
+	\begin{tabular}{lc}
+	\hline
+	Variant filter & Number of variants remaining \\
+	\hline 
+	Raw data & 76979521 \\
+	Missing genotype rate $>$ 0.01 & 7452957 \\
+	Hardy-Weinburg exact test p-value $<$ 5x10$^-5$ & 7452425 \\
+	Minor allele frequency $<$ 0.01 & 4556770 \\ \hline			
+	\end{tabular}
+	\label{tab:variant-filtering}
+\end{table}
+
+\begin{longtable}[H]{lp{1cm}p{2cm}p{1cm}p{2cm}p{1cm}p{2cm}} % {lrrrrrr}{lrrrrrr}
+		\caption{Association results for common class I HLA alleles ranked by p-value from the GWAS by \citet{McLaren2015} compared to results from the current study.}
 		\hline
 		& \multicolumn{2}{l}{McLaren et al.}  & \multicolumn{2}{l}{Standard GWAS} & \multicolumn{2}{l}{GWAS with phylogenetic correction} \\ 
 		\hline
@@ -682,58 +719,14 @@ Therefore, we can expect the RMSE for $\bm{z} - \bm{\bar{z}}$ as an estimate for
 		HLA-A*30:02 & 0.050 & $5.92 \times 10^{-1}$ & 0.047 & $9.28 \times 10^{-1}$ & -0.004 & $9.89 \times 10^{-1}$ \\ 
 		HLA-A*26:01 & -0.003 & $9.57 \times 10^{-1}$ & -0.645 & $1.96 \times 10^{-1}$ & -0.529 & $6.59 \times 10^{-2}$ \\
 		\hline
-		\caption{Association results for common class I HLA alleles ranked by p-value from the GWAS by \citet{McLaren2015} compared to results from the current study.}
 		\label{tab:full-mclaren-comparison}
 \end{longtable}
 
-\begin{table}[H]
-	\begin{center}
-		\begin{tabular}{cccl}
-			\toprule 
-			Parameter & Value & Uncertainty & Reference \\
-			\midrule 
-			$v_0$ & 5.54 & (4.04 - 7.25) HPD & \citealt{Mitov2018} \\
-			$\theta$ & 4.45 & (4.41 - 4.49) HPD& \citealt{Mitov2018}  \\
-			$\theta$ &  4.0 & (1.6 - 4.3) 95\% CI & \citealt{Bertels2018} \\
-			$\theta$ & 4.1 & (3.5 - 4.9) 95\% CI & \citealt{Blanquart2017} \\
-			$\alpha$ & 28.78 & (16.64 - 46.93) HPD & \citealt{Mitov2018} \\
-			$\alpha$ & 32.7 & (0.03 - 57.6) 95\% CI & \citealt{Bertels2018} \\
-			$\alpha$ & 7.6 & (1.2 - 10) 95\% CI & \citealt{Blanquart2017}** \\
-			$\sigma$ & 2.97 & (1.95 - 4.37) HPD & \citealt{Mitov2018} \\
-			$\sigma$ & 1.3 & (0.66 -1.87) 95\% CI &  \citealt{Blanquart2017} \\
-			$\sigma_e$ & 0.77 & (0.73, 0.8) HPD & \citealt{Mitov2018} \\
-			$\sigma_e$ & 0.61 & (0.54, 0.65) 95\% CI &  \citealt{Blanquart2017} \\
-			\bottomrule 
-		\end{tabular}
-		\caption{POUMM parameters previously inferred from HIV data. Notes for each study: \protect\citet{Mitov2018} = 8,483 UK HIV cohort individuals, pol tree; \protect\citet{Bertels2018} = 3,036 SHCS individuals, pol tree; \protect\citet{Blanquart2017} = 1,581 subtype B individuals from BE, CH, FR, NL, UK, whole genome tree, **limited $\alpha$ to $\le$ 10}
-		\label{tab:POUMMparams}
-	\end{center}
-\end{table}
-
-\begin{table}[H]
-	\begin{center}
-			\begin{tabular}{ccl} \toprule 
-			Measurement & Value & Reference \\ \midrule 
-			$\bar{z}$ & $\approx$ 4.5 & \citealt{Mitov2018} \\
-			$\bar{z}$ &  4.4 & \citealt{Blanquart2017} \\
-			$\bar{z}$ & $\approx$ 4.5 & \citealt{Bonhoeffer2015} \\
-			$\sigma^2_z$ &  0.73 &  \citealt{Mitov2018} \\
-			$\sigma^2_z$ &  0.50 & \citealt{Blanquart2017} \\
-			$\sigma^2_z$ & $\approx$ 0.5 & \citealt{Bonhoeffer2015} \\ \bottomrule 
-		\end{tabular}
-		\caption{Summary statistics for log spVL in previously sampled populations. $\bar{z}$ is average spVL (log copies/mL) and $\sigma^2_z$ is variance in measured spVL ( log $\textrm{copies}^2/\textrm{mL}^2$). Values from \protect\citet{Blanquart2017, Mitov2018} are empirical while values from \protect\cite{Bonhoeffer2015} were estimated by fitting a normal distribution to the data.}
-		\label{tab:spVLmeasurements}
-	\end{center}
-\end{table}
-%\todo{I guessed at bar(z) from figure in Mitov2018, search supplement for exact}
-
-\begin{figure}[H]
-	\includegraphics[width=\linewidth]{images/HIV_tree_branch_lengths}
-	\caption{Left plot: branch length distributions for UK HIV tree and our simulated HIV tree prior to pruning down to 500 tips. The mean root-to-tip distance for the UK tree is 0.14 and the mean branch length is 0.02. The mean root-to-tip distance for the full simulated HIV tree is 0.14 and the mean branch length is 0.01. Right plot: branch length distribution for the tree of 500 tips used for simulation. The mean root-to-tip distance for the pruned HIV tree is 0.14 and the mean branch length is 0.03.}
-	\label{fig:branchlengths}
-\end{figure}
-
-\end{doublespace}
+% \begin{figure}[H]
+% 	\includegraphics[width=\linewidth]{images/HIV_tree_branch_lengths}
+% 	\caption{Left plot: branch length distributions for UK HIV tree and our simulated HIV tree prior to pruning down to 500 tips. The mean root-to-tip distance for the UK tree is 0.14 and the mean branch length is 0.02. The mean root-to-tip distance for the full simulated HIV tree is 0.14 and the mean branch length is 0.01. Right plot: branch length distribution for the tree of 500 tips used for simulation. The mean root-to-tip distance for the pruned HIV tree is 0.14 and the mean branch length is 0.03.}
+% 	\label{fig:branchlengths}
+% \end{figure}
 
 \typeout{}
 \printbibliography
