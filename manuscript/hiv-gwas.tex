@@ -127,7 +127,15 @@ In the following we (i) describe a statistical model for the spVL trait, (ii) de
 
 \subsection{A statistical model for spVL}
 
-Our premise is that spVL is the sum of three parts: direct host genetic effects, viral genetic effects, and environmental effects. Uniquely, the viral part is heritable from one transmission partner to another \parencite{Mitov2018, Bertels2018}. To characterize these parts, we use a phylogenetic mixed model (PMM, \cite{Housworth2004}). PMMs assume continuous traits like spVL are the sum of independent heritable and non-heritable parts. The heritable viral part is modeled by a random process occurring in continuous time along the branches of the viral phylogeny. The non-heritable host and environmental parts are modeled as gaussian noise added to sampled individuals at the tips of the phylogeny (Figure \ref{fig:spVLModel}).
+Our premise is that spVL is the sum of several parts: direct host genetic effects, pathogen genetic effects, interaction effects between host and pathogen genetic factors, and environmental effects. Of these, only pathogen genetic effects should be heritable from one transmission partner to another \parencite{Mitov2018, Bertels2018}. To characterize these effects, we use a phylogenetic mixed model (PMM, \cite{Housworth2004}). PMMs assume continuous traits like spVL are the sum of independent heritable and non-heritable parts. In our case, the heritable part comes from pathogen genetic effects and the non-heritable part comes from the other effects. Then, viral genetic effects are modeled by a random process occurring in continuous time along the branches of the pathogen phylogeny. The other, non-heritable effects are modeled as Gaussian noise added to sampled individuals at the tips of the phylogeny (Figure \ref{fig:spVLModel}).
+
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[width=0.75\linewidth]{figures/model_figure}
+		\caption{The POUMM statistical model for the spVL trait. (A) shows how the pathogen effect on spVL, $g_v$, evolves according to an OU process along (C) the pathogen phylogeny. The dashed line in (A) shows the expected value of the trait at each point in time under the model. (B) shows that the non-pathogen effect on spVL, $e$, is modeled as a Gaussian random variable. Each tip on the phylogeny corresponds to a sampled individual with an independent non-pathogen-effect drawn from the distribution shown in (B).}
+		\label{fig:spVLModel}
+	\end{center}
+\end{figure}
 
 So far, spVL has been modelled using PMMs with two different types of random processes. The Brownian Motion (BM) process assumes that trait values are unbounded (i.e. spVL can attain any value). In contrast, the Ornstein-Uhlenbeck (OU) process assumes the trait fluctuates around an optimal value (i.e. extreme spVL values are very unlikely) \cite{Butler2004}. We argue the OU assumption is more realistic for spVL. \citet{Fraser2014} hypothesized that spVL is under stabilizing selection to maximize viral transmission. Accordingly, both \citet{Mitov2018} and \citet{Bertels2018} found higher statistical support for the OU process compared to BM for spVL evolution. Therefore, we assume the OU process. This model, called the phylogenetic Ornstein-Uhlenbeck mixed model (POUMM), is described in detail by \citet{Mitov2018}, but we review the main points here in the spVL context.
 
@@ -165,14 +173,6 @@ Finally, we remember that $e$ is the non-heritable, environmental part of spVL. 
 	Var(e) = \sigma^2_e
 \end{split}
 \end{align}
-
-\begin{figure}[H]
-	\begin{center}
-		\includegraphics[width=0.75\linewidth]{figures/model_figure}
-		\caption{The POUMM statistical model for the spVL trait. (A) shows how the pathogen effect on spVL, $g_v$, evolves according to an OU process along (C) the pathogen phylogeny. The dashed line in (A) shows the expected value of the trait at each point in time under the model. (B) shows that the non-pathogen effect on spVL, $e$, is modeled as a Gaussian random variable. Each tip on the phylogeny corresponds to a sampled individual with an independent non-pathogen-effect drawn from the distribution shown in (B).}
-		\label{fig:spVLModel}
-	\end{center}
-\end{figure}
 
 \subsection{Estimating and removing the virus-determined part of spVL}
 
