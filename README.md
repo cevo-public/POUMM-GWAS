@@ -98,11 +98,11 @@ docker run \
 ### Fit the POUMM, apply phylogenetic correction to spVL trait
 * ```fit_poumm.R``` fits the POUMM to the phylogeny and calculated spVL values, generating maximum-likelihood parameter estimates.
 * ```correct_trait.R``` generates estimates for individual-specific viral, environmental parts of trait using POUMM parameters and trait values.
-* ```make_gwas_phenotypes_file.R``` generates a phenotype file for GWAS with raw and estaimated environmental-only trait values.
 
 ### Prepare human genotype data
 * `scripts/R/filter_gwas_individuals.R` generates a list of SHCS individuals of European descent carrying subtype B HIV.
 * Filter the host genotype files based on individuals to keep, variant thresholds.
+* Summarize allele frequencies, missingness in filtered human genotype data.
 ```
 docker build -t prep-gwas-files -f Dockerfile-prep-gwas-files .
 # Connect to smb://d.ethz.ch/groups/bsse/stadler/
@@ -110,24 +110,13 @@ docker run \
 --volume=/Volumes/stadler/SHCSData/data:/data:ro \
 --volume=`pwd`/output:/output prep-gwas-files
 ```
-* Adjust the .fam file: add POUMM-calcuated GWAS trait values.
-* Get top 5 principal components of host genetic variation.
+* ```make_gwas_phenotypes_file.R``` generates a phenotype file for GWAS with raw and estaimated environmental-only trait values.
 
 ### Run comparative GWAS
-* Run GWAS using PLINK.
-* Filter PLINK results to SNPs only, not covariates and add p-value, beta columns.
-
-[comment]: <> (* add_sex_to_fam_SN.R: Add sex information to .fam file.)
-
-[comment]: <> (* filter_genotype_data_and_add_sex: Filter and QC host genetic data using PLINK.)
-
-[comment]: <> (* summarize_data.sh: Get SNP frequencies and missingness reports for filtered data.)
-
-[comment]: <> (* generate_pc_covariates.sh: Get top 5 principal components of host genetic variation.)
-
-[comment]: <> (* run_gwas.sh: Run GWAS using PLINK.)
-
-[comment]: <> (* manipulate_plink_results_for_plotting.sh: Filter PLINK results to SNPs only, not covariates and add p-value, beta columns.)
-
-
-
+* Get top 5 principal components (PCs) of host genetic variation.
+* Run GWAS using PLINK with sex, top 5 PCs as covariates.
+* Filter PLINK results to SNPs only, not covariates and add p-value, effect size columns.
+```
+docker build -t run-gwas -f Dockerfile-run-gwas .
+docker run --volume=`pwd`/output:/output run-gwas
+```
