@@ -12,7 +12,7 @@ FAM_W_SEX="spVL.shcs.rs_with_sex_SN.fam"
 --keep output/gwas_individuals_to_keep.txt \
 --king-cutoff 0.09375 \
 --maf 0.01 \
---geno 0.01 \
+--geno 0.05 \
 --hwe 0.00005 \
 --make-bed \
 --memory 10000 \
