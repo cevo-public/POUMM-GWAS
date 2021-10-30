@@ -65,7 +65,7 @@
 \begin{document}
 
 \begin{center}
-	\Large{A new phylogeny-aware GWAS framework to estimate direct human genetic effects on HIV set-point viral load}
+	\Large{A phylogeny-aware GWAS framework to correct for heritable pathogen effects on infectious disease traits}
 \end{center}
 \vspace{4pt}
 
@@ -93,7 +93,7 @@
 \begin{doublespace}
 
 \begin{abstract}
-	Infectious diseases are a unique challenge for genome-wide association studies (GWAS) because human genetic variants can not only directly effect disease outcome, but also have indirect effects via selection on the pathogen. Previous GWAS have successfully identified several human genetic variants associated with HIV-1 set point viral load (spVL). However, it is unclear to what extent the identified alleles are directly protective against all HIV strains. HIV strain-specific factors account for an estimated 21 - 29\% of spVL variability, but typical GWAS methods do not consider these effects. We propose a new method to consider the full genome of each patient's infecting strain, remove strain-specific effects on spVL, and thus better estimate the direct effect of human alleles on HIV spVL. In simulations, we show our method can increase GWAS power to detect truly associated human variants when viral effects are highly heritable. When we apply our method to real patient data from Switzerland, we recover weaker signals of association in the \emph{CCR5} gene region and among the top-associated variants in the major histocompatability complex (MHC) compared to a standard GWAS. The top-associated SNPs do not change. This method could also be used investigate whether GWAS-detected associations in other chronic infections are robust to a correction for pathogen-mediated effects.
+	Infectious diseases are a unique challenge for genome-wide association studies (GWAS) because pathogen, host, and environmental factors can all effect disease traits. Previous GWAS have successfully identified several human genetic variants associated with HIV-1 set point viral load (spVL), among other important infectious disease traits. However, GWAS for host genetic determinants of infectious disease traits do not account for potentially confounding or extraneous pathogen effects that are heritable from one infection partner to another in transmission chains.  We propose a novel method to consider the full genome of each patient's infecting strain, remove strain-specific effects on a trait, and thus better estimate the effect of human genetic variants on infectious disease traits. In simulations, we show our method can increase GWAS power to detect truly associated human variants when pathogen effects are highly heritable. When we apply our method to HIV-1 cohort data from Switzerland, we recover slightly weaker but qualitatively similar signals of association in the \emph{CCR5} gene region and among the top-associated variants in the major histocompatability complex (MHC) compared to a standard GWAS. Although estimated heritability and selection parameters for HIV-1 mean standard GWAS are quite robust to pathogen effects, our simulation study shows that our framework may improve GWAS for other diseases where pathogen effects are stronger and more correlated among close members of transmission chains.
 \end{abstract}
 
 \section{Introduction}
@@ -105,10 +105,10 @@ A key goal of genome-wide association studies (GWAS) is to understand the geneti
 For HIV, GWAS have used a trait called set point viral load (spVL) to identify human variants associated with severity of disease course. spVL is generally defined to be the average concentration of viral particles in host plasma during the asymptomatic phase of infection in the absence of treatment \parencite{Mellors1996}. In untreated individuals, spVL is predictive of duration of asymptomatic infection \parencite{Mellors1996} and infectiousness \parencite{Quinn2000}. If viral load can be reduced to undetectable levels, an individual is effectively uninfectious \parencite{HHSARTGuidelines2019}. Notably, spVL varies by orders of magnitude between individuals \parencite{Mellors1996}. Thus, spVL measurements point to a wide range in natural HIV control by the human immune system. 
 
 % How do we measure the extent to which genetic factors determine spVL
-We are interested in understanding to what extent spVL, as a proxy for natural HIV control, is determined by human and viral genetic factors. Heritability is a key measure of how genetically-determined a trait is. Broad-sense heritability $H^2$ measures the fraction of total trait variance that is heritable, i.e. due to inherited differences. Narrow-sense heritability $h^2$ measures the fraction of total trait variance due specifically to additive genetic effects, i.e. the sum of independent effects from all genetic variants. 
+Previous studies have underscored the importance of understanding to what extent spVL, as a proxy for natural HIV control, is determined by human genetic factors \cite{Bartha2013, Dalmasso2008, Fellay2007, Pereyra2010, Fellay2009, Pelak2010, VanManen2011, McLaren2012}. Heritability is a key measure of how genetically-determined a trait is. Broad-sense heritability $H^2$ measures the fraction of total trait variance that is heritable, i.e. due to inherited differences. Narrow-sense heritability $h^2$ measures the fraction of total trait variance due specifically to additive genetic effects, i.e. the sum of independent effects from all genetic variants. 
 
 % How heritable is spVL (human side)
-GWAS can be used to measure narrow-sense heritability from human genetic variants. Several GWAS have been done for spVL \parencite{Bartha2013, Dalmasso2008, Fellay2007, Pereyra2010, Fellay2009, Pelak2010, VanManen2011, McLaren2012}. The largest to-date by \cite{McLaren2015} measured the narrow-sense heritability of spVL from human genetic variants to be approximately 25\%. All but 5\% of this was attributed to two regions in the human genome, the major histocompatibility complex (MHC) and C-C motif chemokine receptor 5 (\emph{CCR5}). Both associations are biologically relevant: the MHC encodes proteins that display viral epitopes at the cell surface and \emph{CCR5} encodes a co-receptor for HIV-1 cell entry. In other words, MHC proteins match bits of the virus like puzzle pieces and display these to signal that infected cells should be destroyed. On the other hand, CCR5 proteins are a signal to the virus that help it find the right cells to infect.
+GWAS can be used to measure narrow-sense heritability from human genetic variants. Several GWAS have been done for spVL \cite{Bartha2013, Dalmasso2008, Fellay2007, Pereyra2010, Fellay2009, Pelak2010, VanManen2011, McLaren2012}. The largest to-date by \cite{McLaren2015} measured the narrow-sense heritability of spVL from human genetic variants to be approximately 25\%. All but 5\% of this was attributed to two regions in the human genome, the major histocompatibility complex (MHC) and C-C motif chemokine receptor 5 (\emph{CCR5}). Both associations are biologically relevant: the MHC encodes proteins that display viral epitopes at the cell surface and \emph{CCR5} encodes a co-receptor for HIV-1 cell entry. In other words, MHC proteins match bits of the virus like puzzle pieces and display these to signal that infected cells should be destroyed. On the other hand, CCR5 proteins are a signal to the virus that help it find the right cells to infect.
 
 % How heritable is spVL (viral side)
 In addition to these human genetic factors, is also well-recognized that viral genetic factors effect spVL. On the viral side, broad-sense heritability is typically measured. Estimates differ depending on the methods employed and the cohort studied (see \citealt{Mitov2018} for a discussion of this uncertainty). Estimates using phylogenetic methods on large UK and Swiss cohorts by \cite{Mitov2018} and \cite{Bertels2018} measured the broad-sense heritability of spVL from the virus to be 21\% - 29\%. However, variation in the MHC is known to exert strong selective pressure on the virus \parencite{Kloverpris2016}. If the virus can change it's ``puzzle piece'' shape to escape MHC proteins, infected cells can go undetected. This means that MHC variants effect spVL largely via selection on the virus \parencite{Bartha2017}. In summary, human genetic factors play a role in determining spVL, but these effects may be mediated by viral genetic variation.
@@ -122,9 +122,9 @@ Issue (iii) is closely related to a well-known problem in standard GWAS, namely 
 However, these approaches are only suitable to quantify effects from $pathogen$ genetic variants on a trait. In contrast, we want to estimate effects of $human$ genetic variants on a trait, taking into account pathogen effects. \parencite{Naret2018} developed a relevant method for this task. The authors suggest adding principle components derived from the pathogen phylogeny as covariates to the linear regression models for association testing. This should correct for trait correlations due to shared pathogen ancestry. However, the top principle components capture only some of the information from the full pathogen phylogeny. Furthermore, we would like to simultaneously address issues (i) and (ii).
 
 % Introduction to our method
-In this work,  we draw from the field of phylogenetic comparative methods to develop a new GWAS approach that estimates and removes trait variability due to the pathogen using information from the full pathogen phylogeny. Our approach should help identify human genetic variants with direct effects on disease traits. Furthermore, we think this approach represents the first GWAS framework to identify human genetic variants associated with a disease trait that accounts for non-independence of samples due to the underlying pathogen phylogeny. 
+In this work,  we draw from the field of phylogenetic comparative methods to develop a new GWAS framework that estimates and removes trait variability due to the pathogen using information from the full pathogen phylogeny. Our approach should help identify human genetic variants that affect disease traits and more accurately estimate their effects. Furthermore, we think this approach represents the first GWAS framework to identify human genetic variants associated with a disease trait that accounts for non-independence of samples due to the underlying pathogen phylogeny. 
 
-In the following we (i) describe a statistical model for the spVL trait, (ii) derive a maximum likelihood estimate for the viral part of spVL under this model, and (iii) describe a new infectious disease GWAS framework using this information. In simulations, we demonstrate that this framework can improve GWAS power to detect human genetic variants effecting a disease trait. Finally, we apply our framework to human and viral genome data from the Swiss HIV Cohort Studey (SHCS) and show that only certain associations with spVL are robust to a correction for viral effects. We suggest that this framework could be applied to other infectious disease GWAS.
+In the following we (i) describe a statistical model for the spVL trait, (ii) derive a maximum likelihood estimate for the viral part of spVL under this model, and (iii) describe a new infectious disease GWAS framework using this information. In simulations, we demonstrate that this framework can improve GWAS power to detect human genetic variants effecting a disease trait. Finally, we apply our framework to human and viral genome data from the Swiss HIV Cohort Studey (SHCS) and show that only certain associations with spVL are robust to a correction for viral effects. Although we developed our framework in the context of HIV-1 spVL, the same approach could readily be applied to other heritable infectious disease traits. 
 
 \subsection{A statistical model for spVL}
 
@@ -263,23 +263,19 @@ Next, we characterized the evolutionary scenarios under which our framework can 
 
 \subsection{GWAS on the Swiss HIV Cohort}
 
-Finally, we applied our framework to empirical data from the Swiss HIV Cohort Study (SHCS). We used data from 1,392 individuals in Switzerland infected with subtype B HIV-1 between 1994 and 2018. The SHCS provided viral load measurements, $pol$ gene sequences, and human genotype data for these individuals. We followed the framework outlined above to estimate the pathogen and non-pathogen effects on spVL for the cohort individuals from these data. Figure \ref{fig:spvl-on-tree} shows the calculated 
+Finally, we applied our framework to empirical data from the Swiss HIV Cohort Study (SHCS). We used data collected from 1,392 individuals in Switzerland infected with subtype B HIV-1 between 1994 and 2018. The SHCS provided viral load measurements, $pol$ gene sequences, and human genotype data for these individuals. We followed the framework outlined above to estimate the pathogen and non-pathogen effects on spVL for the cohort from these data. Figure \ref{fig:spvl-calc-comparison} shows the calculated spVL values, figure \ref{fig:spvl-on-tree} shows the inferred pathogen phylogeny, and figures \ref{fig:spvl-on-tree}, \ref{fig:trait-comparison} show the estimated non-pathogen effects on spVL calculated for these individuals. We estimated spVL heritability in this cohort to be 45\% (95\% highest posterior density, HPD, 24 - 67\%) \ref{tab:POUMM-parameters-our-estimates}. To put these values into the context of our simulation study, they are shown as black points on figure \ref{fig:simulationResults}.
 
-We ran two sets of GWAS association tests on the same host genotype data to compare our framework with a more standard approach. In both GWAS, we regressed a trait value on dosage for each candidate host genetic variant to identify host variants correlated with trait values across the cohort. The two GWAS differ in the trait value used. In the ``GWAS with standard trait value'' we used the unmodified trait value, measured spVL. In the ``GWAS with estimated non-pathogen part of trait'' we used our estimates for the non-pathogen effects on spVL. Figure \ref{fig:gwas-results}A shows that results are qualitatively similar between the two GWAS. Figure \ref{fig:gwas-results}B shows how the strength of association changed for some variants in the MHC and \emph{CCR5} regions. Regardless, these regions were consistent in having variants with the strongest signals of association from across the genome.
+We compared our proposed GWAS framework with a more standard approach by performing two different GWAS on the same SHCS human genotypes. In the ``GWAS with standard trait value'' we used the unmodified trait value, our calculated spVL values, as the GWAS response variable. In the ``GWAS with estimated non-pathogen part of trait'' we used our estimates for the non-pathogen effects on spVL. Figure \ref{fig:gwas-results}A shows that results are qualitatively similar between the two GWAS. Q-Q plots show the distribution of p-values are very similar as well (figure \ref{fig:qq-plots}). Figure \ref{fig:gwas-results}B shows how the strength of association changed for some variants in the MHC and \emph{CCR5} regions. Taking into account phylogenetic information slightly decreased association strength for most variants in \emph{CCR5} region. Association strength increased for some variants in the MHC, for example, SNP rs9265880 had the greatest increase in significance from a p-value of 2.2x10$^{-5}$ to 6x10$^{-7}$. % TODO
+However, the two top-associated SNPs are consistent between our study and \cite{McLaren2015} (table \ref{tab:comp-gwas}). In summary, there are no clear patterns that point to new regions of association in the human genome with spVL when we take into account the pathogen phylogeny.
 
+% TODO
 \begin{figure}[H]
 	\begin{center}
 		\includegraphics[width=0.7\linewidth]{figures/gwas_results}
-		\caption{Results from comparative GWAS. Association results for standard GWAS and GWAS with a phylogenetic correction applied to the same data for HIV-1 set-point viral load. The pullout plots give regional association results from the GWAS with phylogenetic correction in the \emph{CCR5} region (positions 45.4 - 47Mb on chromosome 3) and the MHC region (positions 29.5 - 33.5Mb on chromosome 6). Base positions are with reference to genome build GRCh37. The color scale in the regional association plot is the difference in -log$_{10}$ p-value between the GWAS with phylogenetic correction and the standard GWAS. Red color means the phylogenetic correction decreased variant significance and blue color means the phylogenetic correction increased variant significance. The dashed lines show genome-wide significance (p-value = 5x10$^{-8}$).}
+		\caption{Results from comparative GWAS. (A) shows association p-values for the same host variants from the SHCS cohort in GWAS with two different response variables. On the left, we used unmodified spVL values. On the right, we used our estimates for the non-pathogen effects on spVL. The alternating colors correspond to different chromosomes. (B) compares the strength of association for variants in the \emph{CCR5} and MHC regions between the two GWAS (positions 45.4 - 47Mb on chromosome 3 and 29.5 - 33.5Mb on chromosome 6 for the \emph{CCR5} and MHC, respectively). Base positions are with reference to genome build GRCh37. The color of each point represents the difference in -log$_{10}$ p-value between the two GWAS. Red means taking into account phylogenetic information decreased the strength of association and blue means it increased it. The dashed lines show genome-wide significance at p = 5x10$^{-8}$).}
 		\label{fig:gwas-results}
 	\end{center}
 \end{figure}
-
-The overall distribution of p-values did not change noticeably between the standard GWAS and the GWAS with a phylogenetic correction (figure \ref{fig:qq-plots}). In the \emph{CCR5} and MHC regions, most variants decreased in significance in the GWAS with phylogenetic correction. However, the top-associated variants were constant between analyses. rs112243036 was most significant in the MHC, with a standard GWAS p-value of 9.7x10$^{-16}$ and corrected GWAS p-value of 2.5x10$^{-14}$. In the \emph{CCR5} region, rs7430431 was most significant, with a standard GWAS p-value of 7.4x10$^{-9}$ and a corrected GWAS p-value of 1.7x10$^{-7}$. Some variants in the MHC did increase in significance with a phylogenetic correction. For example, SNP rs9265880 had the greatest increase in significance from a p-value of 2.2x10$^{-5}$ in the standard GWAS to 6x10$^{-7}$ in the GWAS with phylogenetic correction. 
-
-The top-associated SNPs from the \cite{McLaren2015} paper were excluded from the main analysis because of too-high missing rates (3\% for rs1015164 and 4\% for rs59440261). In order to directly compare our results with \cite{McLaren2015}, we ran an additional GWAS for these two SNPs anyways. Both SNPs became less significant with phylogenetic correction (table \ref{tab:comp-gwas}).
-
-Again following the procedure of \cite{McLaren2015}, we imputed common HLA genotypes to more finely map association signals in the MHC region. Some HLA alleles also became more significant with a phylogenetic correction (table \ref{tab:lim-mclaren-comparison}).
 
 \begin{table}[H]
 	\begin{center}
@@ -298,41 +294,18 @@ Again following the procedure of \cite{McLaren2015}, we imputed common HLA genot
 	\end{center}
 \end{table}
 
-\begin{table}[H]
-	\begin{center}
-	\begin{tabular} {p{3cm}p{1cm}p{2cm}p{1cm}p{2cm}p{1cm}p{2cm}} % {lrrrrrr}
-		\hline
-		 & \multicolumn{2}{l}{McLaren et al.}  & \multicolumn{2}{l}{Standard GWAS } & \multicolumn{2}{l}{GWAS with phylogenetic correction} \\ 
-		 \hline
-		Allele & Beta & p-value & Beta & p-value & Beta & p-value \\
-		\hline	
-		HLA-B*57:01 & -0.840 & $2.69 \times 10^{-86}$ & -0.479 & $1.11 \times 10^{-12}$ & -0.268 & $5.43 \times 10^{-12}$ \\ 
-		\rowcolor{Gray}
-		HLA-C*06:02 & -0.436 & $7.32 \times 10^{-50}$ & -0.173 & $1.10 \times 10^{-4}$ & -0.107 & $3.15 \times 10^{-5}$ \\ 
-		HLA-B*27:05 & -0.417 & $4.32 \times 10^{-20}$ & -0.244 & $9.59 \times 10^{-4}$ & -0.122 & $4.40 \times 10^{-3}$ \\ 
-		\rowcolor{Gray}
-		HLA-C*07:01 & 0.195 & $1.86 \times 10^{-14}$ & 0.129 & $7.55 \times 10^{-3}$ & 0.086 & $1.99 \times 10^{-3}$ \\ 
-		HLA-C*07:02 & 0.194 & $3.75 \times 10^{-13}$ & 0.095 & $3.02 \times 10^{-2}$ & 0.052 & $3.98 \times 10^{-2}$ \\ 
-		HLA-B*07:02 & 0.200 & $5.17 \times 10^{-13}$ & 0.129 & $5.29 \times 10^{-3}$ & 0.072 & $7.06 \times 10^{-3}$ \\ 
-		\rowcolor{Gray}
-		HLA-B*08:01 & 0.206 & $2.94 \times 10^{-11}$ & -0.009 & $9.20 \times 10^{-1}$ & 0.015 & $7.75 \times 10^{-1}$ \\ 
-		\rowcolor{Gray}
-		HLA-C*08:02 & -0.307 & $8.76 \times 10^{-11}$ & 0.324 & $8.55 \times 10^{-1}$ & 0.400 & $6.95 \times 10^{-1}$ \\ 
-		HLA-C*04:01 & 0.183 & $9.07 \times 10^{-11}$ & 0.124 & $3.04 \times 10^{-3}$ & 0.058 & $1.67 \times 10^{-2}$ \\ 
-		\rowcolor{Gray}
-		HLA-B*13:02 & -0.346 & $3.70 \times 10^{-10}$ & -0.188 & $1.03 \times 10^{-2}$ & -0.112 & $7.90 \times 10^{-3}$ \\ 
-		\rowcolor{Gray}
-		HLA-B*14:02 & -0.318 & $2.10 \times 10^{-9}$ & 0.067 & $8.12 \times 10^{-1}$ & 0.118 & $4.71 \times 10^{-1}$ \\ 
-		\rowcolor{Gray}
-		HLA-C*12:02 & -0.478 & $4.02 \times 10^{-8}$ & 0.111 & $7.63 \times 10^{-1}$ & 0.094 & $6.58 \times 10^{-1}$ \\
-		\hline
-	\end{tabular}
-	\caption{Association results for common class I HLA alleles ranked by p-value from the GWAS by \cite{McLaren2015} compared to results from the current study. The table is truncated to show only alleles that reached genome-wide significance in the McLaren et al. study. The full table is available in the supplement (table \ref{tab:full-mclaren-comparison}). Grey rows are alleles that increased in significance with a phylogenetic correction.}
-	\label{tab:lim-mclaren-comparison}
-	\end{center}
-\end{table}
-
 \section{Discussion}
+% State the importance of your findings
+We present a novel, phylogeny-aware GWAS framework to correct for heritable pathogen effects on infectious disease traits.  
+
+% Contextualize the study
+We estimated HIV-1 spVL heritability to be 45\% (95\% HPD 24 - 67\%) in the SHCS. Our estimate is at the high end of previous estimates based on the POUMM in European cohorts, but the uncertainty intervals largely overlap: \cite{Bertels2018} estimated 29\% (N = 2014, CI 12 - 46\%) also from the SHCS and \cite{Blanquart2017} estimated 31\% (N = 2028, CI 15 - 43\%) from a pan-European cohort. Our sample size (N = 1493 individuals) is quite a bit smaller than these other studies, possibly because we restrict samples based on having $pol$ gene sequences with at least 750 non-ambiguous bases. Here our aim was to reconstruct a high-quality phylogeny, since the POUMM does not account for phylogenetic uncertainty. 
+
+% State some limitations
+Given our estimates for the heritability of spVL and the selection strength on this trait, our simulation results show that we cannot expect a significant improvement in GWAS power to identify host genetic determinants of this trait (figure \ref{fig:simulationResults}). So although there is a growing consensus that spVL is highly heritable (see \cite{Mitov2018} and citations therein), this does not necessarily mean individuals in a GWAS cohort have phylogenetically correlated spVL values.  
+
+% Summarize the paper
+% Make recommendations or suggestions for future research
 \begin{itemize}
 	\item From the field of phylogenetic comparative methods there are several methods to account for non-independence among samples related by an underlying phylogeny (e.g. independent contrasts, phylogenetic generalized least squares). Compared to these methods, our method is nice for GWAS because we do not change the association model itself, instead we just adjust the trait values prior to association testing.
 \end{itemize}
@@ -417,11 +390,7 @@ We performed two GWAS using the same genotype data. For the first ``standard GWA
 %	\item Table of genotype samples by project (genotyping chip, number of samples, spVL distribution)
 %	\item Link to github with all the code used to run simulations and generate figures
 %	\item Example spVL plots
-%	\item simulated TPR plot annotated with actual inferred POUMM params
-%	\item Simulation results with different parameterizations
-%	\item Whole pipeline replicated with a stricter spVL definition (and correspondingly fewer samples)
-%	\item Comparative QQ-plots from 1500 and standard GWAS
-%	\item Proof of robustness of method to inferred tree
+%	\item Proof of robustness of method to inferred tree -- NA because I just re-ran the _whole_ thing and it's not that different
 %\end{itemize}
 
 \newpage
@@ -555,19 +524,26 @@ Therefore, we can expect the RMSE for $\bm{z} - \bm{\bar{z}}$ as an estimate for
 
 \begin{figure}[H]
 	\centering
-		\includegraphics[width=\linewidth]{figures/poumm_parameter_estimates.png}
+		\includegraphics[width=0.7\linewidth]{figures/poumm_parameter_estimates.png}
 		\caption{Posterior distributions compared to the prior for POUMM parameter estimates based on Swiss data. We ran two different MCMC chains to ensure the estimates converged. The black point on the x-axis shows the posterior mean value, which was used to estimate the pathogen- and non-pathogen effects on spVL.}
 \label{fig:poumm-parameters}
 \end{figure}
 
 \begin{figure}[H]
 \begin{center}
-\includegraphics[width = \linewidth]{figures/spvl_calculation_comparison.png}
-	\caption{A comparison of different ways to calculate spVL based on viral load measurements provided by the SHCS.}
-	\label{fig:spvl-on-tree}
+\includegraphics[width = 0.462\linewidth]{figures/spvl_calculation_comparison.png}
+	\caption{A comparison of different ways to calculate spVL based on viral load measurements provided by the SHCS. The stricter filtering excludes all measurements possibly $<$ 6 months after infection and after treatment or AIDS, whereas the more lenient filtering excludes only measurements after treatment. We used the lenient filter, mean measurement values because these correlate well with the values from the stricter filter but allow us to retain many more individuals from the cohort for our study.}
+	\label{fig:spvl-calc-comparison}
 	\end{center}
 \end{figure}
 
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width = 0.462\linewidth]{figures/trait_values.png}
+	\caption{A comparison of measured (calculated) spVL values versus our estimated non-pathogen effect on spVL for each SHCS cohort member used in the study. The histograms show the marginal distribution of each value across the individuals.}
+	\label{fig:trait-comparison}
+	\end{center}
+\end{figure}
 
 \begin{figure}[H]
 \begin{center}
@@ -605,7 +581,7 @@ Therefore, we can expect the RMSE for $\bm{z} - \bm{\bar{z}}$ as an estimate for
 	$\sigma_e$ & 0.54 & (0.43, 0.65) \\ 
 	$H^2_{\bar{t}}$ & 0.45 & (0.24, 0.67) \\ \hline
 	\end{tabular}
-	\label{tab:POUMM-parameters}
+	\label{tab:POUMM-parameters-our-estimates}
 \end{table}
 
 \begin{table}[H]
@@ -627,7 +603,7 @@ Therefore, we can expect the RMSE for $\bm{z} - \bm{\bar{z}}$ as an estimate for
 	$\sigma_e$ & 0.61 & (0.54, 0.65) 95\% CI &  \citealt{Blanquart2017} & \\
 	\hline 
 	\end{tabular}
-	\label{tab:POUMMparams}
+	\label{tab:POUMMparams-prev-estimated}
 \end{table}
 
 \begin{table}[H]
@@ -1155,3 +1131,40 @@ Therefore, we can expect the RMSE for $\bm{z} - \bm{\bar{z}}$ as an estimate for
 %		\caption{Top association results from \cite{McLaren2015} compared to association results for the best proxy SNPs available in the current study. Proxy SNPs were chosen based on linkage disequilibrium (as measured by R$^2$) with the McLaren et al. SNPs.}
 %	\end{center}
 %\end{table}
+
+% Again following the procedure of \cite{McLaren2015}, we imputed common HLA genotypes to more finely map association signals in the MHC region. Some HLA alleles also became more significant with a phylogenetic correction (table \ref{tab:lim-mclaren-comparison}).
+
+
+% \begin{table}[H]
+% 	\begin{center}
+% 	\begin{tabular} {p{3cm}p{1cm}p{2cm}p{1cm}p{2cm}p{1cm}p{2cm}} % {lrrrrrr}
+% 		\hline
+% 		 & \multicolumn{2}{l}{McLaren et al.}  & \multicolumn{2}{l}{Standard GWAS } & \multicolumn{2}{l}{GWAS with phylogenetic correction} \\ 
+% 		 \hline
+% 		Allele & Beta & p-value & Beta & p-value & Beta & p-value \\
+% 		\hline	
+% 		HLA-B*57:01 & -0.840 & $2.69 \times 10^{-86}$ & -0.479 & $1.11 \times 10^{-12}$ & -0.268 & $5.43 \times 10^{-12}$ \\ 
+% 		\rowcolor{Gray}
+% 		HLA-C*06:02 & -0.436 & $7.32 \times 10^{-50}$ & -0.173 & $1.10 \times 10^{-4}$ & -0.107 & $3.15 \times 10^{-5}$ \\ 
+% 		HLA-B*27:05 & -0.417 & $4.32 \times 10^{-20}$ & -0.244 & $9.59 \times 10^{-4}$ & -0.122 & $4.40 \times 10^{-3}$ \\ 
+% 		\rowcolor{Gray}
+% 		HLA-C*07:01 & 0.195 & $1.86 \times 10^{-14}$ & 0.129 & $7.55 \times 10^{-3}$ & 0.086 & $1.99 \times 10^{-3}$ \\ 
+% 		HLA-C*07:02 & 0.194 & $3.75 \times 10^{-13}$ & 0.095 & $3.02 \times 10^{-2}$ & 0.052 & $3.98 \times 10^{-2}$ \\ 
+% 		HLA-B*07:02 & 0.200 & $5.17 \times 10^{-13}$ & 0.129 & $5.29 \times 10^{-3}$ & 0.072 & $7.06 \times 10^{-3}$ \\ 
+% 		\rowcolor{Gray}
+% 		HLA-B*08:01 & 0.206 & $2.94 \times 10^{-11}$ & -0.009 & $9.20 \times 10^{-1}$ & 0.015 & $7.75 \times 10^{-1}$ \\ 
+% 		\rowcolor{Gray}
+% 		HLA-C*08:02 & -0.307 & $8.76 \times 10^{-11}$ & 0.324 & $8.55 \times 10^{-1}$ & 0.400 & $6.95 \times 10^{-1}$ \\ 
+% 		HLA-C*04:01 & 0.183 & $9.07 \times 10^{-11}$ & 0.124 & $3.04 \times 10^{-3}$ & 0.058 & $1.67 \times 10^{-2}$ \\ 
+% 		\rowcolor{Gray}
+% 		HLA-B*13:02 & -0.346 & $3.70 \times 10^{-10}$ & -0.188 & $1.03 \times 10^{-2}$ & -0.112 & $7.90 \times 10^{-3}$ \\ 
+% 		\rowcolor{Gray}
+% 		HLA-B*14:02 & -0.318 & $2.10 \times 10^{-9}$ & 0.067 & $8.12 \times 10^{-1}$ & 0.118 & $4.71 \times 10^{-1}$ \\ 
+% 		\rowcolor{Gray}
+% 		HLA-C*12:02 & -0.478 & $4.02 \times 10^{-8}$ & 0.111 & $7.63 \times 10^{-1}$ & 0.094 & $6.58 \times 10^{-1}$ \\
+% 		\hline
+% 	\end{tabular}
+% 	\caption{Association results for common class I HLA alleles ranked by p-value from the GWAS by \cite{McLaren2015} compared to results from the current study. The table is truncated to show only alleles that reached genome-wide significance in the McLaren et al. study. The full table is available in the supplement (table \ref{tab:full-mclaren-comparison}). Grey rows are alleles that increased in significance with a phylogenetic correction.}
+% 	\label{tab:lim-mclaren-comparison}
+% 	\end{center}
+% \end{table}
