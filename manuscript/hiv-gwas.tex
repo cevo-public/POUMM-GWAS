@@ -11,6 +11,8 @@
 \usepackage{amsmath}
 \usepackage{longtable} % for table that spans multiple pages
 \usepackage[singlelinecheck=false]{caption} % to left-justify single-line table captions
+\usepackage{array}
+\newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}} % for centered, width-specified columns 
 
 \usepackage[backend=bibtex,style=nature]{biblatex} % Borrowing citation formatting from Nature
 \bibliography{references}
@@ -265,8 +267,7 @@ Next, we characterized the evolutionary scenarios under which our framework can 
 
 Finally, we applied our framework to empirical data from the Swiss HIV Cohort Study (SHCS). We used data collected from 1,392 individuals in Switzerland infected with subtype B HIV-1 between 1994 and 2018. The SHCS provided viral load measurements, $pol$ gene sequences, and human genotype data for these individuals. We followed the framework outlined above to estimate the pathogen and non-pathogen effects on spVL for the cohort from these data. Figure \ref{fig:spvl-calc-comparison} shows the calculated spVL values, figure \ref{fig:spvl-on-tree} shows the inferred pathogen phylogeny, and figures \ref{fig:spvl-on-tree}, \ref{fig:trait-comparison} show the estimated non-pathogen effects on spVL calculated for these individuals. We estimated spVL heritability in this cohort to be 45\% (95\% highest posterior density, HPD, 24 - 67\%) \ref{tab:POUMM-parameters-our-estimates}. To put these values into the context of our simulation study, they are shown as black points on figure \ref{fig:simulationResults}.
 
-We compared our proposed GWAS framework with a more standard approach by performing two different GWAS on the same SHCS human genotypes. In the ``GWAS with standard trait value'' we used the unmodified trait value, our calculated spVL values, as the GWAS response variable. In the ``GWAS with estimated non-pathogen part of trait'' we used our estimates for the non-pathogen effects on spVL. Figure \ref{fig:gwas-results}A shows that results are qualitatively similar between the two GWAS. Q-Q plots show the distribution of p-values are very similar as well (figure \ref{fig:qq-plots}). Figure \ref{fig:gwas-results}B shows how the strength of association changed for some variants in the MHC and \emph{CCR5} regions. Taking into account phylogenetic information slightly decreased association strength for most variants in \emph{CCR5} region. Association strength increased for some variants in the MHC, for example, SNP rs9265880 had the greatest increase in significance from a p-value of 2.2x10$^{-5}$ to 6x10$^{-7}$. % TODO
-However, the two top-associated SNPs are consistent between our study and \cite{McLaren2015} (table \ref{tab:comp-gwas}). In summary, there are no clear patterns that point to new regions of association in the human genome with spVL when we take into account the pathogen phylogeny.
+We compared our proposed GWAS framework with a more standard approach by performing two different GWAS on the same SHCS human genotypes. In the ``GWAS with standard trait value'' we used the unmodified trait value, our calculated spVL values, as the GWAS response variable. In the ``GWAS with estimated non-pathogen part of trait'' we used our estimates for the non-pathogen effects on spVL. Figure \ref{fig:gwas-results}A shows that results are qualitatively similar between the two GWAS. Q-Q plots show the distribution of p-values are very similar as well (figure \ref{fig:qq-plots}). Figure \ref{fig:gwas-results}B shows how the strength of association changed for some variants in the MHC and \emph{CCR5} regions. Taking into account phylogenetic information slightly decreased association strength for most variants in \emph{CCR5} region. Association strength increased for some variants in the MHC, for example, SNP rs9265880 had the greatest increase in significance in the MHC region, from a p-value of $3.5 \times 10^{-07}$ to $7.7 \times 10^{-09}$. However, the top-associated variants in the MHC and \emph{CCR5} regions were consistent regardless of the GWAS response variable used \ref{tab:gwas-top-associations}. For comparison, table \ref{tab:comp-gwas-mclaren-snps} shows our GWAS results for the two top-associated SNPs identified by \cite{McLaren2015}. In summary, there are no clear patterns that point to new regions of association in the human genome with spVL when we take into account the pathogen phylogeny.
 
 % TODO
 \begin{figure}[H]
@@ -278,20 +279,19 @@ However, the two top-associated SNPs are consistent between our study and \cite{
 \end{figure}
 
 \begin{table}[H]
-	\begin{center}
-		\begin{tabular}{p{1cm}p{2cm}p{2.5cm}p{1cm}p{2cm}p{1cm}p{2cm}} % {lrrrrrr} {llclcccc}
-			\hline
-			& & McLaren et al.  & \multicolumn{2}{l}{Standard GWAS } & \multicolumn{2}{l}{GWAS with phylogenetic correction} \\ 
-			\hline
-			Region & Variant & p-value & Beta & p-value & Beta & p-value \\
-			\hline
-			MHC & rs59440261 & 2.0 x 10$^{-83}$ & -0.414 & 1.6x10$^{-11}$ & -0.229 & 1.2x10$^{-10}$ \\
-			\emph{CCR5} & rs1015164 & 1.5 x 10$^{-19}$ & 0.148 & 1.3x10$^{-6}$ & 0.073 & 3.2x10$^{-5}$ \\			
-			\hline
-		\end{tabular}
-		\caption{Top association results from \cite{McLaren2015} compared to association results in the current study.}
-		\label{tab:comp-gwas}
-	\end{center}
+\centering
+\caption{Top association results from \cite{McLaren2015} compared to results from this study from GWAS with unmodified (standard) spVL values and with our estimates for the non-pathogen effects on spVL.}
+\begin{tabular}{p{1cm}p{1.8cm}p{2.4cm}p{1.7cm}p{1.8cm}p{1.7cm}p{1.8cm}} % {lrrrrrr} {llclcccc}
+\hline
+& & McLaren et al.  & \multicolumn{2}{l}{Standard trait value} & \multicolumn{2}{l}{Estimated non-pathogen part of trait} \\ 
+  \hline
+ Region & Variant & p-value & Effect size & p-value & Effect size & p-value \\
+  \hline
+    MHC & rs59440261 & $2.0 \times 10^{-83}$ & -0.4 & $3.3 \times 10^{-11}$ & -0.22 & $2.6 \times 10^{-10}$ \\ 
+    \emph{CCR5} & rs1015164 & $1.5 \times 10^{-19}$ & 0.15 & $7.5 \times 10^{-7}$ & 0.078 & $8.5 \times 10^{-6}$ \\ 
+   \hline
+\end{tabular}
+\label{tab:comp-gwas-mclaren-snps}
 \end{table}
 
 \section{Discussion}
@@ -651,72 +651,109 @@ Therefore, we can expect the RMSE for $\bm{z} - \bm{\bar{z}}$ as an estimate for
 	\label{tab:variant-filtering}
 \end{table}
 
-\begin{longtable}[H]{lp{1cm}p{2cm}p{1cm}p{2cm}p{1cm}p{2cm}} % {lrrrrrr}{lrrrrrr}
-		\caption{Association results for common class I HLA alleles ranked by p-value from the GWAS by \cite{McLaren2015} compared to results from the current study.}
-		\hline
-		& \multicolumn{2}{l}{McLaren et al.}  & \multicolumn{2}{l}{Standard GWAS} & \multicolumn{2}{l}{GWAS with phylogenetic correction} \\ 
-		\hline
-	 	Allele & Beta & p-value & Beta &p-value & Beta& p-value \\ 
-		\hline
-		HLA-B*57:01 & -0.840 & $2.69 \times 10^{-86}$ & -0.479 & $1.11 \times 10^{-12}$ & -0.268 & $5.43 \times 10^{-12}$ \\ 
-		HLA-C*06:02 & -0.436 & $7.32 \times 10^{-50}$ & -0.173 & $1.10 \times 10^{-4}$ & -0.107 & $3.15 \times 10^{-5}$ \\ 
-		HLA-B*27:05 & -0.417 & $4.32 \times 10^{-20}$ & -0.244 & $9.59 \times 10^{-4}$ & -0.122 & $4.40 \times 10^{-3}$ \\ 
-		HLA-C*07:01 & 0.195 & $1.86 \times 10^{-14}$ & 0.129 & $7.55 \times 10^{-3}$ & 0.086 & $1.99 \times 10^{-3}$ \\ 
-		HLA-C*07:02 & 0.194 & $3.75 \times 10^{-13}$ & 0.095 & $3.02 \times 10^{-2}$ & 0.052 & $3.98 \times 10^{-2}$ \\ 
-		HLA-B*07:02 & 0.200 & $5.17 \times 10^{-13}$ & 0.129 & $5.29 \times 10^{-3}$ & 0.072 & $7.06 \times 10^{-3}$ \\ 
-		HLA-B*08:01 & 0.206 & $2.94 \times 10^{-11}$ & -0.009 & $9.20 \times 10^{-1}$ & 0.015 & $7.75 \times 10^{-1}$ \\ 
-		HLA-C*08:02 & -0.307 & $8.76 \times 10^{-11}$ & 0.324 & $8.55 \times 10^{-1}$ & 0.400 & $6.95 \times 10^{-1}$ \\ 
-		HLA-C*04:01 & 0.183 & $9.07 \times 10^{-11}$ & 0.124 & $3.04 \times 10^{-3}$ & 0.058 & $1.67 \times 10^{-2}$ \\ 
-		HLA-B*13:02 & -0.346 & $3.70 \times 10^{-10}$ & -0.188 & $1.03 \times 10^{-2}$ & -0.112 & $7.90 \times 10^{-3}$ \\ 
-		HLA-B*14:02 & -0.318 & $2.10 \times 10^{-9}$ & 0.067 & $8.12 \times 10^{-1}$ & 0.118 & $4.71 \times 10^{-1}$ \\ 
-		HLA-C*12:02 & -0.478 & $4.02 \times 10^{-8}$ & 0.111 & $7.63 \times 10^{-1}$ & 0.094 & $6.58 \times 10^{-1}$ \\ 
-		HLA-C*02:02 & -0.223 & $5.45 \times 10^{-8}$ & -0.089 & $1.31 \times 10^{-1}$ & -0.039 & $2.50 \times 10^{-1}$ \\ 
-		HLA-A*25:01 & -0.301 & $6.80 \times 10^{-8}$ & -0.090 & $9.93 \times 10^{-2}$ & -0.033 & $2.96 \times 10^{-1}$ \\ 
-		HLA-B*52:01 & -0.435 & $2.60 \times 10^{-7}$ & 0.238 & $7.63 \times 10^{-2}$ & 0.150 & $5.33 \times 10^{-2}$ \\ 
-		HLA-C*01:02 & -0.231 & $2.22 \times 10^{-6}$ & -0.198 & $5.07 \times 10^{-4}$ & -0.113 & $5.70 \times 10^{-4}$ \\ 
-		HLA-A*23:01 & 0.269 & $1.66 \times 10^{-5}$ & 0.020 & $7.42 \times 10^{-1}$ & 0.015 & $6.59 \times 10^{-1}$ \\ 
-		HLA-B*55:01 & 0.302 & $2.32 \times 10^{-5}$ & 0.685 & $2.48 \times 10^{-1}$ & 0.436 & $2.03 \times 10^{-1}$ \\ 
-		HLA-B*35:02 & 0.358 & $2.42 \times 10^{-5}$ &  &  &  &  \\ 
-		HLA-A*31:01 & -0.219 & $4.36 \times 10^{-5}$ & -0.052 & $4.50 \times 10^{-1}$ & -0.017 & $6.78 \times 10^{-1}$ \\ 
-		HLA-B*35:01 & 0.156 & $4.82 \times 10^{-5}$ & 0.167 & $2.13 \times 10^{-4}$ & 0.083 & $1.33 \times 10^{-3}$ \\ 
-		HLA-B*49:01 & 0.253 & $1.86 \times 10^{-4}$ & 2.173 & $9.79 \times 10^{-4}$ & 1.253 & $9.82 \times 10^{-4}$ \\ 
-		HLA-B*35:03 & 0.215 & $7.13 \times 10^{-4}$ & -0.241 & $8.00 \times 10^{-1}$ & 0.261 & $6.35 \times 10^{-1}$ \\ 
-		HLA-B*40:01 & 0.148 & $9.37 \times 10^{-4}$ & 0.519 & $1.06 \times 10^{-2}$ & 0.349 & $2.91 \times 10^{-3}$ \\ 
-		HLA-B*18:01 & 0.136 & $9.48 \times 10^{-4}$ & 0.208 & $1.73 \times 10^{-3}$ & 0.133 & $5.09 \times 10^{-4}$ \\ 
-		HLA-A*29:02 & 0.167 & $1.40 \times 10^{-3}$ & 0.150 & $6.17 \times 10^{-2}$ & 0.092 & $4.72 \times 10^{-2}$ \\ 
-		HLA-C*14:02 & -0.228 & $1.50 \times 10^{-3}$ & 0.266 & $7.59 \times 10^{-1}$ & 0.235 & $6.38 \times 10^{-1}$ \\ 
-		HLA-A*11:01 & -0.109 & $2.70 \times 10^{-3}$ & -0.090 & $8.96 \times 10^{-2}$ & -0.052 & $8.92 \times 10^{-2}$ \\ 
-		HLA-A*24:02 & 0.094 & $3.60 \times 10^{-3}$ & 0.133 & $3.79 \times 10^{-3}$ & 0.074 & $5.52 \times 10^{-3}$ \\ 
-		HLA-B*37:01 & 0.222 & $4.50 \times 10^{-3}$ & 0.600 & $3.22 \times 10^{-3}$ & 0.311 & $8.11 \times 10^{-3}$ \\ 
-		HLA-B*44:03 & 0.119 & $5.00 \times 10^{-3}$ & -0.114 & $2.77 \times 10^{-1}$ & -0.080 & $1.88 \times 10^{-1}$ \\ 
-		HLA-C*03:03 & 0.110 & $6.50 \times 10^{-3}$ & -0.078 & $1.86 \times 10^{-1}$ & -0.031 & $3.66 \times 10^{-1}$ \\ 
-		HLA-B*58:01 & -0.253 & $7.10 \times 10^{-3}$ & 6.895 & $7.93 \times 10^{-2}$ & 4.841 & $3.27 \times 10^{-2}$ \\ 
-		HLA-A*32:01 & -0.123 & $8.30 \times 10^{-3}$ & 0.089 & $5.31 \times 10^{-1}$ & 0.071 & $3.86 \times 10^{-1}$ \\ 
-		HLA-C*16:01 & 0.137 & $8.60 \times 10^{-3}$ & 0.057 & $4.46 \times 10^{-1}$ & 0.013 & $7.60 \times 10^{-1}$ \\ 
-		HLA-C*03:04 & 0.093 & $1.25 \times 10^{-2}$ & 0.126 & $3.52 \times 10^{-2}$ & 0.095 & $5.77 \times 10^{-3}$ \\ 
-		HLA-B*38:01 & -0.148 & $1.35 \times 10^{-2}$ & -3.459 & $3.01 \times 10^{-1}$ & -2.224 & $2.49 \times 10^{-1}$ \\ 
-		HLA-A*33:01 & -0.233 & $1.45 \times 10^{-2}$ &  &  &  &  \\ 
-		HLA-A*30:01 & -0.159 & $2.89 \times 10^{-2}$ & 0.072 & $9.04 \times 10^{-1}$ & 0.008 & $9.82 \times 10^{-1}$ \\ 
-		HLA-C*12:03 & -0.077 & $4.59 \times 10^{-2}$ & -0.114 & $2.95 \times 10^{-2}$ & -0.067 & $2.68 \times 10^{-2}$ \\ 
-		HLA-A*01:01 & 0.051 & $4.78 \times 10^{-2}$ & -0.039 & $4.88 \times 10^{-1}$ & -0.050 & $1.24 \times 10^{-1}$ \\ 
-		HLA-B*14:01 & -0.187 & $5.51 \times 10^{-2}$ & 7.071 & $5.00 \times 10^{-2}$ & 3.974 & $5.62 \times 10^{-2}$ \\ 
-		HLA-B*40:02 & -0.130 & $1.01 \times 10^{-1}$ & -0.343 & $3.88 \times 10^{-1}$ & -0.105 & $6.47 \times 10^{-1}$ \\ 
-		HLA-C*07:04 & 0.125 & $1.02 \times 10^{-1}$ & 0.111 & $3.00 \times 10^{-1}$ & 0.080 & $1.98 \times 10^{-1}$ \\ 
-		HLA-C*05:01 & 0.043 & $1.93 \times 10^{-1}$ & -0.022 & $6.51 \times 10^{-1}$ & -0.019 & $4.82 \times 10^{-1}$ \\ 
-		HLA-A*03:01 & 0.025 & $3.29 \times 10^{-1}$ & 0.002 & $9.51 \times 10^{-1}$ & -0.001 & $9.81 \times 10^{-1}$ \\ 
-		HLA-B*51:01 & -0.036 & $3.52 \times 10^{-1}$ & -0.046 & $3.13 \times 10^{-1}$ & -0.044 & $1.01 \times 10^{-1}$ \\ 
-		HLA-A*68:01 & 0.046 & $3.71 \times 10^{-1}$ & 0.036 & $6.09 \times 10^{-1}$ & 0.009 & $8.27 \times 10^{-1}$ \\ 
-		HLA-B*44:02 & 0.030 & $3.73 \times 10^{-1}$ & -0.051 & $3.90 \times 10^{-1}$ & -0.031 & $3.57 \times 10^{-1}$ \\ 
-		HLA-B*39:01 & 0.073 & $3.85 \times 10^{-1}$ &  &  &  &  \\ 
-		HLA-A*02:01 & 0.017 & $3.94 \times 10^{-1}$ & -0.018 & $5.57 \times 10^{-1}$ & -0.008 & $6.77 \times 10^{-1}$ \\ 
-		HLA-C*15:02 & -0.046 & $4.20 \times 10^{-1}$ & 0.064 & $3.26 \times 10^{-1}$ & 0.033 & $3.78 \times 10^{-1}$ \\ 
-		HLA-B*50:01 & 0.066 & $4.68 \times 10^{-1}$ & 1.522 & $1.77 \times 10^{-2}$ & 0.970 & $8.73 \times 10^{-3}$ \\ 
-		HLA-B*15:01 & -0.021 & $5.71 \times 10^{-1}$ & -0.073 & $1.71 \times 10^{-1}$ & -0.021 & $4.93 \times 10^{-1}$ \\ 
-		HLA-A*30:02 & 0.050 & $5.92 \times 10^{-1}$ & 0.047 & $9.28 \times 10^{-1}$ & -0.004 & $9.89 \times 10^{-1}$ \\ 
-		HLA-A*26:01 & -0.003 & $9.57 \times 10^{-1}$ & -0.645 & $1.96 \times 10^{-1}$ & -0.529 & $6.59 \times 10^{-2}$ \\
-		\hline
-		\label{tab:full-mclaren-comparison}
-\end{longtable}
+% latex table generated in R 4.1.1 by xtable 1.8-4 package
+% Sat Oct 30 10:31:16 2021
+\begin{table}[ht]
+\caption{Effect size and p-values from top-associated variants in the $\emph{CCR5}$ and MCR regions from the two GWAS performed in our study. ``Standard'' means the GWAS with standard spVL trait values and ``Corrected'' means the GWAS with estimated non-pathogen effects on spVL.}
+\begin{tabular}{lllP{2.2cm}P{2.2cm}P{1.6cm}P{2.2cm}}
+  \hline
+    Region & Position & Variant & Standard effect size & Standard p-value & Corrected effect size & Corrected p-value \\ 
+  \hline
+    $\emph{CCR5}$ & 46531144 & rs9845968 & -0.16 & $5.6 \times 10^{-9}$ & -0.083 & $1.2 \times 10^{-7}$ \\ 
+    $\emph{CCR5}$ & 46537849 & rs867620 & -0.16 & $3.2 \times 10^{-9}$ & -0.085 & $6 \times 10^{-8}$ \\ 
+    $\emph{CCR5}$ & 46539864 & rs11130092 & -0.16 & $1.1 \times 10^{-9}$ & -0.087 & $2.6 \times 10^{-8}$ \\ 
+    $\emph{CCR5}$ & 46540932 & rs10865942 & -0.16 & $8.4 \times 10^{-9}$ & -0.081 & $4 \times 10^{-7}$ \\ 
+    $\emph{CCR5}$ & 46541147 & rs7430431 & -0.17 & $9.2 \times 10^{-10}$ & -0.088 & $2.3 \times 10^{-8}$ \\ 
+    MHC & 31274380 & rs9264942 & -0.21 & $4.5 \times 10^{-13}$ & -0.12 & $3.7 \times 10^{-13}$ \\ 
+    MHC & 31321919 & rs1055821 & -0.33 & $9.4 \times 10^{-13}$ & -0.19 & $1.4 \times 10^{-12}$ \\ 
+    MHC & 31380034 & rs112243036 & -0.32 & $9.9 \times 10^{-16}$ & -0.17 & $3.7 \times 10^{-14}$ \\ 
+    MHC & 31391401 & rs4418214 & -0.34 & $2.4 \times 10^{-14}$ & -0.18 & $2.5 \times 10^{-12}$ \\ 
+    MHC & 31400137 & rs138130755 & -0.46 & $1 \times 10^{-12}$ & -0.26 & $2.6 \times 10^{-12}$ \\ 
+    MHC & 31400705 & rs138117378 & -0.46 & $1 \times 10^{-12}$ & -0.26 & $2.6 \times 10^{-12}$ \\ 
+    MHC & 31402358 & rs148792134 & -0.46 & $1 \times 10^{-12}$ & -0.26 & $2.6 \times 10^{-12}$ \\ 
+    MHC & 31409677 & rs140991764 & -0.46 & $1 \times 10^{-12}$ & -0.26 & $2.6 \times 10^{-12}$ \\ 
+    $\emph{CCR5}$ & 46531144 & rs9845968 & -0.16 & $5.6 \times 10^{-9}$ & -0.083 & $1.2 \times 10^{-7}$ \\ 
+    $\emph{CCR5}$ & 46537849 & rs867620 & -0.16 & $3.2 \times 10^{-9}$ & -0.085 & $6 \times 10^{-8}$ \\ 
+    $\emph{CCR5}$ & 46539864 & rs11130092 & -0.16 & $1.1 \times 10^{-9}$ & -0.087 & $2.6 \times 10^{-8}$ \\ 
+    $\emph{CCR5}$ & 46541147 & rs7430431 & -0.17 & $9.2 \times 10^{-10}$ & -0.088 & $2.3 \times 10^{-8}$ \\ 
+    $\emph{CCR5}$ & 46556835 & rs6808142 & 0.15 & $8.3 \times 10^{-8}$ & 0.082 & $3.3 \times 10^{-7}$ \\ 
+    MHC & 31274380 & rs9264942 & -0.21 & $4.5 \times 10^{-13}$ & -0.12 & $3.7 \times 10^{-13}$ \\ 
+    MHC & 31321919 & rs1055821 & -0.33 & $9.4 \times 10^{-13}$ & -0.19 & $1.4 \times 10^{-12}$ \\ 
+    MHC & 31367874 & rs111281598 & -0.37 & $1.5 \times 10^{-12}$ & -0.22 & $2.1 \times 10^{-12}$ \\ 
+    MHC & 31376266 & rs73400361 & -0.37 & $1.4 \times 10^{-12}$ & -0.22 & $2.1 \times 10^{-12}$ \\ 
+    MHC & 31380034 & rs112243036 & -0.32 & $9.9 \times 10^{-16}$ & -0.17 & $3.7 \times 10^{-14}$ \\ 
+   \hline
+\end{tabular}
+\label{gwas-top-associations}
+\end{table}
+
+
+% \begin{longtable}[H]{lp{1cm}p{2cm}p{1cm}p{2cm}p{1cm}p{2cm}} % {lrrrrrr}{lrrrrrr}
+% 		\caption{Association results for common class I HLA alleles ranked by p-value from the GWAS by \cite{McLaren2015} compared to results from the current study.}
+% 		\hline
+% 		& \multicolumn{2}{l}{McLaren et al.}  & \multicolumn{2}{l}{Standard GWAS} & \multicolumn{2}{l}{GWAS with phylogenetic correction} \\ 
+% 		\hline
+% 	 	Allele & Beta & p-value & Beta &p-value & Beta& p-value \\ 
+% 		\hline
+% 		HLA-B*57:01 & -0.840 & $2.69 \times 10^{-86}$ & -0.479 & $1.11 \times 10^{-12}$ & -0.268 & $5.43 \times 10^{-12}$ \\ 
+% 		HLA-C*06:02 & -0.436 & $7.32 \times 10^{-50}$ & -0.173 & $1.10 \times 10^{-4}$ & -0.107 & $3.15 \times 10^{-5}$ \\ 
+% 		HLA-B*27:05 & -0.417 & $4.32 \times 10^{-20}$ & -0.244 & $9.59 \times 10^{-4}$ & -0.122 & $4.40 \times 10^{-3}$ \\ 
+% 		HLA-C*07:01 & 0.195 & $1.86 \times 10^{-14}$ & 0.129 & $7.55 \times 10^{-3}$ & 0.086 & $1.99 \times 10^{-3}$ \\ 
+% 		HLA-C*07:02 & 0.194 & $3.75 \times 10^{-13}$ & 0.095 & $3.02 \times 10^{-2}$ & 0.052 & $3.98 \times 10^{-2}$ \\ 
+% 		HLA-B*07:02 & 0.200 & $5.17 \times 10^{-13}$ & 0.129 & $5.29 \times 10^{-3}$ & 0.072 & $7.06 \times 10^{-3}$ \\ 
+% 		HLA-B*08:01 & 0.206 & $2.94 \times 10^{-11}$ & -0.009 & $9.20 \times 10^{-1}$ & 0.015 & $7.75 \times 10^{-1}$ \\ 
+% 		HLA-C*08:02 & -0.307 & $8.76 \times 10^{-11}$ & 0.324 & $8.55 \times 10^{-1}$ & 0.400 & $6.95 \times 10^{-1}$ \\ 
+% 		HLA-C*04:01 & 0.183 & $9.07 \times 10^{-11}$ & 0.124 & $3.04 \times 10^{-3}$ & 0.058 & $1.67 \times 10^{-2}$ \\ 
+% 		HLA-B*13:02 & -0.346 & $3.70 \times 10^{-10}$ & -0.188 & $1.03 \times 10^{-2}$ & -0.112 & $7.90 \times 10^{-3}$ \\ 
+% 		HLA-B*14:02 & -0.318 & $2.10 \times 10^{-9}$ & 0.067 & $8.12 \times 10^{-1}$ & 0.118 & $4.71 \times 10^{-1}$ \\ 
+% 		HLA-C*12:02 & -0.478 & $4.02 \times 10^{-8}$ & 0.111 & $7.63 \times 10^{-1}$ & 0.094 & $6.58 \times 10^{-1}$ \\ 
+% 		HLA-C*02:02 & -0.223 & $5.45 \times 10^{-8}$ & -0.089 & $1.31 \times 10^{-1}$ & -0.039 & $2.50 \times 10^{-1}$ \\ 
+% 		HLA-A*25:01 & -0.301 & $6.80 \times 10^{-8}$ & -0.090 & $9.93 \times 10^{-2}$ & -0.033 & $2.96 \times 10^{-1}$ \\ 
+% 		HLA-B*52:01 & -0.435 & $2.60 \times 10^{-7}$ & 0.238 & $7.63 \times 10^{-2}$ & 0.150 & $5.33 \times 10^{-2}$ \\ 
+% 		HLA-C*01:02 & -0.231 & $2.22 \times 10^{-6}$ & -0.198 & $5.07 \times 10^{-4}$ & -0.113 & $5.70 \times 10^{-4}$ \\ 
+% 		HLA-A*23:01 & 0.269 & $1.66 \times 10^{-5}$ & 0.020 & $7.42 \times 10^{-1}$ & 0.015 & $6.59 \times 10^{-1}$ \\ 
+% 		HLA-B*55:01 & 0.302 & $2.32 \times 10^{-5}$ & 0.685 & $2.48 \times 10^{-1}$ & 0.436 & $2.03 \times 10^{-1}$ \\ 
+% 		HLA-B*35:02 & 0.358 & $2.42 \times 10^{-5}$ &  &  &  &  \\ 
+% 		HLA-A*31:01 & -0.219 & $4.36 \times 10^{-5}$ & -0.052 & $4.50 \times 10^{-1}$ & -0.017 & $6.78 \times 10^{-1}$ \\ 
+% 		HLA-B*35:01 & 0.156 & $4.82 \times 10^{-5}$ & 0.167 & $2.13 \times 10^{-4}$ & 0.083 & $1.33 \times 10^{-3}$ \\ 
+% 		HLA-B*49:01 & 0.253 & $1.86 \times 10^{-4}$ & 2.173 & $9.79 \times 10^{-4}$ & 1.253 & $9.82 \times 10^{-4}$ \\ 
+% 		HLA-B*35:03 & 0.215 & $7.13 \times 10^{-4}$ & -0.241 & $8.00 \times 10^{-1}$ & 0.261 & $6.35 \times 10^{-1}$ \\ 
+% 		HLA-B*40:01 & 0.148 & $9.37 \times 10^{-4}$ & 0.519 & $1.06 \times 10^{-2}$ & 0.349 & $2.91 \times 10^{-3}$ \\ 
+% 		HLA-B*18:01 & 0.136 & $9.48 \times 10^{-4}$ & 0.208 & $1.73 \times 10^{-3}$ & 0.133 & $5.09 \times 10^{-4}$ \\ 
+% 		HLA-A*29:02 & 0.167 & $1.40 \times 10^{-3}$ & 0.150 & $6.17 \times 10^{-2}$ & 0.092 & $4.72 \times 10^{-2}$ \\ 
+% 		HLA-C*14:02 & -0.228 & $1.50 \times 10^{-3}$ & 0.266 & $7.59 \times 10^{-1}$ & 0.235 & $6.38 \times 10^{-1}$ \\ 
+% 		HLA-A*11:01 & -0.109 & $2.70 \times 10^{-3}$ & -0.090 & $8.96 \times 10^{-2}$ & -0.052 & $8.92 \times 10^{-2}$ \\ 
+% 		HLA-A*24:02 & 0.094 & $3.60 \times 10^{-3}$ & 0.133 & $3.79 \times 10^{-3}$ & 0.074 & $5.52 \times 10^{-3}$ \\ 
+% 		HLA-B*37:01 & 0.222 & $4.50 \times 10^{-3}$ & 0.600 & $3.22 \times 10^{-3}$ & 0.311 & $8.11 \times 10^{-3}$ \\ 
+% 		HLA-B*44:03 & 0.119 & $5.00 \times 10^{-3}$ & -0.114 & $2.77 \times 10^{-1}$ & -0.080 & $1.88 \times 10^{-1}$ \\ 
+% 		HLA-C*03:03 & 0.110 & $6.50 \times 10^{-3}$ & -0.078 & $1.86 \times 10^{-1}$ & -0.031 & $3.66 \times 10^{-1}$ \\ 
+% 		HLA-B*58:01 & -0.253 & $7.10 \times 10^{-3}$ & 6.895 & $7.93 \times 10^{-2}$ & 4.841 & $3.27 \times 10^{-2}$ \\ 
+% 		HLA-A*32:01 & -0.123 & $8.30 \times 10^{-3}$ & 0.089 & $5.31 \times 10^{-1}$ & 0.071 & $3.86 \times 10^{-1}$ \\ 
+% 		HLA-C*16:01 & 0.137 & $8.60 \times 10^{-3}$ & 0.057 & $4.46 \times 10^{-1}$ & 0.013 & $7.60 \times 10^{-1}$ \\ 
+% 		HLA-C*03:04 & 0.093 & $1.25 \times 10^{-2}$ & 0.126 & $3.52 \times 10^{-2}$ & 0.095 & $5.77 \times 10^{-3}$ \\ 
+% 		HLA-B*38:01 & -0.148 & $1.35 \times 10^{-2}$ & -3.459 & $3.01 \times 10^{-1}$ & -2.224 & $2.49 \times 10^{-1}$ \\ 
+% 		HLA-A*33:01 & -0.233 & $1.45 \times 10^{-2}$ &  &  &  &  \\ 
+% 		HLA-A*30:01 & -0.159 & $2.89 \times 10^{-2}$ & 0.072 & $9.04 \times 10^{-1}$ & 0.008 & $9.82 \times 10^{-1}$ \\ 
+% 		HLA-C*12:03 & -0.077 & $4.59 \times 10^{-2}$ & -0.114 & $2.95 \times 10^{-2}$ & -0.067 & $2.68 \times 10^{-2}$ \\ 
+% 		HLA-A*01:01 & 0.051 & $4.78 \times 10^{-2}$ & -0.039 & $4.88 \times 10^{-1}$ & -0.050 & $1.24 \times 10^{-1}$ \\ 
+% 		HLA-B*14:01 & -0.187 & $5.51 \times 10^{-2}$ & 7.071 & $5.00 \times 10^{-2}$ & 3.974 & $5.62 \times 10^{-2}$ \\ 
+% 		HLA-B*40:02 & -0.130 & $1.01 \times 10^{-1}$ & -0.343 & $3.88 \times 10^{-1}$ & -0.105 & $6.47 \times 10^{-1}$ \\ 
+% 		HLA-C*07:04 & 0.125 & $1.02 \times 10^{-1}$ & 0.111 & $3.00 \times 10^{-1}$ & 0.080 & $1.98 \times 10^{-1}$ \\ 
+% 		HLA-C*05:01 & 0.043 & $1.93 \times 10^{-1}$ & -0.022 & $6.51 \times 10^{-1}$ & -0.019 & $4.82 \times 10^{-1}$ \\ 
+% 		HLA-A*03:01 & 0.025 & $3.29 \times 10^{-1}$ & 0.002 & $9.51 \times 10^{-1}$ & -0.001 & $9.81 \times 10^{-1}$ \\ 
+% 		HLA-B*51:01 & -0.036 & $3.52 \times 10^{-1}$ & -0.046 & $3.13 \times 10^{-1}$ & -0.044 & $1.01 \times 10^{-1}$ \\ 
+% 		HLA-A*68:01 & 0.046 & $3.71 \times 10^{-1}$ & 0.036 & $6.09 \times 10^{-1}$ & 0.009 & $8.27 \times 10^{-1}$ \\ 
+% 		HLA-B*44:02 & 0.030 & $3.73 \times 10^{-1}$ & -0.051 & $3.90 \times 10^{-1}$ & -0.031 & $3.57 \times 10^{-1}$ \\ 
+% 		HLA-B*39:01 & 0.073 & $3.85 \times 10^{-1}$ &  &  &  &  \\ 
+% 		HLA-A*02:01 & 0.017 & $3.94 \times 10^{-1}$ & -0.018 & $5.57 \times 10^{-1}$ & -0.008 & $6.77 \times 10^{-1}$ \\ 
+% 		HLA-C*15:02 & -0.046 & $4.20 \times 10^{-1}$ & 0.064 & $3.26 \times 10^{-1}$ & 0.033 & $3.78 \times 10^{-1}$ \\ 
+% 		HLA-B*50:01 & 0.066 & $4.68 \times 10^{-1}$ & 1.522 & $1.77 \times 10^{-2}$ & 0.970 & $8.73 \times 10^{-3}$ \\ 
+% 		HLA-B*15:01 & -0.021 & $5.71 \times 10^{-1}$ & -0.073 & $1.71 \times 10^{-1}$ & -0.021 & $4.93 \times 10^{-1}$ \\ 
+% 		HLA-A*30:02 & 0.050 & $5.92 \times 10^{-1}$ & 0.047 & $9.28 \times 10^{-1}$ & -0.004 & $9.89 \times 10^{-1}$ \\ 
+% 		HLA-A*26:01 & -0.003 & $9.57 \times 10^{-1}$ & -0.645 & $1.96 \times 10^{-1}$ & -0.529 & $6.59 \times 10^{-2}$ \\
+% 		\hline
+% 		\label{tab:full-mclaren-comparison}
+% \end{longtable}
 
 % \begin{figure}[H]
 % 	\includegraphics[width=\linewidth]{images/HIV_tree_branch_lengths}
