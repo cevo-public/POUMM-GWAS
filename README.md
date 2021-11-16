@@ -1,8 +1,5 @@
 # Infectious disease GWAS project
 
-Written by Sarah Nadeau \
-Last updated 30.08.2021
-
 This project applies the Phylogenetic Ornstein-Uhlenback Mixed Model (POUMM) to estimate and remove pathogen effects from infectious disease trait data prior to Genome-Wide Association Study (GWAS).
 
 ## Run simuations
