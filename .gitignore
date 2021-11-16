@@ -1,3 +1,6 @@
+manuscript/co_author_suggestions/
+manuscript/*.pdf
+manuscript/*.docx
 scripts/tmp
 *.iml
 config-simulation-*.yaml

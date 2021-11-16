@@ -361,18 +361,40 @@ ggsave(plot = p, filename = paste(FIGDIR, "poumm_parameter_estimates.png", sep =
 Estimated trait values
 TODO: think about some way of depicting phylogenetic relationships here too?
 ```{r}
-p <- ggplot(data = spvl_values,
-            aes(x = spvl_lenient_filter_first_measurement,
-                y = spvl_lenient_filter_mean_measurement,
-                color = spvl_strict_filter_mean_measurement)) +
-        scale_color_gradient(low = "green", high = "red", name = "Mean measurement\nwith stricter filtering") +
+comp_1 <- ggplot(data = spvl_values,
+             aes(x = spvl_lenient_filter_first_measurement,
+                 y = spvl_lenient_filter_mean_measurement)) +
         coord_equal() +
+        lims(x = c(0, 7.25), y = c(0, 7.25)) +
         geom_point() +
-        labs(x = "First measurement", y = "Mean measurement") +
+        labs(x = "First measurement", y = "Mean measurement\n") +
+        geom_abline(slope = 1, intercept = 0, linetype = "dashed") +
         shared_theme
 
-ggsave(plot = p, filename = paste(FIGDIR, "spvl_calculation_comparison.png", sep = "/"),
-       width = linewidth * 2/3, height = height * 2/3, units = "cm")
+comp_2 <- ggplot(data = spvl_values,
+               aes(x = spvl_lenient_filter_first_measurement,
+                   y = spvl_strict_filter_mean_measurement)) +
+        coord_equal() +
+        lims(x = c(0, 7.25), y = c(0, 7.25)) +
+        geom_point() +
+        labs(x = "First measurement", y = "Mean measurement\nwith stricter filtering") +
+        geom_abline(slope = 1, intercept = 0, linetype = "dashed") +
+        shared_theme
+
+comp_3 <- ggplot(data = spvl_values,
+                 aes(x = spvl_lenient_filter_mean_measurement,
+                     y = spvl_strict_filter_mean_measurement)) +
+        coord_equal() +
+        lims(x = c(0, 7.25), y = c(0, 7.25)) +
+        geom_point() +
+        labs(x = "Mean measurement", y = "Mean measurement\nwith stricter filtering") +
+        geom_abline(slope = 1, intercept = 0, linetype = "dashed") +
+        shared_theme
+
+comp <- cowplot::plot_grid(comp_1, comp_2, comp_3, nrow = 1)
+
+ggsave(plot = comp, filename = paste(FIGDIR, "spvl_calculation_comparison.png", sep = "/"),
+       width = linewidth, height = height * 2/3, units = "cm")
 
 p1 <- ggplot(data = traits, aes(x = trait, y = h.MWA)) +
       geom_point() +
