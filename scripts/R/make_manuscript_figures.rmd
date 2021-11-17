@@ -597,3 +597,91 @@ tex_table <- mclaren_top_snps %>% select(ID, BETA_standard, P_standard, BETA_cor
 print(xtable(tex_table, type = "latex", display=c("s", "s", "g","g","g","g")),
       file = paste(FIGDIR, "mclaren_top_snp_comparison.tex", sep = "/"), math.style.exponents = TRUE)
 ```
+
+OU process for simulation setup figure
+```{r}
+# Simulate many OU trajectories along tree
+generate_trait_trajectory <- function(v0, alpha, theta, sigma, N_steps) {
+      POUMM::rTrajectoryOU(
+            z0 = v0,
+            t = 1,
+            alpha = alpha,
+            theta = theta,
+            sigma = sigma,
+            steps = N_steps)
+}
+
+# Generate tree
+set.seed(10)
+tree <- ape::rtree(n = 4)
+tree$edge.length <- tree$edge.length * 6
+node_times <- POUMM::nodeTimes(tree)
+edge_colors = RColorBrewer::brewer.pal(n = 4, name = diverging_palette)
+
+# Define OU process
+scale_factor <- 10  # 1000
+v0 <- 4.5
+theta <- 4.5
+alpha <- 60 / scale_factor
+sigma <- 2 / sqrt(scale_factor)
+
+# Initialize data structures
+traceplot <- as.data.frame(matrix(ncol = 4, nrow = 0))
+colnames(traceplot) <- c("lineage", "time", "v", "color")
+v_nodes <- rep(v0, length(node_times))
+
+set.seed(30)
+# Generate OU trajectory for each edge on tree
+for (j in 1:nrow(tree$edge)) {
+      from = tree$edge[j, 1]
+      to = tree$edge[j, 2]
+      N_steps = round(tree$edge.length[j]*scale_factor) - 1
+      print(paste(N_steps, "steps on branch", j))
+
+      trajectory <- POUMM::rTrajectoryOU(
+            z0 = v_nodes[from],
+            t = 0.0001,
+            alpha = alpha,
+            theta = theta,
+            sigma = sigma,
+            steps = N_steps)
+
+      v_nodes[to] <- trajectory[N_steps]
+      v <- c(v_nodes[from], trajectory)
+
+      new_data <- data.frame(
+            lineage = rep(j, N_steps + 1),
+            time = seq(node_times[from], node_times[to], length.out = N_steps + 1),
+            v = v,
+            color = rep(edge_colors[j], N_steps + 1))
+      traceplot <- rbind(traceplot, new_data)
+}
+
+mu_OU <- function(t) v0 * exp(-alpha * t) + theta * (1 - exp(-alpha * t))
+
+OU_plot <- ggplot(
+      data = traceplot,
+      aes(x = time, y = v, group = lineage)) +
+      geom_line(size = 1.25) +
+      theme_void()
+
+
+#TODO: I have no idea how the edge coloring works, this is a really shitty hardcoded soln
+# tree_data = data.frame(node = c(1, 2, 3, 4, 5), color = c(edge_colors[2], edge_colors[3], edge_colors[4], "blue", edge_colors[1]))
+
+tree_plot <- ggtree::ggtree(
+      tree,
+      ladderize = F,
+      size = 1.5)
+
+# Align OU and tree plots
+aligned_plots <- align_plots(OU_plot, tree_plot, align = "hv", axis = "tblr", rel_heights = c(3, 1))
+
+svglite::svglite(filename = paste(FIGDIR, "ou_process_for_simulation_figure.svg", sep = "/"))
+      ggdraw(aligned_plots[[1]])
+dev.off()
+
+svglite::svglite(filename = paste(FIGDIR, "tree_for_simulation_figure.svg", sep = "/"))
+ggdraw(aligned_plots[[2]])
+dev.off()
+```
