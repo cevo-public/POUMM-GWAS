@@ -143,7 +143,7 @@ Variation in spVL comes from several sources: direct host genetic effects, patho
 \begin{figure}[H]
 	\begin{center}
 	\includegraphics[width = \linewidth]{figures/simulation_setup.pdf}
-	\caption{A high-level schematic of our POUMM-based simulation framework. (A) shows how pathogen genetic effects on spVL evolve along the pathogen phylogeny according to an OU process. (B) shows host genetic effects, which are the sum of independent effects from several causal variants. Each variant can be present in 0, 1, or 2 copies and we assume half have effect size $\delta$ on the trait value and half have effect size $-\delta$. (C) shows that environmental effects are assumed to be independent between sampled individuals and are drawn from a distribution centered at zero.}
+	\caption{A high-level schematic of our POUMM-based simulation framework. (A) shows how pathogen genetic effects on spVL evolve along the pathogen phylogeny according to an Ornstein Uhlenbeck process. (B) shows host genetic effects, which are the sum of independent effects from several causal variants. Each variant can be present in 0, 1, or 2 copies and we assume half have effect size $\delta$ on the trait value and half have effect size $-\delta$. (C) shows that environmental effects are assumed to be independent between sampled individuals and are drawn from a distribution centered at zero. Measured trait values are the sum of these three effects for each simulated individual.}
 		\label{fig:spVLModel}
 	\end{center}
 \end{figure}
@@ -266,7 +266,7 @@ Next, we characterized the evolutionary scenarios under which our framework can 
 \begin{figure}[H]
 	\begin{center}
 		\includegraphics[width=\linewidth]{figures/simulation_results}
-		\caption{Results from the simulation study. We simulated host, pathogen, and environmental effects on a trait under the POUMM with different heritability (y-axis) and selection strength (x-axis) parameters. For each simulated dataset, we applied our method to estimate the non-pathogen effects and performed GWAS with these values. (A) shows that our method (left) can generate more accurate estimates of host genetic effects than the trait value, scaled by its mean (right). (B) shows how GWAS power can improve given the true, simulated non-pathogen effect on spVL (left) and using our estimate for this value (middle) compared to using the scaled trait value (right). Each tile's color corresponds to the average value across 20 simulated datasets of 500 samples. The black point represents our estimates for the heritability and selection strength of spVL based on Swiss HIV data. RMSE = Root mean square error, TPR = True positive rate.}
+		\caption{Results from the simulation study. We simulated host, pathogen, and environmental effects on a trait under the POUMM with different heritability (y-axis) and selection strength (x-axis) parameters. For each simulated dataset, we applied our method to estimate the non-pathogen effects and performed GWAS with these values. (A) shows that our method (left) can generate more accurate estimates of host genetic effects than the trait value, scaled by its mean (right). (B) shows how GWAS power can improve given the true, simulated non-pathogen effect on spVL (left) and using our estimate for this value (middle) compared to using the scaled trait value (right). Each tile's color corresponds to the average value across 20 simulated datasets of 500 samples. The black point represents our estimates for the heritability and selection strength of spVL based on Swiss HIV Cohort Study data. RMSE = Root mean square error, TPR = True positive rate.}
 		\label{fig:simulationResults}
 	\end{center}
 \end{figure}
@@ -654,7 +654,7 @@ Therefore, we can expect the RMSE for $\bm{z} - \bm{\bar{z}}$ as an estimate for
 % latex table generated in R 4.1.1 by xtable 1.8-4 package
 % Sat Oct 30 10:31:16 2021
 \begin{table}[ht]
-\caption{Effect size and p-values from top-associated variants in the $\emph{CCR5}$ and MCR regions from the two GWAS performed in our study. ``Standard'' means the GWAS with standard spVL trait values and ``Corrected'' means the GWAS with estimated non-pathogen effects on spVL.}
+\caption{Effect size and p-values from top-associated variants in the $\emph{CCR5}$ and MCR regions from the two GWAS performed in our study. ``Standard'' means the GWAS with standard spVL trait values and ``Corrected'' means the GWAS with the estimated non-pathogen part of the trait.}
 \begin{tabularx}{\linewidth}{XXXXXXX}
   \hline
     Region & Position & Variant & Standard effect size & Standard p-value & Corrected effect size & Corrected p-value \\ 
