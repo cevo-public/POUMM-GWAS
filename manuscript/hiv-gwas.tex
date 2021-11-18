@@ -138,8 +138,8 @@ Variation in spVL comes from several sources: direct host genetic effects, patho
 
 \begin{figure}[H]
 	\begin{center}
-	\includegraphics[width = \linewidth]{figures/simulation_setup.png}
-	\caption{A high-level schematic of our POUMM-based simulation framework. (A) shows how pathogen genetic effects on spVL evolve along the pathogen phylogeny according to an OU process. (B) shows host genetic effects, which are the sum of independent effects from several causal variants. Each variant can be present in 0, 1, or 2 copies and has some effect $\delta$ on the trait value. We assume each variant has the same magnitude of effect and that half the causal variants have a positive effect and the other half have a negative effect. (C) shows that environmental effects are assumed to be independent between sampled individuals and are drawn from a distribution centered at zero with variance $\sigma^2_e$.}
+	\includegraphics[width = \linewidth]{figures/simulation_setup.pdf}
+	\caption{A high-level schematic of our POUMM-based simulation framework. (A) shows how pathogen genetic effects on spVL evolve along the pathogen phylogeny according to an OU process. (B) shows host genetic effects, which are the sum of independent effects from several causal variants. Each variant can be present in 0, 1, or 2 copies and we assume half have effect size $\delta$ on the trait value and half have effect size $-\delta$. (C) shows that environmental effects are assumed to be independent between sampled individuals and are drawn from a distribution centered at zero.}
 % 		\includegraphics[width=0.462\linewidth]{figures/model_figure}
 % 		\caption{The POUMM statistical model for the spVL trait. (A) shows how the pathogen effect on spVL, $g_v$, evolves according to an OU process along (C) the pathogen phylogeny. The dashed line in (A) shows the expected value of the trait at each point in time under the model. (B) shows that the non-pathogen effect on spVL, $e$, is modeled as a Gaussian random variable. Each tip on the phylogeny corresponds to a sampled individual with an independent non-pathogen-effect drawn from the distribution shown in (B).}
 		\label{fig:spVLModel}
