@@ -73,46 +73,47 @@
 \vspace{4pt}
 
 \begin{flushleft}
-	Sarah Nadeau\textsuperscript{1,2}, Christian W. Thorball\textsuperscript{3}, Roger Kouyos\textsuperscript{4,5}, Huldrych F. Günthard\textsuperscript{4,5}, Jürg Böni\textsuperscript{4}, Sabine Yerly\textsuperscript{6}, Matthieu Perreau\textsuperscript{7}, Thomas Klimkait\textsuperscript{8}, Andri Rauch\textsuperscript{9}, Hans H. Hirsch\textsuperscript{8,10,11}, Matthias Cavassini\textsuperscript{12}, Pietro Vernazza\textsuperscript{13}, Enos Bernasconi\textsuperscript{14}, Jacques Fellay\textsuperscript{2,3,15}, Venelin Mitov\textsuperscript{1,2,*}, Tanja Stadler\textsuperscript{1,2,*}, and the Swiss HIV Cohort Study (SHCS)
+	Sarah Nadeau,$^{1,2}$ Christian W. Thorball,$^{3}$ Roger Kouyos,$^{4,5}$ Huldrych F. Günthard,$^{4,5}$ Jürg Böni,$^{4}$ Sabine Yerly,$^6$ Matthieu Perreau,$^{7}$ Thomas Klimkait,$^{8}$ Andri Rauch,$^{9}$ Hans H. Hirsch,$^{8,10,11}$ Matthias Cavassini,$^{12}$ Pietro Vernazza,$^{13}$ Enos Bernasconi,$^{14}$ Jacques Fellay,$^{2,3,15}$ Venelin Mitov,$^{\dagger,1,2}$ Tanja Stadler,$^{\dagger,\ast,1,2}$ and the Swiss HIV Cohort Study (SHCS)
 \end{flushleft}
 
 \noindent
-\textsuperscript{1}\emph{Department of Biosystems Science and Engineering, ETH Zürich, Basel} \\
-\textsuperscript{2}\emph{Swiss Institute of Bioinformatics, Lausanne} \\
-\textsuperscript{3}\emph{Precision Medicine Unit, Lausanne University Hospital and University of Lausanne, Lausanne, Switzerland} \\
-\textsuperscript{4}\emph{Institute of Medical Virology, University of Zürich, Zürich} \\
-\textsuperscript{5}\emph{Division of Infectious Diseases and Hospital Epidemiology, University Hospital Zürich, University of Zürich, Zürich} \\
-\textsuperscript{6}\emph{Division of Infectious Diseases, Laboratory of Virology, Geneva University Hospital, Geneva} \\
-\textsuperscript{7}\emph{Division of Immunology and Allergy, University Hospital Lausanne, Lausanne} \\
-\textsuperscript{8}\emph{Department of Biomedicine, University of Basel, Basel} \\
-\textsuperscript{9}\emph{Department of Infectious Diseases, Berne University Hospital and University of Berne, Berne} \\
-\textsuperscript{10}\emph{Division of Clinical Virology, University Hospital Basel, Basel} \\
-\textsuperscript{11}\emph{Division of Infectious Diseases and Hospital Epidemiology, University Hospital Basel, Basel} \\
-\textsuperscript{12}\emph{Division of Infectious Diseases, University Hospital Lausanne, Lausanne} \\
-\textsuperscript{13}\emph{Division of Infectious Diseases, Cantonal Hospital St. Gallen, St. Gallen} \\
-\textsuperscript{14}\emph{Division of Infectious Diseases, Regional Hospital Lugano, Lugano} \\
-\textsuperscript{15}\emph{Global Health Institute, School of Life Sciences, École Polytechnique Fédérale de Lausanne} \\
-\textsuperscript{*}\emph{Co-last authors}
+$^{1}$Department of Biosystems Science and Engineering, ETH Zürich, Basel, Switzerland\\
+$^{2}$Swiss Institute of Bioinformatics, Lausanne, Switzerland\\ 
+$^{3}$Precision Medicine Unit, Lausanne University Hospital and University of Lausanne, Lausanne, Switzerland\\ 
+$^{4}$Institute of Medical Virology, University of Zurich, Zurich, Switzerland\\ 
+$^{5}$Division of Infectious Diseases and Hospital Epidemiology, University Hospital Zurich, University of Zurich, Zurich, Switzerland\\
+$^{6}$Division of Infectious Diseases, Laboratory of Virology, Geneva University Hospital, Geneva, Switzerland\\
+$^{7}$Division of Immunology and Allergy, University Hospital Lausanne, Lausanne, Switzerland\\
+$^{8}$Department of Biomedicine, University of Basel, Basel, Switzerland\\
+$^{9}$Department of Infectious Diseases, Bern University Hospital and University of Bern, Bern, Switzerland\\
+$^{10}$Division of Clinical Virology, University Hospital Basel, Basel, Switzerland\\
+$^{11}$Division of Infectious Diseases and Hospital Epidemiology, University Hospital Basel, Basel, Switzerland\\
+$^{12}$Division of Infectious Diseases, University Hospital Lausanne, Lausanne, Switzerland\\
+$^{13}$Division of Infectious Diseases, Cantonal Hospital St. Gallen, St. Gallen, Switzerland\\
+$^{14}$Division of Infectious Diseases, Regional Hospital Lugano, Lugano, Switzerland\\
+$^{15}$Global Health Institute, School of Life Sciences, École Polytechnique Fédérale de Lausanne, Lausanne, Switzerland\\
+$\dagger$Co-last authors\\
+$*$Corresponding author: tanja.stadler@bsse.ethz.ch
 
 \begin{doublespace}
 
 \begin{abstract}
-	Infectious diseases are a unique challenge for genome-wide association studies (GWAS) because pathogen, host, and environmental factors can all effect disease traits. Previous GWAS have successfully identified several human genetic variants associated with HIV-1 set point viral load (spVL), among other important infectious disease traits. However, these GWAS do not account for potentially confounding or extraneous pathogen effects that are heritable from donor to recipient in transmission chains.  We propose a novel method to consider the full genome of each patient's infecting pathogen strain, remove strain-specific effects on a trait based on the pathogen phylogeny, and thus better estimate the effect of human genetic variants on infectious disease traits. In simulations, we show our method can increase GWAS power to detect truly associated host variants when pathogen effects are highly heritable, with strong phylogenetic correlations. When we apply our method to HIV-1 cohort data from Switzerland, we recover slightly weaker but qualitatively similar signals of association between spVL and human genetic variants in the \emph{CCR5} and major histocompatability complex (MHC) gene regions compared to standard GWAS. Our simulation study confirms that based on the estimated heritability and selection parameters for HIV-1 spVL, standard GWAS are robust to pathogen effects. Our framework may improve GWAS for other diseases where pathogen effects are stronger and more phylogenetically correlated amongst individuals in a cohort.
+	Infectious diseases are a unique challenge for genome-wide association studies (GWAS) because pathogen, host, and environmental factors can all effect disease traits. Previous GWAS have successfully identified several human genetic variants associated with HIV-1 set point viral load (spVL), among other important infectious disease traits. However, these GWAS do not account for potentially confounding or extraneous pathogen effects that are heritable from donor to recipient in transmission chains.  We propose a novel method to consider the full genome of each patient's infecting pathogen strain, remove strain-specific effects on a trait based on the pathogen phylogeny, and thus better estimate the effect of human genetic variants on infectious disease traits. In simulations, we show our method can increase GWAS power to detect truly associated host variants when pathogen effects are highly heritable, with strong phylogenetic correlations. When we apply our method to HIV-1 cohort data from the Swiss HIV Cohort Study, we recover slightly weaker but qualitatively similar signals of association between spVL and human genetic variants in the \emph{CCR5} and major histocompatibility complex (MHC) gene regions compared to standard GWAS. Our simulation study confirms that based on the estimated heritability and selection parameters for HIV-1 spVL, standard GWAS are robust to pathogen effects. Our framework may improve GWAS for other diseases where pathogen effects are stronger and more phylogenetically correlated amongst individuals in a cohort.
 \end{abstract}
 
-\section{Introduction}
+\section*{Introduction}
 
 % What is GWAS and why is it important
 A key goal of genome-wide association studies (GWAS) is to understand the genetic basis of phenotypic variation among individuals. In a typical GWAS, millions of genetic variants from across the human genome are screened for statistical association with a trait of interest. Ideally, this procedure identifies variants that are located in, or are in linkage disequilibrium with, alleles that directly affect the trait. If GWAS finds a variant strongly associated with a disease trait, the gene product may be a good drug target \citep{Okada2014}. Even if no single variant has a strong association, many small associations can be aggregated into a polygenic risk score to identify high-risk individuals \citep{Dudbridge2013}.
 
 % Why is spVL and important trait
-For HIV, GWAS have used a trait called set point viral load (spVL) to identify human variants associated with severity of disease course. spVL is generally defined to be the average concentration of viral particles in host plasma during the asymptomatic phase of infection in the absence of treatment \citep{Mellors1996}. In untreated individuals, spVL is predictive of duration of asymptomatic infection \citep{Mellors1996} and infectiousness \citep{Quinn2000}. If viral load can be reduced to undetectable levels, an individual is effectively uninfectious \citep{HHSARTGuidelines2019}. Notably, spVL varies by orders of magnitude between individuals \citep{Mellors1996}. Thus, spVL measurements point to a wide range in natural HIV control amongst individuals. 
+For HIV, GWAS have used a trait called set point viral load (spVL) to identify human variants associated with severity of disease course. spVL is generally defined to be the average concentration of viral particles in host plasma during the asymptomatic phase of infection in the absence of treatment \citep{Mellors1996}. In untreated individuals, spVL is predictive of duration of asymptomatic infection \citep{Mellors1996} and infectiousness \citep{Quinn2000}. If viral load can be reduced to undetectable levels, an individual is effectively uninfectious and the risk of disease progression is massively reduced \citep{HHSARTGuidelines2019}. Notably, spVL varies by orders of magnitude between individuals \citep{Mellors1996}. Thus, spVL measurements point to a wide range in natural HIV control amongst individuals. 
 
 % How do we measure the extent to which genetic factors determine spVL
 To understand HIV pathogenicity, it is important to understand to what extent spVL is determined by host genetic factors \citep{Bartha2013, Dalmasso2008, Fellay2007, Pereyra2010, Fellay2009, Pelak2010, VanManen2011, McLaren2012}. Heritability is a key measure of how genetically-determined a trait is. Here we distinguish between two different heritability measures that are used in different contexts in infectious disease study. Broad-sense heritability $H^2$ measures the fraction of total trait variance that is heritable, i.e. due to inherited differences. In the infectious disease case, broad-sense heritability from pathogen factors, which are inherited by recipients from their infection partners, is typically measured. On the other hand, narrow-sense heritability $h^2$ measures the fraction of total trait variance due specifically to additive genetic effects, i.e. the sum of independent effects from all genetic variants. GWAS for infectious disease typically measure narrow-sense heritability of a trait based on human genetic variants.
 
 % How heritable is spVL (human side)
-Several GWAS have been done to measure the narrow-sense heritability of spVL and identify associated host genetic variants \citep{Bartha2013, Dalmasso2008, Fellay2007, Pereyra2010, Fellay2009, Pelak2010, VanManen2011, McLaren2012}. The largest study to-date by \citet{McLaren2015} estimated the narrow-sense heritability of spVL from human genetic variants to be approximately 25\%. All but 5\% of this was attributed to two regions in the human genome, the major histocompatibility complex (MHC) and C-C motif chemokine receptor 5 (\emph{CCR5}). Both associations are biologically relevant: the MHC encodes proteins that present viral epitopes at the cell surface and \emph{CCR5} encodes a co-receptor for HIV-1 cell entry. In other words, MHC proteins match bits of the virus like puzzle pieces and display these to signal that infected cells should be destroyed. CCR5 proteins help the virus infect target cells.
+Several GWAS have been done to measure the narrow-sense heritability of spVL and identify associated host genetic variants \citep{Bartha2013, Dalmasso2008, Fellay2007, Pereyra2010, Fellay2009, Pelak2010, VanManen2011, McLaren2012}. The largest study to-date by \citet{McLaren2015} estimated the narrow-sense heritability of spVL from human genetic variants to be approximately 25\%. All but 5\% of this was attributed to two regions in the human genome, the major histocompatibility complex (MHC) and C-C motif chemokine receptor 5 (\emph{CCR5}). Both associations are biologically relevant: the MHC encodes proteins that present viral epitopes at the cell surface and \emph{CCR5} encodes a co-receptor for HIV-1 cell entry. In other words, MHC proteins match bits of the virus like puzzle pieces and display these to signal that a cell is infected. CCR5 proteins help the virus infect target cells.
 
 % How heritable is spVL (viral side)
 In addition to these human genetic factors, it is well-recognized that viral genetic factors effect spVL. As mentioned, heritability from the viral side is typically measured using broad-sense heritability. Estimates differ depending on the methods employed and the cohort studied (see \citet{Mitov2018} for a discussion of this uncertainty). Estimates using phylogenetic methods on large UK and Swiss cohorts by \citep{Mitov2018} and \citep{Bertels2018} measured the broad-sense heritability of spVL from the virus to be 21\% - 29\%. However, variation in the MHC is known to exert strong selective pressure on the virus \citep{Kloverpris2016, Nguyen2021}. If the virus can change its ``puzzle piece'' shape to escape MHC-presentation, infected cells can go undetected. This means that MHC variants affect spVL largely via selection on the virus \citep{Bartha2017}. In summary, human genetic factors play a role in determining spVL, but these effects may be mediated by viral genetic variation.
@@ -128,15 +129,17 @@ However, these approaches are only suitable to quantify effects from $pathogen$ 
 % Introduction to our method
 In this work,  we draw from the field of phylogenetic comparative methods to develop a new GWAS framework that estimates and removes trait variability due to the pathogen using information from the full pathogen phylogeny. Our approach should help identify human genetic variants that affect disease traits and more accurately estimate their effects. Furthermore, we think this approach represents the first GWAS framework to identify human genetic variants associated with a disease trait that accounts for non-independence of samples due to the underlying pathogen phylogeny. 
 
-In the following we (i) describe a statistical model for the spVL trait, (ii) derive a maximum likelihood estimate for the viral part of spVL under this model, and (iii) describe a new infectious disease GWAS framework using this information. In simulations, we demonstrate that this framework can improve GWAS power to detect host genetic variants effecting a disease trait. Finally, we apply our framework to human and viral genome data from the Swiss HIV Cohort Study (SHCS) and show that associations with spVL are robust to a correction for viral effects. Although we developed our framework in the context of HIV-1 spVL, the same approach could readily be applied to other heritable infectious disease traits. 
+In the following we describe a statistical model for the spVL trait, derive a maximum likelihood estimate for the viral part of spVL under this model, and describe a new infectious disease GWAS framework using this information. In simulations, we demonstrate that this framework can improve GWAS power to detect host genetic variants effecting a disease trait. Finally, we apply our framework to human and viral genome data from the Swiss HIV Cohort Study (SHCS) and show that associations with spVL are robust to a correction for viral effects. Although we developed our framework in the context of HIV-1 spVL, the same approach could readily be applied to other heritable infectious disease traits. 
 
-\subsection{A statistical model for spVL}
+\section*{New Approaches}
+\subsection*{A statistical model for spVL}
 
-Variation in spVL comes from several sources: direct host genetic effects, pathogen effects, interaction effects between the host and the pathogen, and other environmental effects. Of these, only pathogen effects are heritable from one transmission partner to another \citep{Leventhal2016}. To characterize these effects, we use a phylogenetic mixed model (PMM) \citep{Housworth2004}. PMMs assume continuous traits like spVL are the sum of independent heritable and non-heritable parts. In our case, pathogen effects comprise the heritable part and all other effects comprise the non-heritable part. Then, the heritable part is modeled by a random process occurring in continuous time along the branches of the pathogen phylogeny. The non-heritable part is modeled as Gaussian noise added to sampled individuals at the tips of the phylogeny (Figure \ref{fig:spVLModel}).
+Variation in spVL comes from several sources: direct host genetic effects, pathogen effects, interaction effects between the host and the pathogen, and other environmental effects. Of these, only pathogen effects are heritable from one transmission partner to another \citep{Leventhal2016}. To characterize these effects, we use a phylogenetic mixed model (PMM) \citep{Housworth2004}. PMMs assume continuous traits like spVL are the sum of independent heritable and non-heritable parts. In our case, pathogen effects comprise the heritable part and all other effects comprise the non-heritable part. Then, the heritable part is modeled by a random process occurring in continuous time along the branches of the pathogen phylogeny, as in Figure \ref{fig:spVLModel}A. The non-heritable part is modeled as Gaussian noise added to sampled individuals at the tips of the phylogeny.
 
 \begin{figure}[H]
 	\begin{center}
 	\includegraphics[width = \linewidth]{figures/simulation_setup.png}
+	\caption{A high-level schematic of our POUMM-based simulation framework. (A) shows how pathogen genetic effects on spVL evolve along the pathogen phylogeny according to an OU process. (B) shows host genetic effects, which are the sum of independent effects from several causal variants. Each variant can be present in 0, 1, or 2 copies and has some effect $\delta$ on the trait value. We assume each variant has the same magnitude of effect and that half the causal variants have a positive effect and the other half have a negative effect. (C) shows that environmental effects are assumed to be independent between sampled individuals and are drawn from a distribution centered at zero with variance $\sigma^2_e$.}
 % 		\includegraphics[width=0.462\linewidth]{figures/model_figure}
 % 		\caption{The POUMM statistical model for the spVL trait. (A) shows how the pathogen effect on spVL, $g_v$, evolves according to an OU process along (C) the pathogen phylogeny. The dashed line in (A) shows the expected value of the trait at each point in time under the model. (B) shows that the non-pathogen effect on spVL, $e$, is modeled as a Gaussian random variable. Each tip on the phylogeny corresponds to a sampled individual with an independent non-pathogen-effect drawn from the distribution shown in (B).}
 		\label{fig:spVLModel}
@@ -185,7 +188,7 @@ Finally, broad-sense trait heritability can be calculated as the fraction of tot
 	H^2_{\bar{t}} = \frac{Var[g_v(t)]}{Var[g_v(t)] + Var(e)} = \frac{\frac{\sigma^2}{2\alpha}(1 - e^{-2\alpha t})}{\frac{\sigma^2}{2\alpha}(1 - e^{-2\alpha t}) + \sigma^2_e}
 \end{equation}
 
-\subsection{Teasing apart pathogen and non-pathogen effects on spVL}
+\subsection*{Teasing apart pathogen and non-pathogen effects on spVL}
 
 Given the assumptions of the POUMM, we can estimate a heritable pathogen effect on spVL and a non-heritable, host and environmental effect on spVL. Here, we derive a maximum-likelihood estimate for these values for individuals in a cohort, given measured spVL values and a pathogen phylogeny linking the infecting strains.
 
@@ -229,7 +232,7 @@ Given the estimator we just derived for $\bm{g}_v$, we can now estimate $\bm{e}$
 
 We will use this value to try to improve upon standard GWAS methods in infectious disease.
 
-\subsection{A POUMM-based GWAS framework for infectious disease}
+\subsection*{A POUMM-based GWAS framework for infectious disease}
 
 We propose to improve standard GWAS for infectious diseases by estimating and removing trait variability due to pathogen effects. Our new framework is as follows:
 
@@ -241,17 +244,17 @@ We propose to improve standard GWAS for infectious diseases by estimating and re
 	\item Perform GWAS with only the non-pathogen effects on the trait as the response variable.
 \end{enumerate}
 
-\section{Results}
+\section*{Results}
 
-\subsection{Simulation study}
+\subsection*{Simulation study}
 
-To test the theoretical best-case performance of our method, we simulated data under the POUMM and applied our framework to the simulated data. Figure \ref{fig:sim-design} shows the simulation scheme and table \ref{tab:sim-params} gives the value or expression for each parameter. In a nutshell, we simulated independent, additive host genetic effects, independent environmental effects, and heritable pathogen genetic effects under different scenarios of trait heritability and selection strength. To maintain the same heritability while varying selection strength, we counter-balanced by varying the intensity of stochastic evolutionary fluctuations accordingly. We fixed other variables to plausible values based on the spVL literature.
+To test the theoretical best-case performance of our method, we simulated data under the POUMM and applied our framework to the simulated data. Figure \ref{fig:spVLModel} shows a high-level schematic of our simulation framework and table \ref{tab:sim-params} gives the value or expression for each parameter. In a nutshell, we simulated independent, additive host genetic effects, independent environmental effects, and heritable pathogen genetic effects under different scenarios of trait heritability and selection strength. To maintain the same heritability while varying selection strength, we counter-balanced by varying the intensity of stochastic evolutionary fluctuations accordingly. We fixed other variables to plausible values based on the spVL literature.
 
-\subsubsection{Estimator accuracy}
+\subsubsection*{Estimator accuracy}
 
-First, we evaluated how well our method estimated the additive host genetic effects from the simulated data. Additive host genetic effects represent an ideal (albeit unattainable) baseline for infectious disease GWAS. Figure \ref{fig:simulationResults}A shows that our method incorporating phylogenetic information can more accurately estimate this value compared to the trait value. To ensure a fair comparison, we scaled trait values to have the same mean, zero, as host genetic effects so as not to bias the root mean squared error (RMSE) by a constant factor. In the supplemental material, we show why the scaled trait value is expected to have an RMSE of approximately 0.74 under our simulation set-up. By incorporating phylogenetic information, we can improve upon this error in scenarios where the trait is highly heritable and under low selection pressure. This is because high heritability means the pathogen greatly effects the trait value. Then, when the trait is under weak selection, pathogen effects can drift far from the long-term optimum and stochastic fluctuations are low to maintain the same heritability. Thus, our method performs well when an infectious disease trait is highly heritable and trait values are highly correlated amongst closely related members of a transmission chain, but vary widely within the entire cohort.
+First, we evaluated how well our method estimated the additive host genetic effects from the simulated data. Additive host genetic effects represent an ideal (albeit unattainable) baseline for infectious disease GWAS. Figure \ref{fig:simulationResults}A shows that our method incorporating phylogenetic information can more accurately estimate this value compared to the trait value. To ensure a fair comparison, we scaled trait values to have the same mean, zero, as host genetic effects so as not to bias the root mean squared error (RMSE) by a constant factor. In the supplemental material, we show why the scaled trait value is expected to have an RMSE of approximately 0.74 under our simulation scheme. By incorporating phylogenetic information, we can improve upon this error in scenarios where the trait is highly heritable and under low selection pressure. This is because high heritability means the pathogen greatly effects the trait value. Then, when the trait is under weak selection, pathogen effects can drift far from the long-term optimum and stochastic fluctuations are low to maintain the same heritability. Thus, our method performs well when an infectious disease trait is highly heritable and trait values are highly correlated amongst closely related members of a transmission chain, but vary widely within the entire cohort.
 
-\subsubsection{Theoretical GWAS improvement}
+\subsubsection*{Theoretical GWAS improvement}
 
 Next, we characterized the evolutionary scenarios under which our framework can actually improve GWAS power. We used the true positive rate (TPR) to evaluate the fraction of simulated host genetic variants with direct effects we could recover as being significantly associated with the trait. We performed three different GWAS for each simulated dataset: the first represents an ideal in which we can exactly know and remove pathogen effects from trait values, the second is using our method to estimate this value and remove it, and the third represents a standard GWAS using the scaled trait value. Figure \ref{fig:simulationResults}B shows that our framework can improve the TPR in simulated scenarios where selection strength $<$ 10 time$^{-1}$ and heritability $>$ 45\%. If we were able to perfectly estimate and remove pathogen effects on a trait, the TPR would increase across all values of selection strength so long as the trait is more than marginally heritable. We estimate approximately 25\% to be the heritability threshold above which GWAS power is negatively impacted by pathogen effects. In summary, we show it is theoretically possible to improve GWAS power for heritable infectious disease traits by estimating and removing pathogen effects using information from the pathogen phylogeny.
 
@@ -266,13 +269,12 @@ Next, we characterized the evolutionary scenarios under which our framework can 
 	\end{center}
 \end{figure}
 
-\subsection{GWAS on the Swiss HIV Cohort}
+\subsection*{GWAS on the Swiss HIV Cohort}
 
 Finally, we applied our framework to empirical data from the Swiss HIV Cohort Study (SHCS). We used data collected from 1,392 individuals in Switzerland infected with subtype B HIV-1 between 1994 and 2018. The SHCS provided viral load measurements, $pol$ gene sequences, and human genotype data for these individuals. We followed the framework outlined above to estimate the pathogen and non-pathogen effects on spVL for the cohort from these data. Figure \ref{fig:spvl-calc-comparison} shows the calculated spVL values, figure \ref{fig:spvl-on-tree} shows the inferred pathogen phylogeny, and figures \ref{fig:spvl-on-tree}, \ref{fig:trait-comparison} show the estimated non-pathogen effects on spVL calculated for these individuals. We estimated spVL heritability in this cohort to be 45\% (95\% highest posterior density, HPD, 24 - 67\%) \ref{tab:POUMM-parameters-our-estimates}. To put these values into the context of our simulation study, they are shown as black points on figure \ref{fig:simulationResults}.
 
 We compared our proposed GWAS framework with a more standard approach by performing two different GWAS on the same SHCS human genotypes. In the ``GWAS with standard trait value'' we used the unmodified trait value, our calculated spVL values, as the GWAS response variable. In the ``GWAS with estimated non-pathogen part of trait'' we used our estimates for the non-pathogen effects on spVL. Figure \ref{fig:gwas-results}A shows that results are qualitatively similar between the two GWAS. Q-Q plots show the distribution of p-values are very similar as well (figure \ref{fig:qq-plots}). Figure \ref{fig:gwas-results}B shows how the strength of association changed for some variants in the MHC and \emph{CCR5} regions. Taking into account phylogenetic information slightly decreased association strength for most variants in the \emph{CCR5} region. Association strength increased for some variants in the MHC, for example, SNP rs9265880 had the greatest increase in significance in the MHC region, from a p-value of $3.5 \times 10^{-07}$ to $7.7 \times 10^{-09}$. However, the top-associated variants in the MHC and \emph{CCR5} regions were consistent regardless of the GWAS response variable used (figure \ref{tab:gwas-top-associations}). Finally table \ref{tab:comp-gwas-mclaren-snps} shows how our GWAS results compare for the two top-associated SNPs identified by \citet{McLaren2015}. In summary, there are no clear patterns that point to new regions of association in the human genome with spVL when we take into account the pathogen phylogeny.
 
-% TODO
 \begin{figure}[H]
 	\begin{center}
 		\includegraphics[width=0.7\linewidth]{figures/gwas_results}
@@ -297,12 +299,12 @@ We compared our proposed GWAS framework with a more standard approach by perform
 \label{tab:comp-gwas-mclaren-snps}
 \end{table}
 
-\section{Discussion}
+\section*{Discussion}
 % State the importance of your findings
 In this paper, we presented a novel, phylogeny-aware GWAS framework to correct for heritable pathogen effects on infectious disease traits. By using information from the pathogen phylogeny, we show it is possible to improve GWAS power to detect host genetic variants associated with a disease trait. This should help us better understand which host factors are protective against a disease versus which increase susceptibility or disease severity.
 
 % Contextualize the study & address limitations
-Our method relies on the POUMM, a model of continuous trait evolution that accounts for heritable and non-heritable effects on a trait, as well as selection. Using this model, we estimated HIV-1 spVL heritability to be 45\% (95\% HPD 24 - 67\%) in the Swiss HIV Cohort Study. Compared to previous studies, this estimate is at the higher end \citep{Mitov2018}. Also using the POUMM, \citep{Bertels2018} estimated a spVL heritability of 29\% (N = 2014, CI 12 - 46\%) from the same cohort and \citep{Blanquart2017} estimated 31\% (N = 2028, CI 15 - 43\%) from a pan-European cohort. We note that our sample size (N = 1493 individuals) is quite a bit smaller than these other studies. This might be because we restricted samples based on having $pol$ gene sequences with at least 750 non-ambiguous bases. Our aim was to reconstruct a high-quality phylogeny, since the POUMM does not account for phylogenetic uncertainty and the POUMM parameter estimates are key to our downstream GWAS methods. Although our heritability estimate is rather high, the confidence interval largely overlaps that of other studies and we note that estimating heritability per se was not our primary focus.
+Our method relies on the POUMM, a model of continuous trait evolution that accounts for heritable and non-heritable effects on a trait, as well as selection. Using this model, we estimated HIV-1 spVL heritability to be 45\% (95\% HPD 24 - 67\%) in the Swiss HIV Cohort Study. Compared to previous studies, this estimate is at the higher end \citep{Mitov2018}. Also using the POUMM, \citep{Bertels2018} estimated a spVL heritability of 29\% (N = 2014, CI 12 - 46\%) from the same cohort and \citep{Blanquart2017} estimated 31\% (N = 2028, CI 15 - 43\%) from a pan-European cohort. We note that our sample size (N = 1493 individuals) is smaller than in these other studies. This might be because we restricted samples based on having $pol$ gene sequences with at least 750 non-ambiguous bases. Our aim was to reconstruct a high-quality phylogeny, since the POUMM does not account for phylogenetic uncertainty and the POUMM parameter estimates are key to our downstream GWAS methods. Although our heritability estimate is rather high, the confidence interval largely overlaps that of other studies and we note that estimating heritability per se was not our primary focus.
 
 Instead, the main novelty of our approach was to correct the spVL trait prior to performing the GWAS, thereby estimating and removing pathogen effects. In simulations, we show that when trait heritability amongst infection partners is greater than approximately 25\%, GWAS power to detect host genetic variants associated with the same trait is reduced. Our method can correct for this effect in certain evolutionary scenarios by using information from the full pathogen phylogeny. 
 
@@ -315,53 +317,41 @@ Our method is convenient for GWAS because it is simply a pre-processing step tha
 % Summarize the paper
 In summary, we argue that infectious disease GWAS should take the pathogen phylogeny into account when searching for host determinants of a disease trait. We give a practical threshold for identifying when GWAS suffer from pathogen effects (heritability of the trait amongst infection partners $>$ 25\%) and provide a method that can help in scenarios where trait values are highly heritable and phylogenetically-structured amongst members of a cohort.
 
-%\begin{itemize}
-%	\item Compare inferred POUMM parameters to previous studies \citep{Mitov2018, Bertels2018}
-%	\item Standard GWAS highlights previously identified regions associated with spVL: $CCR5$ and MHC
-%	\item We expect non-viral only GWAS to increase signals of association in $CCR5$ (because noise in spVL from the virus reduced) and decrease signals of association in MHC (because viral mutations mediate MHC effects). It \emph{seems} like the results support these hypotheses, but I am waiting on POUMM parameter estimates from a longer MCMC run.
-%	\item The phylogenetic correction to GWAS leads to the biggest p-value changes in the $CCR5$ and MHC regions
-%	\item SNPs near the FUT1 gene (on chromosome 6, highlighted as one of the top-20 p-value changes in the first pipeline run) increased in significance, and the Lewis-X antigen produced by this gene is known to play a role in early HIV infection \citep{Naarding2005}.
-%	\item Address method caveats: 
-%	\begin{itemize}
-%		\item We don't model virus-host interaction effects
-%		\item We don't account for uncertainty in non-viral component of spVL estimates
-%	\end{itemize}
-%	\item Implications for future research: what other infectious disease traits are heritable?
-%\end{itemize}
+\section*{Materials and Methods}
 
-\section{Methods}
+\subsection*{Simulation model}
 
-\subsection{Simulation model}
-
-Whenever possible, we tried to parameterize our simulation model for spVL using empirical data. We set the total variance in spVL to 0.73 log copies$^2$ mL$^{-2}$ based on UK cohort data \citep{Mitov2018}. After allotting 25\% of this variance to the host part of spVL $g_h$ (following \citet{McLaren2015}), we partitioned the remaining variance between the viral part $g_v$ and the environmental part $\epsilon$ in different ratios to assess estimator performance across a range of spVL heritabilities. $g_h$ was simulated as the sum of contributions from 20 causal host genetic variants, 10 of which had an effect size of 0.2 log copies mL$^{-1}$ and 10 of which had an effect size of -0.2 log copies mL$^{-1}$. Host genetic variants were generated from a binomial distribution with probability $p$ calculated such that $g_h$ had the appropriate variance (see table \ref{tab:sim-params}). We generated a random viral phylogeny with branch lengths on the same time scale as a previously inferred UK cohort HIV tree \citep{Hodcroft2014} using the R package ape \citep{Paradis2018}. $g_v$ was simulated by running an OU process along the phylogeny using the R package POUMM \citep{Mitov2017a-POUMM} and sampling values at the tips. For the OU parameters $\theta$ and $g_{0}$ we used 4.5 log copies mL$^{-1}$, similar to values previously inferred for HIV (table \ref{tab:POUMM-parameters-our-estimates}). To assess our estimator's performance under a range of evolutionary scenarios, we co-varied the OU parameters for selection strength, $\alpha$, and intensity of random fluctuations, $\sigma$, so that different proportions of the variability in $g_v$ were attributable to selection and drift, respectively. Finally, the environmental component of spVL $\epsilon$ was generated from a normal distribution with mean 0.
+Whenever possible, we tried to parameterize our simulation model for spVL using empirical data. We set the total variance in spVL to 0.73 log copies$^2$ mL$^{-2}$ based on UK cohort data \citep{Mitov2018}. After allotting 25\% of this variance to the host part of spVL $g_h$ (following \citet{McLaren2015}), we partitioned the remaining variance between the viral part $g_v$ and the environmental part $\epsilon$ in different ratios to assess estimator performance across a range of spVL heritabilities. $g_h$ was simulated as the sum of contributions from 20 causal host genetic variants, 10 of which had an effect size of 0.2 log copies mL$^{-1}$ and 10 of which had an effect size of -0.2 log copies mL$^{-1}$. Host genetic variants were generated from a binomial distribution with probability $p$ calculated such that $g_h$ had the appropriate variance (see table \ref{tab:sim-params}). We generated a random viral phylogeny with branch lengths on the same time scale as a previously inferred UK cohort HIV tree \citep{Hodcroft2014} using the R package ape \citep{Paradis2018}. $g_v$ was simulated by running an OU process along the phylogeny using the R package POUMM \citep{Mitov2017a-POUMM} and sampling values at the tips. For the OU parameters $\theta$ and $g_{0}$ we used 4.5 log copies mL$^{-1}$, similar to values previously inferred for HIV (table \ref{tab:POUMM-parameters-our-estimates}). To assess our estimator's performance under a range of evolutionary scenarios, we co-varied the OU parameters for selection strength, $\alpha$, and intensity of random fluctuations, $\sigma$, so that different proportions of the variability in $g_v$ were attributable to selection and drift, respectively. Finally, the environmental component of spVL $\epsilon$ was generated from a normal distribution with mean 0.  For a full graphical model representation of the simulation scheme, see Figure \ref{fig:sim-design}.
 
 \begin{table}[H]
 	\begin{tabular}{p{1.5cm}ll} \toprule 
 		Variable & Expression & Definition \\ \midrule 
-		$\sigma^2_z$ &  0.73 log copies$^{2}$/mL$^{2}$ & total spVL variance \\ 
-		$H^2_{\bar{t}}$ & varied & spVL viral heritability at $\bar{t}$ \\
-		$\sigma^2_{g_h}$ & $\sigma_{g_h}^2 = 0.25*\sigma_z^2$ & variance in host part of spVL \\
-		$\sigma^2_{g_v}(\bar{t})$ & $\sigma^2_{g_{v}}(\bar{t}) = H^2_{\bar{t}}*\sigma_z^2$ & variance in viral part of spVL at $\bar{t}$ \\ 
-		$\sigma^2_{\epsilon}$ & $\sigma_{\epsilon}^2 = \sigma_z^2 - \sigma^2_{g_v} - \sigma^2_{g_h}$ & variance in environmental part of spVL \\ 
-		$\bar{t}$ & 0.14 substitutions site$^{-1}$ yr$^{-1}$ & mean root-tip time in viral phylogeny \\ 
-		$\bm{g}_v$ & $\bm{g}_v \sim Norm(\bm{\mu}_{OU}, \boldsymbol{\Sigma}_{OU})$ & viral part of spVL for all individuals \\ 
-		$\theta$ & 4.5 log copies/mL & optimal spVL value \\
+		$\sigma^2_z$ &  0.73 log copies$^{2}$/mL$^{2}$ & Total spVL variance \\ 
+		$H^2_h$ & 0.25 & Host heritability of spVL \\
+		$H^2_{\bar{t}}$ & varied & Viral heritability of spVL at $\bar{t}$ \\
+		$\sigma^2_{g_h}$ & $\sigma_{g_h}^2 = 0.25*\sigma_z^2$ & Variance in host part of spVL \\
+		$\sigma^2_{g_v}(\bar{t})$ & $\sigma^2_{g_{v}}(\bar{t}) = H^2_{\bar{t}}*\sigma_z^2$ & Variance in viral part of spVL at $\bar{t}$ \\ 
+		$\sigma^2_{\epsilon}$ & $\sigma_{\epsilon}^2 = \sigma_z^2 - \sigma^2_{g_v} - \sigma^2_{g_h}$ & Variance in environmental part of spVL \\ 
+		$\bar{t}$ & 0.14 substitutions site$^{-1}$ yr$^{-1}$ & Mean root-tip time in viral phylogeny \\ 
+		$\bm{g}_v$ & $\bm{g}_v \sim Norm(\bm{\mu}_{OU}, \boldsymbol{\Sigma}_{OU})$ & Viral part of spVL for all individuals \\ 
+		$\theta$ & 4.5 log copies/mL & Optimal spVL value \\
 		$g_{0}$ & 4.5 log copies/mL & $g_v$ at the root of the phylogeny  \\ 
-		$\alpha$ & varied & selection strength of OU process \\ 
-		$\sigma$ & $\sigma = \sqrt{\frac{2\alpha\sigma^2_{g_{v}}(\bar{t})}{1 - exp(-2\alpha\bar{t})}}$ & time-unit standard deviation of OU process \\ 
-		$\Psi$ & branch lengths $\sim Exp(\bar{t})$ & viral phylogeny \\ 
-		$g_{h_i}$ & $g_{h_i} = \delta \sum_{j = 1}^{j = M/2}{G_{ij}} - \delta \sum_{j = M/2}^{j = M}{G_{ij}}$ & host part of spVL for individual $i$ \\ 
-		$G_{N \times M}$ & $G_{ij} \sim Binom(2, p)\ \forall i \in {1...N}, \forall j \in {1...M}$ & host genotype matrix \\
-		$p$ & $p = \frac{1}{2} - \sqrt{\frac{1}{4} - \frac{H_{\bar{t}}^2\sigma^2_z}{2\delta^2M}}$ &  host variant allele frequency \\ 
-		$\delta$ & 0.2 & host variant effect size \\ 
-		$M$ & 20 & number of causal host variants \\ 
-		$\epsilon_i$ & $ \epsilon_i \sim Norm(0, \sigma^2_{\epsilon})$ & environmental part of spVL for individual $i$ \\ \bottomrule 
+		$\alpha$ & varied & Selection strength of OU process \\ 
+		$\sigma$ & $\sigma = \sqrt{\frac{2\alpha\sigma^2_{g_{v}}(\bar{t})}{1 - exp(-2\alpha\bar{t})}}$ & Time-unit standard deviation of OU process \\ 
+		$\Psi$ & branch lengths $\sim Exp(\bar{t})$ & Viral phylogeny \\ 
+		$g_{h_i}$ & $g_{h_i} = \delta \sum_{j = 1}^{j = M/2}{G_{ij}} - \delta \sum_{j = M/2}^{j = M}{G_{ij}}$ & Host part of spVL for individual $i$ \\ 
+		$G_{N \times M}$ & $G_{ij} \sim Binom(2, p)\ \forall i \in {1...N}, \forall j \in {1...M}$ & Host genotype matrix \\
+		$p$ & $p = \frac{1}{2} - \sqrt{\frac{1}{4} - \frac{H_{h}^2\sigma^2_z}{2\delta^2M}}$ &  Host variant allele frequency \\ 
+		$\delta$ & 0.2 & Host variant effect size \\ 
+		$M$ & 20 & Number of causal host variants \\ 
+		$\epsilon_i$ & $ \epsilon_i \sim Norm(0, \sigma^2_{\epsilon})$ & Environmental part of spVL for individual $i$ \\ 
+		$N$ & 500 & Number of simulated samples \\ \bottomrule 
 	\end{tabular}
-	\caption{Simulation model parameters.}
+	\caption{Simulation model parameters. For a full graphical model representation of the simulation scheme, including how these parameters are related, see Figure \ref{fig:sim-design}.}
 	\label{tab:sim-params}
 \end{table}
 
-\subsection{Swiss HIV-1 data}
+\subsection*{Swiss HIV-1 data}
 
 Human genotypes, viral load measurements, and HIV-1 $pol$ gene sequences from HIV-1 positive individuals were all collected in the context of other studies by the Swiss HIV Cohort Study (SHCS, www.shcs.ch). All participants were HIV-1–infected individuals at least 16 years old and written informed consent was obtained from all cohort participants by \citet{Schoeni-Affolter2010}. The data was received in anonymized form after the project was approved by the SHCS. 
 
@@ -369,17 +359,17 @@ For phylogenetic inference, we retained sequences from 1,493 individuals with no
 
 For GWAS, we retained data from 1,392 of the 1,493 individuals with European ancestry and not closely related to other individuals in the cohort (Table \ref{tab:sample-filtering}). These were 227 females and 1165 males. Ancestry was determined by plotting individuals along the three primary axes of genotypic variation from a combined dataset of SHCS samples and HapMap populations (Figure \ref{fig:PCA}). Kinship was evaluated using PLINK version 2.3 \citep{Chang2015}; we used the --king-cutoff option to exclude one from each pair of individuals with a kinship coefficient $>$ 0.09375. Initial host genotyping quality control and imputation were done as in \cite{Thorball2021GeneticLymphoma}. Subsequent genotyping quality control was performed using PLINK version 2.3 \citep{Chang2015}. We used the options --maf 0.01, --geno 0.01, and --hwe 0.00005 to remove variants with minor allele frequency less than 0.01, missing call rate greater than 0.05, or Hardy-Weinberg equilibrium exact test p-value less than 5x10$^-5$. After quality filtering, approximately 6.2 million genetic variants from the 1,392 individuals were retained for GWAS (Table \ref{tab:variant-filtering}). 
 
-\subsection{POUMM parameter inference}
+\subsection*{POUMM parameter inference}
 
 We used the R package POUMM version 2.1.6 \citep{Mitov2017a-POUMM} to infer the POUMM parameters $g_0, \alpha, \theta, \sigma, \text{ and }\sigma_e$ from the approximate maximum-likelihood phylogeny and calculated spVL values. The Bayesian inference method implemented in this package requires specification of a prior distribution for each parameter. We used the same, broad prior distributions as in \citet{Mitov2018}, namely: $g_{0} \sim \mathcal{N}(4.5,\ 3)$, $\alpha \sim Exp(0.02)$, $\theta \sim \mathcal{N}(4.5,\ 3)$, $H^2_{\bar{t}} \sim \mathcal{U}(0,\ 1)$, and $\sigma^2_e \sim Exp(0.02)$. We ran two MCMC chains for 4x10$^6$ samples each with a target sample acceptance rate of 0.01 and a thinning interval of 1000. The first 2x10$^5$ samples of each chain were used for automatic adjustment of the MCMC proposal distribution. Figure \ref{fig:poumm-parameters} shows the posterior distributions for inferred parameters. Table \ref{tab:POUMM-parameters-our-estimates} gives the posterior mean values used for subsequent calculations.
 
-\subsection{Phylogenetic spVL correction}
+\subsection*{Phylogenetic spVL correction}
 We corrected calcualted spVL values using the method described in this paper. For each of the 1,392 individuals in the GWAS cohort, we estimated the viral part of spVL using equation \ref{eq:MuG} and the corresponding non-viral part using equation \ref{eq:EHat}. For the POUMM parameters $\alpha$, $\sigma$, $\theta$, and $\sigma_e$, we used the posterior mean estimates generated as described above. 
 
-\subsection{Association testing}
+\subsection*{Association testing}
 We performed two GWAS using the same human genotype data from the SHCS. For the first ``GWAS with standard trait value'' we used total calculated spVL ($\bm{z}$) as the response variable for association testing, replicating prior GWAS for host genetic determinants of spVL. For the second ``GWAS with estimated non-pathogen part of trait'' we replaced total spVL with the estimated non-viral component of spVL ($\hat{\bm{e}}$) as the response variable. Association testing was performed using a linear association model in PLINK version 2.3 \citep{Chang2015} with sex and the top 5 principle components of host genetic variation included as covariates. The sex and principle components covariates were included to reduce residual variance in spVL and control for confounding from host population structure, respectively. 
 
-\section{Acknowledgments}
+\section*{Acknowledgments}
 
 This study was funded by ETH Zurich. We would like to thank Esposito Mauro and Alexandra Scherrer from the SHCS data center, who were especially helpful in retrieving data, Alexandra Calmy and her team from the Geneva University Hospital for data contributions, and Michael Landis, who shared a LaTeX template for graphical model drawing. Finally and most importantly, we thank the participants of the Swiss HIV Cohort Study for contributing their samples and making this research possible.
 
@@ -394,12 +384,12 @@ This study was funded by ETH Zurich. We would like to thank Esposito Mauro and A
 %\end{itemize}
 
 \newpage
-\section{Supplemental Material}
+\section*{Supplemental Material}
 \beginsupplement
 
-\subsection{Expected results from simulations}
+\subsection*{Expected results from simulations}
 
-Here we show the root mean square error (RMSE) of $\bm{z} - \bm{\bar{z}}$ as an estimate for $\bm{h}$ should be $\approx$ 0.74 in our simulation setup. First we write the expression for the RMSE:
+Here we show the root mean square error (RMSE) of $\bm{z} - \bm{\bar{z}}$ as an estimate for $\bm{h}$ should be $\approx$ 0.74 in our simulation scheme. First we write the expression for the RMSE:
 
 \begin{equation}
     RMSE = \sqrt{\frac{\sum_i^N(z - \bar{z} - h)^2}{N}}
@@ -411,7 +401,7 @@ Note that $z - \bar{z}$ differs from $h$ due to a viral effect and an environmen
     RMSE = \sqrt{\sigma^2_{g_v} + \sigma^2_\epsilon}
 \end{equation}
 
-We can calculate the variance due to these two effects because the total variance in spVL $\sigma^2_z$, and the fraction of the total variance due to host genetic effects, $\sigma^2_{g_h}$, are fixed parameters in our simulation setup.
+We can calculate the variance due to these two effects because the total variance in spVL $\sigma^2_z$, and the fraction of the total variance due to host genetic effects, $\sigma^2_{g_h}$, are fixed parameters in our simulation scheme.
 
 \begin{equation}
 \begin{split}
@@ -435,7 +425,7 @@ Therefore, we can expect the RMSE for $\bm{z} - \bm{\bar{z}}$ as an estimate for
 	\node[anchor = west] (alabel) at (-1, 4) {A. Variance partitioning};
 	\node[constnode] (H2h) at (0, 0) {0.25};
 	\node[constnode] (varz) at ($(H2h) + (1.8, 0)$) {$\sigma^2_z$};
-	\node[constnode] (H2) at ($(H2h) + (3.6, 0)$) {$H^2_{\bar{t}}$};
+	\node[constnode] (H2) at ($(H2h) + (3.6, 0)$) {\textcolor{red}{$H^2_{\bar{t}}$}};
 	\node[detnode] (varh) at ($(H2h) + (0.9, 1.5)$) {$\sigma^2_{g_h}$};
 	\node[detnode] (varv) at ($(varz) + (0.9, 1.5)$) {\tiny $\sigma^2_{g_{v}}(\bar{t})$};
 	\node[detnode] (vare) at ($(varh) + (0.9, 1.5)$) {$\sigma^2_{\epsilon}$};
@@ -450,10 +440,10 @@ Therefore, we can expect the RMSE for $\bm{z} - \bm{\bar{z}}$ as an estimate for
 	
 	% Virus
 	\begin{scope}[xshift = 6cm, yshift = -0.5cm]
-	\node[anchor = west] (blabel) at (-1, 4.5) {B. Viral part of spVL};
+	\node[anchor = west] (blabel) at (-1, 4.5) {B. Generating viral effects};
 	\node[constnode] (theta) at (0, 1.5) {$\theta$};
 	\node[constnode] (g0) at (1.8, 1.5) {$g_{0}$};
-	\node[constnode] (alpha) at (3.6, 1.5) {$\alpha$};
+	\node[constnode] (alpha) at (3.6, 1.5) {\textcolor{red}{$\alpha$}};
 	\node[detnode] (sigma) at (5.4, 1.5) {$\sigma$};
 	\node[constnode] (tree) at (7.2, 1.5) {$\Psi$};
 	\node[detnode] (varv) at (3.6+0.9, 0) {\tiny $\sigma^2_{g_{v}}(\bar{t})$};
@@ -470,14 +460,14 @@ Therefore, we can expect the RMSE for $\bm{z} - \bm{\bar{z}}$ as an estimate for
 	\draw[taro] (alpha) -- (sigma);
 	\node[white] (varpic) at (3.6+0.9, -1.75) {};
 	\draw[taro] (varpic) -- (varv);
-	\node (vdist) at ($(v) + (1.8, 0.3)$) {Normal};
+	\node (vdist) at ($(v) + (1.8, 0.3)$) {Gaussian};
 	\draw (v) -- (vdist);
 	\draw[decoration={brace, mirror, raise=18pt}, sloped, decorate] (7.2, 1.5 - .5) -- node[below = 18pt] {OU parameters} (7.2, 1.5 + .5);
 	\end{scope}
 	
 	% Host 
 	\begin{scope}[xshift = 0cm, yshift = -9cm]
-	\node[anchor = west] (clabel) at (-1, 5.55) {C. Host part of spVL};
+	\node[anchor = west] (clabel) at (-1, 5.55) {C. Generating host effects};
 	\node[constnode] (d) at (1.8, 1.5) {2};
 	\node[detnode] (p) at (3.6, 1.5) {$p$};
 	\node[snode] (G) at (1.8, 3) {$G$};
@@ -497,7 +487,7 @@ Therefore, we can expect the RMSE for $\bm{z} - \bm{\bar{z}}$ as an estimate for
 	\draw[taro] (G) -- (h);
 	\node[white] (varpic) at (3.6, -1.5) {};
 	\draw[taro] (varpic) -- (varh);
-	\node (hdist) at ($(h) + (2.7, 0.3)$) {$\approx$ Normal};
+	\node (hdist) at ($(h) + (2.7, 0.3)$) {$\approx$ Gaussian};
 	\draw (h) -- (hdist);
 	\node (gdist) at ($(G) + (-2, 0.6)$) {Binomial};
 	\draw (G) -- (gdist);
@@ -505,7 +495,7 @@ Therefore, we can expect the RMSE for $\bm{z} - \bm{\bar{z}}$ as an estimate for
 	
 	% Environment
 	\begin{scope}[xshift = 10cm, yshift = -6.5cm]
-	\node[anchor = west] (dlabel) at (-1, 3) {D. Environmental part of spVL};
+	\node[anchor = west] (dlabel) at (-1, 3) {D. Generating environmental effects};
 	\node[detnode] (vare) at (0, 0) {$\sigma^2_{\epsilon}$};
 	\node[constnode] (zero) at ($(vare) + (1.8, 0)$) {0};
 	\node[snode] (e) at ($(vare) + (1.8/2, 1.5)$) {$\vec{\epsilon}$};
@@ -513,12 +503,12 @@ Therefore, we can expect the RMSE for $\bm{z} - \bm{\bar{z}}$ as an estimate for
 	\draw[taro] (vare) -- (e);
 	\node[white] (varpic) at (0, -1.5) {};
 	\draw[taro] (varpic) -- (vare);
-	\node (edist) at ($(e) + (1.8, 0.3)$) {Normal};
+	\node (edist) at ($(e) + (1.8, 0.3)$) {Gaussian};
 	\draw (e) -- (edist);
 	\end{scope}
 	
 	\end{tikzpicture}
-	\caption{A graphical representation of the simulation model. Variables in solid squares are constant in the simulation scheme, whereas variables in solid circles are realizations of random variables and variables in dashed circles are determined as a function of other variables. Arrows represent dependencies among variables and the dashed square represents repetition \citep{Hohna2014}.}
+	\caption{A graphical model representation of our simulation scheme, following the recommendations in \cite{Hohna2014}. Variables in solid squares are constants, with the two master control variables that we vary from simulation to simulation highlighted in red. Variables in solid circles are realizations of random variables and variables in dashed circles are determined as a function of other variables. Arrows represent dependencies among variables and the dashed square represents repetition. All parameters are defined in table \ref{tab:sim-params}, as well as the values or expressions used for them. (A) shows how the variance in the simulated environmental effect $\sigma^2_{\epsilon}$ is smaller if the master pathogen heritability value $H^2_{\bar{t}}$ is higher and vice-versa. (B) shows the OU parameters and the pathogen phylogeny, which generate the Gaussian-distributed pathogen effects. The OU parameters $\theta$ and $g_0$ are fixed, whereas $\sigma$ is a deterministic function of the variance in the pathogen effect and the value of $\alpha$. In other words, we use $\sigma$ to maintain the desired pathogen heritability while varying $\alpha$. We generate a new random phylogeny for each simulation. (C) shows how host genotypes are drawn to generate host effects. The host genotype matrix $G$ contains the number of copies (0, 1, or 2) for each of $M$ causal variants with effect size $\delta$. We assume half the variants have a positive effect and half have a negative effect. The allele frequency $p$ for the causal variants set so that we achieve the desired variance in the host effects. (D) shows that the environmental effect is drawn from a Gaussian distribution with mean zero and variance as determined in part (A).}
 	\label{fig:sim-design}
 \end{figure}
 
