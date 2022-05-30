@@ -277,6 +277,14 @@ Next, we characterized the evolutionary scenarios under which our framework can 
 	\end{center}
 \end{figure}
 
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[width=0.7\linewidth]{figures/example_simulation_trait_values}
+		\caption{Example simulated data from two evolutionary scenarios where (left) a phylogenetic correction does not improve GWAS power and (right) where it does. Both data sets were simulated with selection strength = 0.1 time $^{-1}$ and all other parameters fixed as in the full simulation study.}
+		\label{fig:simulationTraitExample}
+	\end{center}
+\end{figure}
+
 \subsection*{GWAS on the Swiss HIV Cohort}
 
 Finally, we applied our framework to empirical data from the Swiss HIV Cohort Study (SHCS). We used data collected from 1,392 individuals in Switzerland infected with HIV-1 subtype B between 1994 and 2018. The SHCS provided viral load measurements, $pol$ gene sequences, and human genotype data for these individuals. We followed the framework outlined above to estimate the pathogen and non-pathogen effects on spVL for the cohort from these data. Figure \ref{fig:spvl-calc-comparison} shows the calculated (total) spVL values, which vary between approximately 1 and 6 log copies/mL in the cohort.  Figure \ref{fig:spvl-on-tree} shows that this trait is not strongly phylogenetically structured in the cohort, despite high heritability. Finally, figure \ref{fig:trait-comparison} shows that the estimated non-pathogen effects on spVL correlate quite strongly with total spVL. We estimated spVL heritability in this cohort to be 45\% (95\% highest posterior density, HPD, 24 - 67\%) and selection strength to be 58 time$^{-1}$ (95\% HPD 19 - 95) (Figure \ref{fig:poumm-parameters}, Table \ref{tab:POUMM-parameters-our-estimates}). To put these values into the context of our simulation study, they are shown as black points on Figure \ref{fig:simulationResults}.
