@@ -48,6 +48,7 @@ Load data
 ```{r}
 accuracy_simulation_results <- read.delim("output/2021-08-31_estimator_accuracy_MLE.txt")
 tpr_simulation_results <- read.delim("output/2021-08-31_GWAS_TPR_MLE.txt")
+example_simulation_results <- read.delim("output_revisions/2022-05-30_simulateFullDataset_2.txt")
 tree <- ape::read.tree(file = paste(OUTDIR, "pathogen_no_outgroup.newick", sep = "/"))
 traits <- read.csv(file = paste(OUTDIR, "poumm_corrected_traits.csv", sep = "/"))
 tree_w_trait_data <- treeio::full_join(tree, traits, by = "label")
@@ -225,7 +226,7 @@ rmse_plot <- plotHeatmap(
         is.real.scale = F,
         labeller = label_wrap_gen(width = 25)) +
         labs(x = expression("Selection strength (" * alpha * ")"),
-             y = expression("spVL heritability (" * italic('H'^2) * ")")) +
+             y = expression("Heritability (" * italic('H'^2) * ")")) +
         shared_theme +
         theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
         geom_point(data = spvl_data, fill = "black")
@@ -279,7 +280,7 @@ tpr_plot <- makeTPRPlot(
         fill.mid = RColorBrewer::brewer.pal(name = 'RdBu', n = 3)[2]) +
         facet_grid(. ~ inference.method, labeller = label_wrap_gen(width = 25)) +
         labs(x = expression("Selection strength (" * alpha * ")"),
-             y = expression("spVL heritability (" * italic('H'^2) * ")")) +
+             y = expression("Heritability (" * italic('H'^2) * ")")) +
         shared_theme +
         theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
         geom_point(data = spvl_data, fill = "black")
@@ -402,6 +403,17 @@ p1 <- ggplot(data = traits, aes(x = trait, y = h.MWA)) +
       labs(x = "Calculated spVL trait", y = ehat_name)
 p2 <- ggExtra::ggMarginal(p1, type="histogram")
 ggsave(plot = p2, filename = paste(FIGDIR, "trait_values.png", sep = "/"),
+      width = linewidth * 2/3, height = height * 2/3, units = "cm")
+```
+
+Example trait values from successful simulation
+```{r}
+p1 <- ggplot(data = example_simulation_results %>% rename("Heritability" = H2), aes(x = h, y = h.MWA)) +
+      geom_point() +
+      facet_grid(. ~ Heritability, labeller = "label_both") + 
+      shared_theme +
+      labs(x = "Simulated host part of trait", y = ehat_name)
+ggsave(plot = p1, filename = paste(FIGDIR, "example_simulation_trait_values.png", sep = "/"),
       width = linewidth * 2/3, height = height * 2/3, units = "cm")
 ```
 
