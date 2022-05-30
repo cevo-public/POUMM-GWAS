@@ -305,7 +305,7 @@ tpr_plot <- makeTPRPlot(
         geom_point(data = example_data1, fill = "black", shape = 1) + 
         geom_point(data = example_data2, fill = "black", shape = 1)
 
-top_row <- plot_grid(NULL, rmse_plot, rel_widths = c(1, 3.25), labels = c("", "A"))
+top_row <- plot_grid(NULL, rmse_plot, rel_widths = c(1.03, 3), labels = c("", "A"))
 png(filename = "figures/simulation_results.png", width = linewidth, height = height, unit = "cm", res = 300)
 plot_grid(top_row, tpr_plot, align = "v", axis = "tb", nrow = 2, labels = c("", "B"))
 dev.off()
