@@ -78,7 +78,7 @@ Data cannot be published due to privacy protections. See the [Swiss HIV Cohort S
 * ``` Rscript scripts/R/calculate_spvl.R``` produces spVL values calculated a few different ways. They are compared in `output/spvl_calculation_comparison.png`. I use the mean of viral load measurements taken before treatment start for further analysis.
 * ```Rscript scripts/R/filter_sequences.R``` attaches spVL and subtype data to the pol sequence data. I filter to only subtype B sequences with spVL values (focal) and A sequences (outgroup) of at least 750 non-gap, non-N characters. The sequence header format is `<patient id>_<collection date %Y-%m-%d>_<'outgroup' or 'focal'>_<spVL value>`.
 
-### Build pathogen phylogeny
+### Build pathogen phylogeny (IQ-TREE)
 * Build container, mount volume with prepared sequence data, run container.
 * This is done locally because I don't have sudo permissions to run Docker on the server where the data lives.
 * The script generates an alignment, trims characters after position 1505, and constructs and approximate maximum-likelihood tree.
@@ -89,6 +89,31 @@ docker run \
 --volume=/Volumes/stadler/SHCSData/data/newfasta2019-10-25.fas:/sequences.fasta:ro \
 --volume=`pwd`/output:/output build-tree
 ```
+
+### Build pathogen phylogeny (BEAST2)
+* Using BEAST2 version 2.6.3
+* Used same alignment as produced for IQ-TREE tree building (output/pathogen_trimmed.fasta) except without 5 type-A outgroup sequences (output/pathogen_trimmed_no_outgroup.fasta)
+* Used tip dates
+* GTR substitution model, 4 gamma-distributed rate categories, empirical base frequencies
+* Strict clock with rate fixed to 0.00079 subs / site / year as in Stadler et al, PNAS, 2013
+* Birth-death tree prior with serial sampling implemented in BDMM package
+* Birth, death, sampling rate priors taken from Stadler et al, PNAS, 2013, table shows non-default priors
+* Ran 3 independent chains for 6 million samples each
+* Using un-bounded sampling proportion meant sampling  proportion highly correlated with become-uninfectius rate
+* Sampling proportion in all of SHCS >= 45% (Swiss HIV Cohort Study et al, International Journal of Epidemiology, 2009)
+* Sampling starts 1994 in analyzed dataset
+
+| Parameter | Prior distribution | Notes |
+| --- | --- | --- |
+| reproductive number | LogN(0.5,1) | 95% interquartile range: 0.2 - 11.7 |
+| become-uninfectious rate | LogN(-1, 1) | 95% interquartile range: 0.05 - 2.61 (20 years - 140 days) | 
+| sampling proportion | Uniform(0.35, 0.75) | Note: fixed to 0 until time 23.4 (one month prior to first sample) |
+| time of outbreak origin | LogN(3.3, 0.1)| 95% interquartile range: 22.3 - 33 years before first sample |
+
+* I had a really hard time getting this to converge, after 6 million steps the posterior was still increasing almost linearly
+
+
+### Root the phylogeny
 
 * ```Rscript scripts/R/root_tree.R``` roots the phylogeny with type "A" sequences as the outgroup, then removes the outgroup.
 
@@ -109,7 +134,7 @@ docker run \
 ```
 * ```make_gwas_phenotypes_file.R``` generates a phenotype file for GWAS with raw and estaimated environmental-only trait values.
 
-### Run comparative GWAS
+### Run comparative GWAS (PLINK)
 * Get top 5 principal components (PCs) of host genetic variation.
 * Run GWAS using PLINK with sex, top 5 PCs as covariates.
 * Filter PLINK results to SNPs only, not covariates and add p-value, effect size columns.
@@ -117,3 +142,18 @@ docker run \
 docker build -t run-gwas -f Dockerfile-run-gwas .
 docker run --volume=`pwd`/output:/output run-gwas
 ```
+
+### Run comparative GWAS (ATOMM)
+* Format host genotype data into haplotype genotype matrices.
+```
+docker build -t plink -f Dockerfile-plink .
+# Run image interactively:
+docker run -it --rm --mount type=bind,src=$PWD/scripts,dst=/scripts --mount type=bind,src=$PWD/output,dst=/output plink
+# Run the commands in scripts/bash/get_atomm_host_genotypes.sh
+```
+* Format pathogen genotype data into haplotype genotype matrices.
+```
+Rscript get_atomm_pathogen_genotypes.R
+```
+* Format phenotype data into required tabular format
+* Run program as in demo.m, testing only marginal effects on the host side
