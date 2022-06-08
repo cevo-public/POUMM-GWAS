@@ -90,7 +90,7 @@ docker run \
 --volume=`pwd`/output:/output build-tree
 ```
 
-### Build pathogen phylogeny (BEAST2)
+<!-- ### Build pathogen phylogeny (BEAST2)
 * Using BEAST2 version 2.6.3
 * Used same alignment as produced for IQ-TREE tree building (output/pathogen_trimmed.fasta) except without 5 type-A outgroup sequences (output/pathogen_trimmed_no_outgroup.fasta)
 * Used tip dates
@@ -110,7 +110,7 @@ docker run \
 | sampling proportion | Uniform(0.35, 0.75) | Note: fixed to 0 until time 23.4 (one month prior to first sample) |
 | time of outbreak origin | LogN(3.3, 0.1)| 95% interquartile range: 22.3 - 33 years before first sample |
 
-* I had a really hard time getting this to converge, after 6 million steps the posterior was still increasing almost linearly
+* I had a really hard time getting this to converge, after 6 million steps the posterior was still increasing almost linearly -->
 
 
 ### Root the phylogeny
@@ -157,3 +157,31 @@ Rscript get_atomm_pathogen_genotypes.R
 ```
 * Format phenotype data into required tabular format
 * Run program as in demo.m, testing only marginal effects on the host side
+
+## Apply method to GWAS for A. thaliana genetic determinants of QDR against X. arboricola
+
+### Data
+
+* A. thaliana host genetic data from 1001 genomes project (https://1001genomes.org/data/GMI-MPI/releases/v3.1/1001genomes_snp-short-indel_only_ACGTN.vcf.gz)
+
+* QDR (Quantitative Disease Resistance) measurements provided by ATOMM study authors (full_phenotype_data.txt).
+
+* X. arboricola pathogen genetic data from ATOMM study (pathogen_alleles.txt)
+
+### Build pathogen phylogeny (Neighbor-Joining) and calculate average QDR trait
+
+* `scripts/R/make_nj_tree_xanthamonas.R`
+
+### Fit the POUMM, apply phylogenetic correction to QDR trait
+
+* `scripts/R/fit_poumm_xanthamonas.R`
+* `scripts/R/correct_trait_xanthamonas.R`
+
+### Prepare host genotype data
+
+On Euler cluster:
+```
+cd $SCRATCH
+wget https://1001genomes.org/data/GMI-MPI/releases/v3.1/1001genomes_snp-short-indel_only_ACGTN.vcf.gz
+
+```
