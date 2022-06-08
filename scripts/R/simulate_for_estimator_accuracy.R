@@ -21,9 +21,14 @@ N <- config_values$N
 # Designate output file
 outfile <- generateOutfileName(outdir = "output", description = "estimator_accuracy_MLE")
 
-# Simulate HIV phylogeny
-print("Simulating HIV phylogeny.")
-tree <- simulateHIVTreeExpBL(N)
+if (config_values$is.HIVTree) {
+  # Simulate HIV phylogeny
+  print("Simulating HIV phylogeny.")
+  tree <- simulateHIVTreeExpBL(N)
+} else {
+  print("Simulating random phylogeny -- be careful with selection strength units!")
+  tree <- simulateRandomTreeExpBL(N)
+}
 
 param.list <- list(
   N = N,

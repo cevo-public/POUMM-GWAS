@@ -201,6 +201,12 @@ simulateHIVTreeGeometricBL <- function(N) {
   return(subsampled_HIV_tree)
 }
 
+simulateRandomTreeExpBL <- function(N) {
+  require(ape)
+  tree <- ape::rtree(n = N, br = rexp, rate = 1)
+  return(tree)
+}
+
 printExpectedH2FromParameterization <- function(tree = NULL, sigma = NULL, alpha = NULL, d = 2, delta, M, p, var.z) {
   # Use to determine M, p, delta values such that H2.h is reasonable value
   if (!(is.null(tree))) {
