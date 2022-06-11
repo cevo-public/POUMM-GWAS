@@ -479,11 +479,11 @@ pruned_tree <- ape::keep.tip(phy = simulation_tree, tip = sample(simulation_tree
 # pruned_tree <- ape::extract.clade(phy = simulation_tree, 516)  # keep some small clade
 
 example_data_lo_h2 <- example_simulation_results %>% filter(H2 == 0.15, alpha == 0.1)
-min_runID <- min(example_data_lo_h2$runID)
-example_data_lo_h2 <- example_data_lo_h2 %>% filter(runID == min_runID)
+selected_runID <- max(example_data_lo_h2$runID)
+example_data_lo_h2 <- example_data_lo_h2 %>% filter(runID == selected_runID)
 example_data_hi_h2 <- example_simulation_results %>% filter(H2 == 0.75, alpha == 0.1)
-min_runID <- min(example_data_hi_h2$runID)
-example_data_hi_h2 <- example_data_hi_h2 %>% filter(runID == min_runID)
+selected_runID <- max(example_data_hi_h2$runID)
+example_data_hi_h2 <- example_data_hi_h2 %>% filter(runID == selected_runID)
 example_data <- rbind(example_data_lo_h2, example_data_hi_h2) %>% rename("label" = "sample", "Heritability" = "H2")
 
 # Plot trait values on a clade in the tree
@@ -501,7 +501,8 @@ hi_h2_tree <- ggtree(pruned_tree) %<+% example_data_hi_h2 +
 # Plot trait value accuracy
 p1 <- ggplot(data = example_data, aes(x = h, y = h.MWA)) +
       geom_point() +
-      facet_grid(. ~ Heritability, labeller = "label_both") + 
+      facet_wrap(. ~ Heritability, labeller = "label_both") + 
+      geom_abline(intercept = 0, slope = 1) + 
       shared_theme +
       labs(x = "Simulated host part of trait", y = "Estimated non-pathogen\npart of trait")
 
