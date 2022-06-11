@@ -1,15 +1,7 @@
-# This function is incorrect! It was used for the initial manuscript submission
-# calculateSigmaFromParameterization_old <- function(tree, alpha, H2, var.z) {
-#   var.gv <- H2 * var.z
-#   t.avg <- mean(POUMM::nodeTimes(tree = tree, tipsOnly = TRUE))
-#   sigma <- sqrt((2 * alpha * var.gv) / (1 - exp(-2 * alpha * t.avg)))
-#   return(sigma)
-# }
-
-# This function is correct! It was used for the manuscript revision
 calculateSigmaFromParameterization <- function(tree, alpha, H2, var.z) {
+  var.gv <- H2 * var.z
   t.avg <- mean(POUMM::nodeTimes(tree = tree, tipsOnly = TRUE))
-  sigma <- sqrt((-2 * alpha * H2 * (var.z * (0.75 - H2))) / ((H2 - 1) * (1 - exp(-2 * alpha * t.avg))))
+  sigma <- sqrt((2 * alpha * var.gv) / (1 - exp(-2 * alpha * t.avg)))
   return(sigma)
 }
 
