@@ -17,15 +17,20 @@ source("scripts/R/functions/GWAS_utility_functions.R")
 set.seed(1)
 
 # Read parameters for data simulation from config file
-# config_values <- yaml::read_yaml(file = "../../config-simulation.yaml")
-config_values <- yaml::read_yaml(file = "config-simulation.yaml")
+config_values <- yaml::read_yaml(file = "../../config-simulation.yaml")
 N <- config_values$N
 
 # Designate output file
 outfile <- generateOutfileName(outdir = "output", description = "GWAS_TPR_MLE")
 
-# Simulate HIV phylogeny
-tree <- simulateHIVTreeExpBL(N)
+if (config_values$is.HIVTree) {
+  # Simulate HIV phylogeny
+  print("Simulating HIV phylogeny.")
+  tree <- simulateHIVTreeExpBL(N)
+} else {
+  print("Simulating random phylogeny -- be careful with selection strength units!")
+  tree <- simulateRandomTreeExpBL(N)
+}
 
 # Set constant parameters for data simulation
 param.list <- list(
