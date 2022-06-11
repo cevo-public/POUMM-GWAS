@@ -192,15 +192,15 @@ spvl_data$inference.method <- factor(
 example_data1 <- data.frame(
         inference.method = "h.MWA.p.value",
         H2 = get_xval_for_sim_plots(real_vals = c(0.15, 0.25, 0.35, 0.45, 0.55, 0.65, 0.75), estimate = 0.15),
-        alpha = get_xval_for_sim_plots(real_vals = c(0.1, 0.5, 1, 5, 10, 20, 30, 40, 50, 60), estimate = 0.1))
+        alpha = get_xval_for_sim_plots(real_vals = c(0.1, 0.5, 1, 5, 10, 20, 30, 40, 50, 60), estimate = 5))
 example_data1$inference.method <- factor(
         example_data1$inference.method,
         levels = c("h.plus.e.p.value", "h.MWA.p.value", "norm.z.p.value"),
         labels = c(e_name, ehat_name, z_minus_zbar_name))
 example_data2 <- data.frame(
         inference.method = "h.MWA.p.value",
-        H2 = get_xval_for_sim_plots(real_vals = c(0.15, 0.25, 0.35, 0.45, 0.55, 0.65, 0.75, 0.85), estimate = 0.75),
-        alpha = get_xval_for_sim_plots(real_vals = c(0.1, 0.5, 1, 5, 10, 20, 30, 40, 50, 60), estimate = 0.1))
+        H2 = get_xval_for_sim_plots(real_vals = c(0.15, 0.25, 0.35, 0.45, 0.55, 0.65, 0.75, 0.85), estimate = 0.65),
+        alpha = get_xval_for_sim_plots(real_vals = c(0.1, 0.5, 1, 5, 10, 20, 30, 40, 50, 60), estimate = 5))
 example_data2$inference.method <- factor(
         example_data2$inference.method,
         levels = c("h.plus.e.p.value", "h.MWA.p.value", "norm.z.p.value"),
@@ -308,7 +308,7 @@ tpr_plot <- makeTPRPlot(
         geom_point(data = example_data2, fill = "black", shape = 1)
 
 top_row <- plot_grid(NULL, rmse_plot, rel_widths = c(1.03, 3), labels = c("", "A"))
-png(filename = "figures/simulation_results_v2.png", width = linewidth, height = height, unit = "cm", res = 300)
+png(filename = "figures/simulation_results.png", width = linewidth, height = height, unit = "cm", res = 300)
 plot_grid(top_row, tpr_plot, align = "v", axis = "tb", nrow = 2, labels = c("", "B"))
 dev.off()
 ```
@@ -428,33 +428,74 @@ ggsave(plot = p2, filename = paste(FIGDIR, "trait_values.png", sep = "/"),
       width = linewidth * 2/3, height = height * 2/3, units = "cm")
 ```
 
+Plot how sigma changes with alpha at different heritabilities
+```{r}
+set.seed(1)
+tree <- simulateHIVTreeExpBL(500)
+to_plot <- data.frame(alpha = c(0.1, 0.5, 1, 5, 10, 20, 30, 40, 50, 60))
+to_plot$sigma_H15 <- calculateSigmaFromParameterization(tree, to_plot$alpha, H2 = 0.15, 0.73)
+to_plot$sigma_H75 <- calculateSigmaFromParameterization(tree, to_plot$alpha, H2 = 0.75, 0.73)
+
+ggplot(data = to_plot, aes(x = alpha)) + 
+        geom_point(aes(y = sigma_H15, color = "15%")) + 
+        geom_point(aes(y = sigma_H75, color = "75%")) + 
+        scale_color_discrete(name = expression("Heritability (" * italic('H'^2) * ")")) + 
+        shared_theme + 
+        labs(x = expression("Selection strength (" * alpha * ")"),
+             y = expression("Intensity of stochastic fluctuations (" * sigma * ")"))
+ggsave(filename = "figures/sigma_vs_alpha.png", width = linewidth, height = height, units = "cm")
+```
+
 Example trait values from successful simulation
 ```{r}
-# Re-generate simulation tree, attach trait data to it
+# Re-generate simulation tree
 set.seed(1)
 simulation_tree <- simulateHIVTreeExpBL(500)
-for (idx in 501:550) {
-        single_clade <- ape::extract.clade(phy = simulation_tree, node = idx)
-        if (length(single_clade$tip.label) > 8 && length(single_clade$tip.label) < 30) {
-                print(idx)
-        }
-}
-single_clade <- ape::extract.clade(phy = simulation_tree, node = 516)
 
-example_data <- example_simulation_results %>% rename("label" = "sample", "Heritability" = "H2")
-example_data_lo_h2 <- example_data %>% filter(Heritability == 0.15)
-example_data_hi_h2 <- example_data %>% filter(Heritability == 0.65)
+# Get tree distances
+tree_distances <- as.data.frame(ape::cophenetic.phylo(simulation_tree))
+xy <- t(combn(colnames(tree_distances), 2))
+tree_distances_long <- data.frame(xy, dist=tree_distances[xy]) %>% 
+        rename("label_1" = "X1", "label_2" = "X2") %>%
+        mutate(dist_decile_rank = ntile(dist, 10))
+
+# Plot correlation between tips as function of tree distance for each simulation scenario
+slim_sim_results <- example_simulation_results %>% select(H2, alpha, runID, z, sample)
+tmp <- tree_distances_long %>% merge(slim_sim_results, by.x = "label_1", by.y = "sample") %>% rename("z_1" = "z")
+tmp2 <- tmp %>% merge(slim_sim_results %>% rename("label_2" = "sample")) %>% rename("z_2" = "z")
+
+tip_pair_data_corelations <- tmp2 %>%
+        group_by(H2, alpha, runID, dist_decile_rank) %>%
+        summarize(correlation = cor(z_1, z_2))
+
+ggplot(data = tip_pair_data_corelations, aes(x = factor(dist_decile_rank), y = correlation)) +
+        geom_boxplot() + 
+        facet_grid(alpha ~ H2, labeller = plot_labeller) + 
+        labs(x = "Tree distance decile", y = "Pearson correlation in trait value") + 
+        shared_theme
+ggsave(filename = "figures/tip_trait_correlation.png", width = linewidth, height = height, unit = "cm")
+
+pruned_tree <- ape::keep.tip(phy = simulation_tree, tip = sample(simulation_tree$tip.label, size = 12))  # keep some random tips
+# pruned_tree <- ape::extract.clade(phy = simulation_tree, 516)  # keep some small clade
+
+example_data_lo_h2 <- example_simulation_results %>% filter(H2 == 0.15, alpha == 0.1)
+min_runID <- min(example_data_lo_h2$runID)
+example_data_lo_h2 <- example_data_lo_h2 %>% filter(runID == min_runID)
+example_data_hi_h2 <- example_simulation_results %>% filter(H2 == 0.75, alpha == 0.1)
+min_runID <- min(example_data_hi_h2$runID)
+example_data_hi_h2 <- example_data_hi_h2 %>% filter(runID == min_runID)
+example_data <- rbind(example_data_lo_h2, example_data_hi_h2) %>% rename("label" = "sample", "Heritability" = "H2")
 
 # Plot trait values on a clade in the tree
 mar <- 20
-lo_h2_tree <- ggtree(single_clade) %<+% example_data_lo_h2 + 
-        geom_tippoint(aes(color = v), size = 3) + 
-        scale_color_viridis_b(name = "Pathogen\npart of trait") + 
+lo_h2_tree <- ggtree(pruned_tree) %<+% example_data_lo_h2 + 
+        geom_tippoint(aes(color = z), size = 3) + 
+        scale_color_viridis_b(name = "Trait value") + 
         theme_tree(plot.margin=margin(0, mar, 0, mar))
 
-hi_h2_tree <- ggtree(single_clade) %<+% example_data_hi_h2 + 
-        geom_tippoint(aes(color = v), size = 3) + 
-        scale_color_viridis_b(name = "Pathogen\npart of trait") + 
+hi_h2_tree <- ggtree(pruned_tree) %<+% example_data_hi_h2 + 
+        geom_tippoint(aes(color = z), size = 3) + 
+        scale_color_viridis_b(name = "Trait value") + 
         theme_tree(plot.margin=margin(0, mar, 0, mar))
 
 # Plot trait value accuracy
