@@ -98,144 +98,150 @@ $*$Corresponding author: tanja.stadler@bsse.ethz.ch
 % \begin{doublespace}
 
 \begin{abstract}
-	Infectious diseases are particularly challenging for genome-wide association studies (GWAS) because genetic effects from two organisms (pathogen and host) may significantly influence a trait of interest. Previous GWAS have successfully identified host genetic variants associated with important infectious disease traits, such as HIV-1 set point viral load (spVL). However, these GWAS do not account for potentially confounding or extraneous pathogen effects that are heritable from donor to recipient in transmission chains.  We propose a new method to consider the full genome of each patient's infecting pathogen strain, remove strain-specific effects on a trait based on the pathogen phylogeny, and thus better estimate the effect of human genetic variants on infectious disease traits. In simulations, we show our method can increase GWAS power to detect truly associated host variants when pathogen effects are highly heritable, with strong phylogenetic correlations. When we apply our method to HIV-1 subtype B data from the Swiss HIV Cohort Study, we recover slightly weaker but qualitatively similar signals of association between spVL and human genetic variants in the \emph{CCR5} and major histocompatibility complex (MHC) gene regions compared to standard GWAS. Our simulation study confirms that based on the estimated heritability and selection parameters for HIV-1 subtype B spVL, standard GWAS are robust to pathogen effects. Our framework may improve GWAS for other diseases if pathogen effects are even more phylogenetically correlated amongst individuals in a cohort.
+	Infectious diseases are particularly challenging for genome-wide association studies (GWAS) because genetic effects from two organisms (pathogen and host) can influence a trait. Traditional GWAS assume individual samples are independent observations. However, pathogen effects on an infectious disease trait can be heritable from donor to recipient in transmission chains. Thus, residuals in GWAS association tests for host genetic effects may not be independent due to shared pathogen ancestry. We propose a new method to estimate and remove heritable pathogen effects on a trait based on the pathogen phylogeny prior to host GWAS, thus restoring independence of samples. In simulations, we show this pre-processing step can increase GWAS power to detect truly associated host variants when pathogen effects are highly heritable, with strong phylogenetic correlations. When we apply our method to HIV-1 subtype B data from the Swiss HIV Cohort Study, we recover slightly weaker but qualitatively similar signals of association between spVL and human genetic variants in the \emph{CCR5} and major histocompatibility complex (MHC) gene regions compared to standard GWAS. Our simulation study confirms that based on the estimated heritability and selection parameters for HIV-1 subtype B spVL, standard GWAS are robust to pathogen effects. Our framework may improve GWAS for other diseases if pathogen effects are even more phylogenetically correlated amongst individuals in a cohort.
 \end{abstract}
 
 \section*{Introduction}
 
 % What is GWAS and why is it important
-A key goal of genome-wide association studies (GWAS) is to understand the genetic basis of phenotypic variation among individuals. In a typical GWAS, millions of genetic variants from across the human genome are screened for statistical association with a trait of interest. Ideally, this procedure identifies variants that are located in, or are in linkage disequilibrium with, alleles that directly affect the trait. If GWAS finds a variant strongly associated with a disease trait, the gene product may be a good drug target \citep{Okada2014}. Even if no single variant has a strong association, many small associations can be aggregated into a polygenic risk score to identify high-risk individuals \citep{Dudbridge2013}.
-
-% Why is spVL and important trait
-For HIV, GWAS have used a trait called set point viral load (spVL) to identify human variants associated with the severity of disease course. spVL is generally defined to be the average concentration of viral RNA copies in host plasma during the asymptomatic phase of infection in the absence of treatment (see e.g. \cite{Alizon2010}). In untreated individuals, spVL is predictive of the duration of asymptomatic infection \citep{Mellors1996} and infectiousness \citep{Quinn2000}. If viral load can be reduced to undetectable levels, an individual is effectively uninfectious and the risk of disease progression is massively reduced \citep{HHSARTGuidelines2019}. Notably, spVL varies by orders of magnitude between individuals \citep{Mellors1996}. Thus, spVL measurements point to a wide range in natural HIV control amongst individuals. 
-
-% How do we measure the extent to which genetic factors determine spVL
-To understand HIV pathogenicity, it is important to understand to what extent spVL is determined by host genetic factors as opposed to pathogen genetic factors. Heritability is a key measure of how genetically-determined a trait is. On the host side, narrow-sense heritability, the fraction of total trait variance explained by additive genetic effects, is a typical output of GWAS. 
-% How heritable is spVL (human side)
-Several GWAS have measured the narrow-sense heritability of spVL and identified associated host genetic variants \citep{Bartha2013, Dalmasso2008, Fellay2007, Pereyra2010, Fellay2009, Pelak2010, VanManen2011, McLaren2012}. The largest study to-date by \citet{McLaren2015} estimated that additive human genetic effects account for approximately 25\% of the variation in spVL amongst infected individuals. All but 5\% of this was attributed to two regions in the human genome, the major histocompatibility complex (MHC) and C-C motif chemokine receptor 5 (\emph{CCR5}). Both associations are biologically relevant: the MHC encodes proteins that present viral epitopes at the cell surface and \emph{CCR5} encodes a co-receptor for HIV-1 cell entry. In other words, MHC proteins match bits of the virus like puzzle pieces and display these to signal that a cell is infected. CCR5 proteins help the virus infect target cells.
-
-% How heritable is spVL (viral side)
-On the pathogen side, broad-sense heritability $H^2$ is typically measured. This is the fraction of total trait variance due to any factors ``inherited'' from infection partner to infection partner (the most obvious being pathogen genetic factors). Broad-sense heritability is commonly measured by quantifying how correlated a trait is between infection partners or how phylogenetically structured a trait is based on a reconstructed pathogen phylogeny. For HIV spVL, estimates differ depending on the methods employed and the cohort studied (see \citet{Mitov2018} for a discussion of this uncertainty). Using phylogenetic methods on large UK and Swiss cohorts, \citet{Mitov2018} and \citet{Bertels2018} estimated that pathogen factors account for 21\% - 29\% of the variation in spVL amongst infected individuals. However, variation in the MHC is known to exert strong selective pressure on the virus \citep{Kloverpris2016, Nguyen2021SystematicLink}. If the virus can change its ``puzzle piece'' shape to escape MHC-presentation, infected cells can go undetected. This means that MHC variants affect spVL largely via selection on the virus \citep{Bartha2017}. In summary, human genetic factors play a role in determining spVL, but these effects may be due to interaction with specific viral genetic variants.
-
-% The gap
-Most of the GWAS for human genetic determinants of spVL conducted so far \citep{Dalmasso2008, Fellay2007, Pereyra2010, Fellay2009, Pelak2010, VanManen2011, McLaren2012, McLaren2015} do not explicitly consider any viral effect on spVL. In these GWAS, viral genetic effects are lumped in with residual variance due to other, non-genetic factors. This has several potential negative consequences. Viral effects may be (i) confounding or (ii) extraneous variables that produce distorted or spurious associations between host genetic variants and a disease trait in host GWAS. 
-%This may occur if the virus affects the disease trait (the dependent variable in host GWAS) or if it affects both the disease trait and the host genotype (the independent variable in host GWAS).
-For example, stratification in both the host and pathogen populations may yield spurious correlations in host GWAS that are really due to independent pathogen factors. Then, co-evolution between a pathogen and its host may yield distorted estimates for host genetic effects that are not broadly protective against all pathogen strains. Finally, (iii) spVL values from a cohort are not truly independent samples, given that patients closer in the transmission chain have more similar strains and therefore more similar spVL values.
+A key goal of genome-wide association studies (GWAS) is to understand the genetic basis of phenotypic variation among individuals. In a typical GWAS, millions of genetic variants from across an organism's genome are screened for statistical association with a trait of interest. Ideally, this procedure identifies variants that are located in, or are in linkage disequilibrium with, alleles that directly affect the trait. If GWAS finds a variant strongly associated with a disease trait, the gene product may be a good drug target \citep{Okada2014}. Even if no single variant has a strong association, many small associations can be aggregated into a polygenic risk score to identify susceptible individuals \citep{Dudbridge2013}.
 
 % Overview of relevant methods and why we don't use them
-Issue (iii) is closely related to a well-known problem in standard GWAS. Shared (human) ancestry, especially between close relatives, can also give rise to spurious genetic correlations with a trait. Corrections for these correlations are well-developed and widely accepted  \citep{Astle2009, Price2006}. More recently, \citet{Power2017} emphasized the need to do similar corrections for shared pathogen ancestry in microbial GWAS. Several state-of-the-art methods exist for this, e.g. \citep{Earle2016, collins_phylogenetic_nodate}. 
+It is well-known that GWAS can be sensitive to confounding variables. Shared ancestry among individuals, especially between close relatives, can give rise to spurious genetic correlations with a trait. Corrections for these types of population structure are well-developed and widely accepted  \citep{Astle2009, Price2006}. More recently, analogous methods have been developed for microbial GWAS, where clonal reproduction exacerbates population structure \citep{Power2017}. Microbial GWAS-specific phylogenetic methods to account for population structure in microbial GWAS include explicitly testing for lineage-specific effects as in \citep{Earle2016} and modified association tests that account for phylogenetic relationships amongst samples as in \citep{collins_phylogenetic_nodate}. 
 % \citep{Earle2016} simultaneously test for pathogen lineage and locus-level associations with a trait using a linear mixed model framework. \citep{collins_phylogenetic_nodate} test for locus-level associations that are significantly stronger than expected under a null model considering shared pathogen ancestry. 
-However, these approaches are only suitable to quantify effects from $pathogen$ genetic variants on a trait. In contrast, we want to estimate effects of $human$ genetic variants on a trait, while accounting for pathogen effects. \citet{Naret2018} developed a relevant method for this in the context of a genome-to-genome GWAS framework. The authors suggest adding principle components derived from the pathogen phylogeny as covariates to the linear regression models for association testing. This should correct for trait correlations due to shared pathogen ancestry. However, the top principle components capture only some of the information from the full pathogen phylogeny. Furthermore, we would like to simultaneously address issues (i) and (ii).
+These approaches are designed to quantify genetic effects from one organism on a trait. 
+
+In the infectious disease context, genetic effects from two organisms - the host and the pathogen - may affect an infectious disease trait. GWAS using paired host-pathogen genotype data have previously been done to elucidate the marginal and interaction effects of host and pathogen genetic variants. Methods to account for microbial population structure when testing for marginal host associations or host-pathogen interaction effects include adding the microbial kinship matrix as a random effect in a linear mixed model as in \citep{Wang2018Two-wayGenomes} and using principle components derived from either this matrix or the pathogen phylogeny as covariates in a linear model as in \citep{Naret2018}. These methods focus on capturing and accounting for correlations due to the pathogen phylogeny, without further investigating the nature of these correlations.
+%However, the top principle components capture only some of the information from the full pathogen phylogeny. Furthermore, we would like to simultaneously address issues (i) and (ii).
+
+In this work, we draw from the field of phylogenetic comparative methods to propose a new two-step framework to correct for pathogen population structure and satisfy the GWAS assumption of independent samples. It is a pre-processing step for GWAS that first fits an evolutionary model to trait data and the pathogen phylogeny to estimate the correlation structure of the trait due to pathogen effects. On the basis of this inference, it estimates and removes pathogen effects on the trait so that downstream GWAS association testing with host genetic variants can be performed as normal under the assumption of independent samples. The main advantage of this approach compared to the previously outlined methods to correct for pathogen population structure are that it generates additional information on the evolutionary dynamics of the trait in the pathogen population. It is also restricted to a pre-processing step, which allows use of existing highly optimized tools to perform GWAS association tests under a variety of models. This framework relies on paired pathogen-host genotyping and is envisioned specifically for continuous-valued traits that are highly heritable from infection partner to infection partner.
+% We hypothesis this should increase GWAS power for several reasons. For one, pathogen effects may be confounding or extraneous variables that produce distorted or spurious associations between host genetic variants and a disease trait in host GWAS. 
+We hypothesized that our approach should improve GWAS power to identify host genetic variants broadly associated with disease traits.
+%This may occur if the virus affects the disease trait (the dependent variable in host GWAS) or if it affects both the disease trait and the host genotype (the independent variable in host GWAS).
+%For example, stratification in both the host and pathogen populations may yield spurious correlations in host GWAS that are really due to independent pathogen factors. 
+% Then, co-evolution between a pathogen and its host may yield distorted estimates for host genetic effects that are not broadly protective against all pathogen strains. Finally, trait values from a population are not truly independent samples, given that hosts closer in the transmission chain have more similar pathogen strains and therefore more similar trait values. 
+
+% % Why is spVL and important trait
+% For HIV, GWAS have used a trait called set point viral load (spVL) to identify human variants associated with the severity of disease course. spVL is generally defined to be the average concentration of viral RNA copies in host plasma during the asymptomatic phase of infection in the absence of treatment (see e.g. \cite{Alizon2010}). In untreated individuals, spVL is predictive of the duration of asymptomatic infection \citep{Mellors1996} and infectiousness \citep{Quinn2000}. If viral load can be reduced to undetectable levels, an individual is effectively uninfectious and the risk of disease progression is massively reduced \citep{HHSARTGuidelines2019}. Notably, spVL varies by orders of magnitude between individuals \citep{Mellors1996}. Thus, spVL measurements point to a wide range in natural HIV control amongst individuals. 
+
+% % How do we measure the extent to which genetic factors determine spVL
+% To understand HIV pathogenicity, it is important to understand to what extent spVL is determined by host genetic factors as opposed to pathogen genetic factors. Heritability is a key measure of how genetically-determined a trait is. On the host side, narrow-sense heritability, the fraction of total trait variance explained by additive genetic effects, is a typical output of GWAS. 
+% % How heritable is spVL (human side)
+% Several GWAS have measured the narrow-sense heritability of spVL and identified associated host genetic variants \citep{Bartha2013, Dalmasso2008, Fellay2007, Pereyra2010, Fellay2009, Pelak2010, VanManen2011, McLaren2012}. The largest study to-date by \citet{McLaren2015} estimated that additive human genetic effects account for approximately 25\% of the variation in spVL amongst infected individuals. All but 5\% of this was attributed to two regions in the human genome, the major histocompatibility complex (MHC) and C-C motif chemokine receptor 5 (\emph{CCR5}). Both associations are biologically relevant: the MHC encodes proteins that present viral epitopes at the cell surface and \emph{CCR5} encodes a co-receptor for HIV-1 cell entry. In other words, MHC proteins match bits of the virus like puzzle pieces and display these to signal that a cell is infected. CCR5 proteins help the virus infect target cells.
+
+% How heritable is spVL (viral side)
+% On the pathogen side, broad-sense heritability $H^2$ is typically measured. This is the fraction of total trait variance due to any factors ``inherited'' from infection partner to infection partner (the most obvious being pathogen genetic factors). Broad-sense heritability is commonly measured by quantifying how correlated a trait is between infection partners or how phylogenetically structured a trait is based on a reconstructed pathogen phylogeny. For HIV spVL, estimates differ depending on the methods employed and the cohort studied (see \citet{Mitov2018} for a discussion of this uncertainty). Using phylogenetic methods on large UK and Swiss cohorts, \citet{Mitov2018} and \citet{Bertels2018} estimated that pathogen factors account for 21\% - 29\% of the variation in spVL amongst infected individuals. However, variation in the MHC is known to exert strong selective pressure on the virus \citep{Kloverpris2016, Nguyen2021SystematicLink}. If the virus can change its ``puzzle piece'' shape to escape MHC-presentation, infected cells can go undetected. This means that MHC variants affect spVL largely via selection on the virus \citep{Bartha2017}. In summary, human genetic factors play a role in determining spVL, but these effects may be due to interaction with specific viral genetic variants.
+
+% % The gap
+% Most of the GWAS for human genetic determinants of spVL conducted so far \citep{Dalmasso2008, Fellay2007, Pereyra2010, Fellay2009, Pelak2010, VanManen2011, McLaren2012, McLaren2015} do not explicitly consider any viral effect on spVL. In these GWAS, viral genetic effects are lumped in with residual variance due to other, non-genetic factors. This has several potential negative consequences. 
+% n GWAS, hosts are typically selected to not share recent ancestry. Further, shared environmental variables are included as covariates to avoid spurious associations. We argue similar considerations must be taken
+% for pathogen effects that heritable from one transmission partner to another \citep{Leventhal2016}. 
 
 % Introduction to our method
-In this work,  we draw from the field of phylogenetic comparative methods to develop a new GWAS framework that estimates and removes trait variability due to the pathogen using information from the full pathogen phylogeny. Our approach should help identify human genetic variants that affect disease traits and more accurately estimate their effects.
-
-In the following we describe a statistical model for the spVL trait, derive a maximum likelihood estimate for the viral part of spVL under this model, and describe a new infectious disease GWAS framework using this information. In simulations, we show that this framework can improve GWAS power to detect host genetic variants that affect disease traits. Finally, we apply our framework to human and viral genome data from the Swiss HIV Cohort Study (SHCS) and show that associations with spVL are robust to a correction for viral effects. Although we developed our framework in the context of HIV-1 spVL, this approach can readily be applied to other heritable infectious disease traits. 
+In the following, we describe the evolutionary model for heritable, continuous-valued infectious disease traits upon which our method is based. We then derive a maximum likelihood estimate for the pathogen part of a trait under this model, and describe a new infectious disease GWAS framework using this information. In simulations, we show that this framework can improve GWAS power to detect host genetic variants that affect disease traits. Finally, we apply our framework to paired host-pathogen genotyping data from the Swiss HIV Cohort Study (SHCS) and a previously studied \emph{Arabidosis thaliana}-\emph{Xanthomonas arboricola} pathosystem. We show that associations with set-point viral load (spVL) and quantitative disease resistance (QDR) traits, respectively, are robust to a correction for pathogen effects.
 
 \section*{New Approaches}
-\subsection*{A statistical model for spVL}
+\subsection*{A statistical model for heritable, continuous-valued infectious disease traits}
 
-Variation in spVL comes from several sources: direct host genetic effects, pathogen effects, interaction effects between the host and the pathogen, and other environmental effects. n GWAS, hosts are typically selected to not share recent ancestry. Further, shared environmental variables are included as covariates to avoid spurious associations. We argue similar considerations must be taken
-for pathogen effects that heritable from one transmission partner to another \citep{Leventhal2016}. To characterize these effects, we use a phylogenetic mixed model (PMM) \citep{Housworth2004}. PMMs assume continuous traits like spVL are the sum of independent heritable and non-heritable parts. In our case, pathogen effects comprise the heritable part and all other effects comprise the non-heritable part. The heritable part is modeled by a random process occurring in continuous time along the branches of the pathogen phylogeny, as in Figure \ref{fig:spVLModel}A. The non-heritable part is modeled as Gaussian noise added to sampled individuals at the tips of the phylogeny.
+Variation in infectious disease traits like viral load or infection severity can come from several sources. These include host genetic factors, pathogen genetic factors, interaction effects between the host and the pathogen, or non-genetic factors like healthcare quality or temperature. GWAS typically stratify samples or include covariates to correct for host genetic factors or non-genetic factors that may be correlated with a trait value. This leaves pathogen genetic factors as a remaining source of correlation, since close transmission partners may be infected with very similar pathogen strains. Broad-sense heritability $H^2$ quantifies the fraction of total trait variance that is ``inherited'' from infection partner to infection partner. To characterize $H^2$ and the heritable and non-heritable factors that determine infectious disease traits, we use a phylogenetic mixed model (PMM) \citep{Housworth2004}. PMMs assume continuous traits are the sum of independent heritable and non-heritable parts. In the infectious disease GWAS case, we assume the heritable part comprises pathogen genetic factors and all other factors are non-heritable. The heritable pathogen part is modeled by a random process occurring in continuous time along the branches of the pathogen phylogeny, as in Figure \ref{fig:spVLModel}A. The non-heritable part is modeled as Gaussian noise added to sampled individuals at the tips of the phylogeny.
 
 \begin{figure}[H]
 	\begin{center}
 	\includegraphics[width = \linewidth]{figures/simulation_setup.png}
-	\caption{A high-level schematic of our POUMM-based simulation framework. (A) shows how pathogen genetic effects on spVL evolve along the pathogen phylogeny according to an Ornstein-Uhlenbeck process. (B) shows how host genetic effects are the sum of independent effects from several causal variants. Each variant can be present in 0, 1, or 2 copies. Half the variants have a positive effect of size $\delta$ and half have a negative effect of size $\delta$. (C) shows how environmental effects are independently drawn from a Gaussian distribution centered at 0. These three effects sum to the trait value for each simulated individual.}
+	\caption{A high-level schematic of our POUMM-based simulation framework in the context of HIV-1 spVL. (A) shows how the viral effects on spVL evolve along the viral phylogeny according to an Ornstein-Uhlenbeck process. (B) shows how human host genetic effects are the sum of independent effects from several causal variants. Each variant can be present in 0, 1, or 2 copies. Half the variants have a positive effect of size $\delta$ and half have a negative effect of size $\delta$. (C) shows how other environmental effects are independently drawn from a Gaussian distribution centered at 0. These three effects sum to the trait value for each simulated individual.}
 		\label{fig:spVLModel}
 	\end{center}
 \end{figure}
 
-So far, PMMs with two types of random processes have been used to model spVL evolution. The Brownian Motion (BM) process assumes unbounded trait values, i.e. spVL can attain any value. The Ornstein-Uhlenbeck (OU) process assumes trait values fluctuate around an optimal value, i.e. extreme spVL values are unlikely. \citet{Mitov2018} and \citet{Bertels2018} previously showed the OU process has higher statistical support for spVL. This makes sense given that spVL is likely under stabilizing selection to maximize viral transmission potential \citep{Fraser2014}. Therefore, we assume the OU process. The full model is called the phylogenetic Ornstein-Uhlenbeck mixed model (POUMM) and is described in detail by \citet{Mitov2018}. Here, we review the main points in the spVL context.
+PMMs have previously been applied to the study of infectious disease traits using two different types of random processes to model trait evolution. The Brownian Motion (BM) process assumes unbounded trait values, i.e. the trait can attain any value. The Ornstein-Uhlenbeck (OU) process assumes trait values fluctuate around an optimal value, i.e. extreme trait values are unlikely. Here, we assume the more flexible OU process as it encompasses a wider variety of evolutionary scenarios. For example, \citet{Mitov2018} and \citet{Bertels2018} previously showed the OU process has higher statistical support for HIV-1 spVL. This makes sense given that spVL is likely under stabilizing selection to maximize viral transmission potential \citep{Fraser2014}. The full model is called the phylogenetic Ornstein-Uhlenbeck mixed model (POUMM) and is described in detail by \citet{Mitov2018}. Here, we review the main points relevant to our method.
 
-Under the POUMM, the spVL trait $z$ is the sum of viral effects $g_v$, host genetic effects $g_h$, and other environmental or interaction effects $\epsilon$. We can group the non-heritable effects $g_h$ and $\epsilon$ into a broader category of ``environmental'' effects $l$: 
+Under the POUMM, the trait $z$ is the sum of heritable genetic effects $g$, i.e. due to the pathogen, and non-heritable ``environmental'' effects $\epsilon$, i.e. host genetic effects and other environmental or interaction effects: 
 
 \begin{equation}
-    z = g_{v} + l
+    z = g + \epsilon
 \end{equation}
-$g_v$ is a viral trait that evolves along the phylogeny according to an OU process. The OU process is defined by a stochastic differential equation with two terms. The first term represents a deterministic pull towards an optimal trait value and the second term represents stochastic fluctuations modelled by Brownian motion \citep{Butler2004}:
+$g$ is a pathogen trait that evolves along the phylogeny according to an OU process. The OU process is defined by a stochastic differential equation with two terms. The first term represents a deterministic pull towards an optimal trait value and the second term represents stochastic fluctuations modelled by Brownian motion \citep{Butler2004}:
 
 \begin{align}
 \begin{split}
-	&dg_v(t) = \alpha[\theta - g_v(t)]dt + \sigma dW_t \\
-	&g_v(0) = g_0 
+	&dg(t) = \alpha[\theta - g(t)]dt + \sigma dW_t \\
+	&g(0) = g_0 
 	\label{eq:OUprocess}
 \end{split}
 \end{align}
 
-Here the parameter $\alpha$ represents selection strength towards an evolutionarily optimal value represented by parameter $\theta$. The parameter $\sigma$ measures the intensity of stochastic fluctuations in the evolutionary process. Finally, $dW_t$ is the Wiener process underlying Brownian motion. The OU process is a Gaussian process, meaning that $g_v(t)$ is a Gaussian random variable. Assuming $g_v(t)$ starts at initial value $g_0$ at time $t = 0$ at the root of the phylogeny, we can write the expectation for $g_v(t)$ at time $t$: 
+Here the parameter $\alpha$ represents selection strength towards an evolutionarily optimal value represented by parameter $\theta$. The parameter $\sigma$ measures the intensity of stochastic fluctuations in the evolutionary process. Finally, $dW_t$ is the Wiener process underlying Brownian motion. The OU process is a Gaussian process, meaning that $g(t)$ is a Gaussian random variable. Assuming $g(t)$ starts at initial value $g_0$ at time $t = 0$ at the root of the phylogeny, we can write the expectation for $g(t)$ at time $t$: 
 
 \begin{equation}
-   E[g_v(t)] = g_0e^{-\alpha t} + (1 - e^{-\alpha t})\theta \label{eq:OUmean}
+   E[g(t)] = g_0e^{-\alpha t} + (1 - e^{-\alpha t})\theta \label{eq:OUmean}
 \end{equation}
-and the variance in $g_v(t)$ if we were to repeat the random evolutionary process many times \citep{Butler2004}:
+and the variance in $g(t)$ if we were to repeat the random evolutionary process many times \citep{Butler2004}:
 \begin{equation}
-    Var[g_v(t)] = \frac{\sigma^2}{2\alpha}(1 - e^{-2\alpha t}) \label{eq:OUVar}
+    Var[g(t)] = \frac{\sigma^2}{2\alpha}(1 - e^{-2\alpha t}) \label{eq:OUVar}
 \end{equation}
 
-$g_v$ evolves independently in descendent lineages after a divergence event in the phylogeny. The covariance between $g_v(t)$ in a lineage $i$ at time $t_i$ and another lineage $j$ at time $t_j$, $Cov\big(g_{v_i}(t_i), g_{v_j}(t_j)\big)$, increases with the amount of time between $t_0$ and the divergence of the two lineages, $t_{0(ij)}$, and decreases with the total amount of time the lineages evolve independently, $d_{ij}$ \citep{Butler2004}: 
+$g$ evolves independently in descendent lineages after a divergence event in the phylogeny. The covariance between $g(t)$ in a lineage $i$ at time $t_i$ and another lineage $j$ at time $t_j$, $Cov\big(g_{i}(t_i), g_{j}(t_j)\big)$, increases with the amount of time between $t_0$ and the divergence of the two lineages, $t_{0(ij)}$, and decreases with the total amount of time the lineages evolve independently, $d_{ij}$ \citep{Butler2004}: 
 
 \begin{equation}
-	Cov\big(g_{v_i}(t_i), g_{v_j}(t_j)\big) = \frac{\sigma^2}{2\alpha}[e^{-\alpha d_{ij}}(1 - e^{-2\alpha t_{0(ij)}})]
+	Cov\big(g_{i}(t_i), g_{j}(t_j)\big) = \frac{\sigma^2}{2\alpha}[e^{-\alpha d_{ij}}(1 - e^{-2\alpha t_{0(ij)}})]
 	\label{eq:OUcov}
 \end{equation}
-Next, we remember that $l$ is the non-heritable, environmental part of spVL. $l$ is modeled as a Gaussian random variable that is time- and phylogeny-independent. The expectation of $l$ is 0, meaning environmental effects are equally likely to raise or lower spVL from the virus-determined level. The parameter $\sigma_l^2$ measures the between-host variance of the environmental effect.
+Next, we remember that $\epsilon$ is the non-heritable part of the trait. $\epsilon$ is modeled as a Gaussian random variable that is time- and phylogeny-independent. The expectation of $\epsilon$ is 0, meaning environmental effects are equally likely to raise or lower the trait from the pathogen-determined level. The parameter $\sigma_\epsilon^2$ measures the between-host variance of the environmental effect.
 
 \begin{align}
 \begin{split}
-	E(l) = 0 \\
-	Var(l) = \sigma^2_l
+	E(\epsilon) = 0 \\
+	Var(\epsilon) = \sigma^2_\epsilon
 \end{split}
 \end{align}
 
 Finally, broad-sense trait heritability can be calculated as the fraction of total trait variance that is heritable:
 
 \begin{equation}
-	H^2_{\bar{t}} = \frac{Var[g_v(t)]}{Var[g_v(t)] + Var(l)} = \frac{\frac{\sigma^2}{2\alpha}(1 - e^{-2\alpha t})}{\frac{\sigma^2}{2\alpha}(1 - e^{-2\alpha t}) + \sigma^2_l}
+	H^2_{\bar{t}} = \frac{Var[g(t)]}{Var[g(t)] + Var(\epsilon)} = \frac{\frac{\sigma^2}{2\alpha}(1 - e^{-2\alpha t})}{\frac{\sigma^2}{2\alpha}(1 - e^{-2\alpha t}) + \sigma^2_\epsilon}
+	\label{eq:POUMM-H2}
 \end{equation}
 
-\subsection*{Teasing apart pathogen and non-pathogen effects on spVL}
+\subsection*{Teasing apart pathogen and non-pathogen effects on a trait}
 
-Given the assumptions of the POUMM, we can estimate a heritable pathogen effect on spVL and a non-heritable, host and environmental effect on spVL. Here, we derive a maximum-likelihood estimate for these values for individuals in a cohort, given measured spVL values and a pathogen phylogeny linking the infecting strains.
+Given the assumptions of the POUMM, we can estimate a heritable pathogen effect on a trait and a corresponding non-heritable, host and environmental effect. Here, we derive a maximum-likelihood estimate for these values for individuals in a GWAS cohort, given measured trait values and a pathogen phylogeny linking the infecting strains.
 
-Let $\bm{g}_v(\bm{t})$ be a vector of $g_v$ values, one for each individual in the cohort. $\bm{t}$ are the sampling times of each individual relative to the root of the phylogeny. To simplify notation, we omit the $\bm{t}$ from here on. $\bm{g}_v$ is a realization of a Gaussian random vector $\bm{G_v} \sim \mathcal{N}\big(\bm{\mu}_{OU}, \boldsymbol{\Sigma}_{OU}\big)$. The expectation $\bm{\mu}_{OU}$ is defined by equation \ref{eq:OUmean}, the diagonal elements of the covariance matrix $\boldsymbol{\Sigma}_{OU}$ are defined by equation \ref{eq:OUVar}, and the off-diagonal elements of $\boldsymbol{\Sigma}_{OU}$ by equation \ref{eq:OUcov}. 
+Let $\bm{g}(\bm{t})$ be a vector of $g$ values, one for each individual in the cohort. $\bm{t}$ are the sampling times of each individual relative to the root of the phylogeny. To simplify notation, we omit the $\bm{t}$ from here on. $\bm{g}$ is a realization of a Gaussian random vector $\bm{G} \sim \mathcal{N}\big(\bm{\mu}_{OU}, \boldsymbol{\Sigma}_{OU}\big)$. The expectation $\bm{\mu}_{OU}$ is defined by equation \ref{eq:OUmean}, the diagonal elements of the covariance matrix $\boldsymbol{\Sigma}_{OU}$ are defined by equation \ref{eq:OUVar}, and the off-diagonal elements of $\boldsymbol{\Sigma}_{OU}$ by equation \ref{eq:OUcov}. Similarly, let $\bm{\epsilon}$ be a vector of the environmental part of the trait for each individual.  $\bm{\epsilon}$ is a realization of a Gaussian random vector $\bm{\mathcal{E}} \sim \mathcal{N}\big(\bm{0}, \boldsymbol{\Sigma}_\mathcal{E}\big)$, where $\boldsymbol{\Sigma}_\mathcal{E}$ is a diagonal matrix with diagonal elements equal to $\sigma^2_\epsilon$.
 
-Similarly, let $\bm{l}$ be a vector of the environmental part of spVL for each individual.  $\bm{l}$ is a realization of a Gaussian random vector $\bm{L} \sim \mathcal{N}\big(\bm{0}, \boldsymbol{\Sigma}_L\big)$, where $\boldsymbol{\Sigma}_L$ is a diagonal matrix with diagonal elements equal to $\sigma^2_l$.
-
-Considering that $\bm{G_v}$ and $\bm{L}$ are independent random vectors and that their realizations $\bm{g}_v$ and $\bm{l}$ must sum together to equal the observed spVL values $\bm{z}$, we can write the following proportionality for the joint probability density of $\bm{g}_v$ and $\bm{l}$:
+Considering that $\bm{G}$ and $\bm{\mathcal{E}}$ are independent random vectors and that their realizations $\bm{g}$ and $\bm{\epsilon}$ must sum together to equal the observed trait values $\bm{z}$, we can write the following proportionality for the joint probability density of $\bm{g}$ and $\bm{\epsilon}$:
 
 \begin{equation}
-	f\big(\bm{g}_v, \bm{l}\big) \propto \mathcal{N}\big(\bm{g}_v; \bm{\mu}_{G}, \boldsymbol{\Sigma}_G\big)
+	f\big(\bm{g}, \bm{\epsilon}\big) \propto \mathcal{N}\big(\bm{g}; \bm{\mu}_{G}, \boldsymbol{\Sigma}_G\big)
 	\label{eq:pdfGprop}
 \end{equation} 
 
-where the expected value of $\bm{g}_v$ and the covariance matrix $\boldsymbol{\Sigma}_G$ are defined as:
+where the expected value of $\bm{g}$ and the covariance matrix $\boldsymbol{\Sigma}_G$ are defined as:
 
 \begin{align}
-	Exp(\bm{g}_v) = \bm{\mu}_{G} &=  \boldsymbol{\Sigma}_G\big(\boldsymbol{\Sigma}_{OU}^{-1}\bm{\mu}_{OU} + \boldsymbol{\Sigma}_L^{-1} \bm{z}\big) \label{eq:MuG}\\
-	\boldsymbol{\Sigma}_G &= \big(\boldsymbol{\Sigma}_{OU}^{-1} + \boldsymbol{\Sigma}_L^{-1}\big)^{-1} \label{eq:SigmaG}
+	Exp(\bm{g}) = \bm{\mu}_{G} &=  \boldsymbol{\Sigma}_G\big(\boldsymbol{\Sigma}_{OU}^{-1}\bm{\mu}_{OU} + \boldsymbol{\Sigma}_\mathcal{E}^{-1} \bm{z}\big) \label{eq:MuG}\\
+	\boldsymbol{\Sigma}_G &= \big(\boldsymbol{\Sigma}_{OU}^{-1} + \boldsymbol{\Sigma}_\mathcal{E}^{-1}\big)^{-1} \label{eq:SigmaG}
 \end{align}
 
 \begin{proof}
 	\begin{align}\label{eq:pdfG}
 	\begin{split}
-		f\big(\bm{g}_v,\ \bm{l}\big) &= f\big(\bm{g}_v|\ \bm{l}\big) \times f\big(\bm{l}\big) \\
-	&= f\big(\bm{g}_v\big) \times f\big(\bm{l}\big) \\
-	&= \mathcal{N}\big(\bm{g}_v;\ \bm{\mu}_{OU}, \mathbf{\Sigma}_{OU}\big) \times \mathcal{N}\big(\bm{l};\ \bm{0}, \mathbf{\Sigma}_L\big) \\
-	&= \mathcal{N}\big(\bm{g}_v;\ \bm{\mu}_{OU}, \mathbf{\Sigma}_{OU}\big) \times \mathcal{N}\big(\bm{z} - \bm{g}_v;\ \bm{0}, \mathbf{\Sigma}_L\big) \\
-	&= \mathcal{N}\big(\bm{g}_v;\ \bm{\mu}_{OU}, \mathbf{\Sigma}_{OU}\big) \times \mathcal{N}\big(\bm{g}_v;\ \bm{z}, \mathbf{\Sigma}_L\big)
+		f\big(\bm{g},\ \bm{\epsilon}\big) &= f\big(\bm{g}|\ \bm{\epsilon}\big) \times f\big(\bm{\epsilon}\big) \\
+	&= f\big(\bm{g}\big) \times f\big(\bm{\epsilon}\big) \\
+	&= \mathcal{N}\big(\bm{g};\ \bm{\mu}_{OU}, \mathbf{\Sigma}_{OU}\big) \times \mathcal{N}\big(\bm{\epsilon};\ \bm{0}, \mathbf{\Sigma}_\mathcal{E}\big) \\
+	&= \mathcal{N}\big(\bm{g};\ \bm{\mu}_{OU}, \mathbf{\Sigma}_{OU}\big) \times \mathcal{N}\big(\bm{z} - \bm{g};\ \bm{0}, \mathbf{\Sigma}_\mathcal{E}\big) \\
+	&= \mathcal{N}\big(\bm{g};\ \bm{\mu}_{OU}, \mathbf{\Sigma}_{OU}\big) \times \mathcal{N}\big(\bm{g};\ \bm{z}, \mathbf{\Sigma}_\mathcal{E}\big)
 	\end{split}
 \end{align}
 	
 	Equations \ref{eq:MuG} and \ref{eq:SigmaG} follow from eq. \ref{eq:pdfG} and eq. 371, p. 42, section 8.1.8 ``Product of Gaussian densities'' in \citet{Petersen2012}.
 \end{proof}
 
-Importantly, equation \ref{eq:MuG} is the maximum likelihood estimate for $\bm{g}_v$, the viral effect on spVL, taking into account all available information - measured spVL, the pathogen phylogeny, and inferred POUMM parameters. This estimator is an inverse-variance weighted average of measured spVL ($\bm{z}$) and information from the POUMM evolutionary model ($\bm{\mu}_{OU}$). In other words, $g_v$ will be closer to measured spVL if spVL is not very heritable. If spVL is highly heritable, $g_v$ will be closer to the expected value under the POUMM, i.e. take more information from the phylogenetic relationships between infecting strains. 
+Importantly, equation \ref{eq:MuG} is the maximum likelihood estimate for $\bm{g}_v$, the pathogen effect on the trait, taking into account all available information - measured trait values, the pathogen phylogeny, and inferred POUMM parameters. This estimator is an inverse-variance weighted average of measured trait ($\bm{z}$) and information from the POUMM evolutionary model ($\bm{\mu}_{OU}$). In other words, $g$ will be closer to the measured trait value if the trait is not very heritable. If the trait is highly heritable, $g$ will be closer to the expected value under the POUMM, i.e. take more information from the phylogenetic relationships between infecting strains. 
 
-Given the estimator we just derived for $\bm{g}_v$, we can now estimate $\bm{l}$, the spVL value $without$ pathogen effects: 
+Given the estimator we just derived for $\bm{g}$, we can now estimate $\bm{\epsilon}$, the trait value $without$ pathogen effects: 
 
 \begin{equation}
-	\hat{\bm{l}} = \bm{z} - Exp(\bm{g}_v)
+	\hat{\bm{\epsilon}} = \bm{z} - Exp(\bm{g})
 	\label{eq:EHat}
 \end{equation}
 
@@ -246,7 +252,7 @@ We will use this value to try to improve upon standard GWAS methods in infectiou
 We propose to improve standard GWAS for infectious diseases by estimating and removing trait variability due to pathogen effects. Our new framework is as follows:
 
 \begin{enumerate}
-	\item Sample host genotypes, trait values, and pathogen genome sequence data from a cohort.
+	\item Sample paired host genotypes, pathogen genome sequences, and trait values from a cohort.
 	\item Construct a pathogen phylogeny using the pathogen genome sequences.
 	\item Estimate the parameters of the POUMM based on the trait values and the pathogen phylogeny. This can be done with e.g. the R package POUMM \citep{Mitov2017a-POUMM}.
 	\item Generate maximum-likelihood estimates for the pathogen and corresponding non-pathogen effects on the trait using equations \ref{eq:MuG} and \ref{eq:EHat}.
@@ -257,11 +263,17 @@ We propose to improve standard GWAS for infectious diseases by estimating and re
 
 \subsection*{Simulation study}
 
-To test the theoretical best-case performance of our method, we simulated data under the POUMM and applied our framework to the simulated data. Figure \ref{fig:spVLModel} shows a high-level schematic of our simulation framework and Table \ref{tab:sim-params} gives the value or expression for each parameter. For a description of the full simulation scheme, see Figure \ref{fig:sim-design}. In a nutshell, we simulated independent, additive host genetic effects, independent environmental effects, and heritable pathogen genetic effects under different scenarios of trait heritability and selection strength. To maintain the same heritability while varying selection strength, we counter-balanced by varying the intensity of stochastic evolutionary fluctuations accordingly. We fixed other variables to plausible values based on the spVL literature.
+To test the theoretical best-case performance of our method, we simulated data under the POUMM and applied our framework to the simulated data. We parameterized our simulation scheme with the time-scale and other parameters of an HIV-1 outbreak in mind, with spVL as the trait of interest. 
+
+We first simulated a phylogeny of 500 tips with exponentially distributed branch lengths and mean root-to-tip time of 0.14 substitutions per site per year as in \cite{Hodcroft2014}. Then, we simulated pathogen trait values $g$ along this phylogeny using the POUMM package in R \citep{Mitov2017a-POUMM}. For the simulation, we considered a range of pathogen heritability parameter values $H^2$, from 15 to 75\%, and a range of selection strength parameters values $\alpha$, from 0.1 to 60 time$^{-1}$. The intensity of stochastic fluctuations parameter $\sigma$ was determined based $H^2$ and $\alpha$ (a re-arrangement of equation \ref{eq:POUMM-H2} given the partition of trait variance described below). These values ranged from XX to XX, depending on alpha. We recorded the simulated pathogen part of the trait value for each tip in the phylogeny.
+
+We paired each tip's simulated pathogen trait value with a simulated host trait value. Simulated hosts had 100 genome positions. We sampled alleles (0, 1, or 2) for each position from a binomial distribution with probability 0.13. 10 random positions had an effect size of 0.2 on the trait and 10 had an effect size of -0.2. The other 80 positions had no effect on the trait. This parameterization produced roughly normally distributed host trait values centered at 0 with variance equal to 25\% of the total trait variance, which we constrained to 0.73 based on the variance in log spVL values measured by \cite{Mitov2018}. We used 25\% host heritability for spVL based on \cite{McLaren2015}.
+
+Finally, we sampled an additional random environmental effect for each tip from a normal distribution centered at 0. The variance of this distribution was scaled based on the pathogen heritability of the trait, from 0 (no affect) in the scenario with 75\% pathogen heritability and 25\% host heritability to 0.44 in the scenario with 15\% pathogen heritability and 25\% host heritability. Figure \ref{fig:sim-design} shows a high-level schematic of this simulation framework and Table \ref{tab:sim-params} gives the value or expression for each parameter.
 
 \subsubsection*{Estimator accuracy}
 
-First, we evaluated how well our method estimated the additive host genetic effects from the simulated data. Additive host genetic effects represent an ideal (albeit unattainable) baseline for infectious disease GWAS. Figure \ref{fig:simulationResults}A shows that our method incorporating phylogenetic information can more accurately estimate these value compared to the trait value. To ensure a fair comparison, we scaled trait values to have the same mean, zero, as host genetic effects so as not to bias the root mean squared error (RMSE) by a constant factor. As shown in the supplemental material, we can calculate the expected RMSE using the scaled trait value across scenarios in our simulation scheme because the variance in the spVL trait due to viral genetic effects and environmental effects is fixed. Thus, we expect the RMSE using the scaled trait value to be 0.74 across all simulation scenarios. By incorporating phylogenetic information, we can improve upon this error in scenarios where the trait is highly heritable, under low selection pressure, and with relatively moderate stochastic fluctuations compared to outbreak duration. This is because high heritability means the trait value is highly pathogen-dependent. Then, when the trait is under weak selection, the pathogen effects can drift far from the long-term optimum and stochastic fluctuations are low to maintain the same heritability. Thus, our method performs well when an infectious disease trait is highly heritable and trait values are strongly correlated amongst close transmission partners.
+First, we evaluated how well our method estimated the additive host genetic effects from the simulated data. Additive host genetic effects represent an ideal (albeit unattainable) baseline for infectious disease GWAS. Figure \ref{fig:simulationResults}A shows that our method incorporating phylogenetic information can more accurately estimate these value compared to the trait value. To ensure a fair comparison, we scaled trait values to have the same mean, zero, as host genetic effects so as not to bias the root mean squared error (RMSE) by a constant factor. As shown in the supplemental material, we can calculate the expected RMSE using the scaled trait value across scenarios in our simulation scheme because the variance in the trait due to viral genetic effects and environmental effects is fixed. Thus, we expect the RMSE using the scaled trait value to be 0.74 across all simulation scenarios. By incorporating phylogenetic information, we can improve upon this error in scenarios where the trait is highly heritable, under low selection pressure, and with relatively moderate stochastic fluctuations compared to outbreak duration. This is because high heritability means the trait value is highly pathogen-dependent. Then, when the trait is under weak selection, the pathogen effects can drift far from the long-term optimum and stochastic fluctuations are low to maintain the same heritability. Thus, our method performs well when an infectious disease trait is highly heritable and trait values are strongly correlated amongst close transmission partners.
 
 \subsubsection*{Theoretical GWAS improvement}
 
@@ -281,7 +293,7 @@ Next, we characterized the evolutionary scenarios under which our framework can 
 \begin{figure}[H]
 	\begin{center}
 		\includegraphics[width=0.7\linewidth]{figures/example_simulation_trait_values}
-		\caption{Example simulated data from two evolutionary scenarios where (left) a phylogenetic correction does not improve GWAS power and (right) where it does. The only difference in the two simulations is heritability; selection strength was fixed to 0.1 time $^{-1}$ and all other parameters were fixed as in the full simulation study. These examples correspond to the empty points in Figure \ref{fig:simulationResults}.}
+		\caption{Example simulated data from two evolutionary scenarios where (left) a phylogenetic correction to trait values does not improve GWAS power and (right) where it does. These examples correspond to the empty points in Figure \ref{fig:simulationResults}. Apparent is that the phylogenetically-corrected trait values (y-axis) correspond better with the true host part of the trait when trait heritability due to the pathogen is higher (right side). Selection strength was fixed to 0.1 time $^{-1}$ for both scenarios and all other parameters were fixed as in the full simulation study. }
 		\label{fig:simulationTraitExample}
 	\end{center}
 \end{figure}
@@ -316,6 +328,8 @@ We compared our proposed GWAS framework with a more standard approach by perform
 \label{tab:comp-gwas-mclaren-snps}
 \end{table}
 
+\subsection*{GWAS on the \emph{A. thaliana}-\emph{X. arboricola} pathosystem}
+
 \section*{Discussion}
 % State the importance of your findings
 In this paper, we presented a new phylogeny-aware GWAS framework to correct for heritable pathogen effects on infectious disease traits. By using information from the pathogen phylogeny, we show it is possible to improve GWAS power to detect host genetic variants associated with a disease trait. This should help us better understand which host factors are protective against a disease versus which increase susceptibility or disease severity.
@@ -325,7 +339,7 @@ Our method relies on the POUMM, a model of continuous trait evolution that accou
 
 Instead, the main novelty of our approach was to correct the spVL trait prior to performing the GWAS, thereby estimating and removing pathogen effects. In simulations, we show that when trait heritability amongst infection partners is greater than approximately 25\%, GWAS power to detect host genetic variants associated with the same trait is reduced. Our method can correct for this effect in certain evolutionary scenarios by using information from the full pathogen phylogeny. 
 
-Based on our simulation results, our method is anticipated to be very useful for disease traits that are highly heritable from donor to recipient and  maintain a high correlation between sampled individuals. In simulations, we showed this is the case when heritability is high, selection strength is low, and trait values are not subject to strong stochastic fluctuations. So, cohort-level, phylogenetically structured differences in the measured trait value are necessary for our approach to outperform state of the art methods. 
+Based on our simulation results, our method is anticipated to be very useful for disease traits that are highly heritable from donor to recipient and  maintain a high correlation between sampled individuals. In simulations, we showed this is the case when heritability is high, selection strength is low, and trait values are not subject to strong stochastic fluctuations. So, cohort-level, phylogenetically structured differences in the measured trait value are necessary for our approach to outperform state of the art methods. Co-infection, or any other non-genetic factor that increases variability in the trait of interest, would reduce the effectiveness of this method. The more environmental ``noise'' in the trait value, the less signal there is to tease apart pathogen effects. There is also less signal for host genetic effects, so GWAS in general suffer when there are confounding factors affecting a trait of interest. In this case, we would recommend adding co-infection status as a covariate in the GWAS association test.
 
 Given our estimates for the heritability of spVL and the selection strength on this trait using Swiss HIV cohort data, our simulation results reveal that we cannot expect a significant improvement in GWAS power for human genetic determinants of spVL (Figure \ref{fig:simulationResults}). Our method slightly decreases p-values for variants in $CCR5$ and slightly decreases some and increases other p-values for variants in the MHC (Figure \ref{fig:gwas-results}B). Simulations show we shouldn't expect a net p-value decrease, but our simulations represent an ideal scenario since we simulate under the POUMM. In real life, un-modeled evolutionary pressures like drug treatment and host-specific HLA alleles might cause the reduced p-values. However, the overall picture is consistent between the two GWAS (Figure \ref{fig:gwas-results}A). Therefore, we conclude that GWAS for host determinants of HIV-1 subtype B spVL is robust to our correction for pathogen effects. 
 
@@ -338,7 +352,7 @@ In summary, we argue that infectious disease GWAS should take the pathogen phylo
 
 \subsection*{Simulation model}
 
-Whenever possible, we tried to parameterize our simulation model for spVL using empirical data. We set the total variance in spVL to 0.73 log copies$^2$ mL$^{-2}$ based on UK cohort data \citep{Mitov2018}. Other studies have estimated slightly lower values though (Table \ref{tab:spVLmeasurements}). After allotting 25\% of this variance to the host part of spVL $g_h$ based on results by \citet{McLaren2015}, we partitioned the remaining variance between the viral part $g_v$ and the environmental part $\epsilon$ in different ratios to assess estimator performance across a range of spVL heritabilities. $g_h$ was simulated as the sum of contributions from 20 causal host genetic variants, 10 of which had an effect size of 0.2 log copies mL$^{-1}$ and 10 of which had an effect size of -0.2 log copies mL$^{-1}$. Host genetic variants were generated from a binomial distribution with probability $p$ calculated such that $g_h$ had the appropriate variance (see Table \ref{tab:sim-params}). We generated a random viral phylogeny with branch lengths on the same time scale as a previously inferred UK cohort HIV tree \citep{Hodcroft2014} using the R package ape \citep{Paradis2018}. $g_v$ was simulated by running an OU process along the phylogeny using the R package POUMM \citep{Mitov2017a-POUMM} and sampling values at the tips. For the OU parameters $\theta$ and $g_{0}$ we used 4.5 log copies mL$^{-1}$ based on fitting the same model to SCHS data (Table \ref{tab:POUMM-parameters-our-estimates}). This is similar to values previously inferred for HIV (Table \ref{tab:POUMMparams-prev-estimated}). To assess our estimator's performance under a range of evolutionary scenarios, we co-varied the OU parameters for selection strength, $\alpha$, and intensity of random fluctuations, $\sigma$, so that different proportions of the variability in $g_v$ were attributable to selection and drift, respectively. Finally, the environmental component of spVL $\epsilon$ was generated from a normal distribution with mean 0.  For a full graphical model representation of the simulation scheme, see Figure \ref{fig:sim-design}.
+Whenever possible, we tried to parameterize our simulation model for spVL using empirical data. We set the total variance in spVL to 0.73 log copies$^2$ mL$^{-2}$ based on UK cohort data \citep{Mitov2018}. Other studies have estimated slightly lower values though (Table \ref{tab:spVLmeasurements}). After allotting 25\% of this variance to the host part of spVL $h$ based on results by \citet{McLaren2015}, we partitioned the remaining variance between the viral part $g$ and the environmental part $\epsilon$ in different ratios to assess estimator performance across a range of spVL heritabilities. $h$ was simulated as the sum of contributions from 20 causal host genetic variants, 10 of which had an effect size of 0.2 log copies mL$^{-1}$ and 10 of which had an effect size of -0.2 log copies mL$^{-1}$. Host genetic variants were generated from a binomial distribution with probability $p$ calculated such that $h$ had the appropriate variance (see Table \ref{tab:sim-params}). We generated a random viral phylogeny with branch lengths on the same time scale as a previously inferred UK cohort HIV tree \citep{Hodcroft2014} using the R package ape \citep{Paradis2018}. $g$ was simulated by running an OU process along the phylogeny using the R package POUMM \citep{Mitov2017a-POUMM} and sampling values at the tips. For the OU parameters $\theta$ and $g_{0}$ we used 4.5 log copies mL$^{-1}$ based on fitting the same model to SCHS data (Table \ref{tab:POUMM-parameters-our-estimates}). This is similar to values previously inferred for HIV (Table \ref{tab:POUMMparams-prev-estimated}). To assess our estimator's performance under a range of evolutionary scenarios, we co-varied the OU parameters for selection strength, $\alpha$, and intensity of random fluctuations, $\sigma$, so that different proportions of the variability in $g$ were attributable to selection and drift, respectively. Finally, the environmental component of spVL $\epsilon$ was generated from a normal distribution with mean 0.  For a full graphical model representation of the simulation scheme, see Figure \ref{fig:sim-design}.
 
 \begin{table}[H]
 	\caption{Simulation model parameters. For a full graphical model representation of the simulation scheme, including how these parameters are related, see Figure \ref{fig:sim-design}.}
@@ -347,15 +361,15 @@ Whenever possible, we tried to parameterize our simulation model for spVL using 
 		$\sigma^2_z$ &  0.73 log copies$^{2}$/mL$^{2}$ & Total spVL variance \\ 
 		$H^2_h$ & 0.25 & Host heritability of spVL \\
 		$H^2_{\bar{t}}$ & varied & Viral heritability of spVL at $\bar{t}$ \\
-		$\sigma^2_{g_h}$ & $\sigma_{g_h}^2 = 0.25*\sigma_z^2$ & Variance in host part of spVL \\
-		$\sigma^2_{g_v}(\bar{t})$ & $\sigma^2_{g_{v}}(\bar{t}) = H^2_{\bar{t}}*\sigma_z^2$ & Variance in viral part of spVL at $\bar{t}$ \\ 
-		$\sigma^2_{\epsilon}$ & $\sigma_{\epsilon}^2 = \sigma_z^2 - \sigma^2_{g_v} - \sigma^2_{g_h}$ & Variance in environmental part of spVL \\ 
+		$\sigma^2_{h}$ & $\sigma_{h}^2 = 0.25*\sigma_z^2$ & Variance in host part of spVL \\
+		$\sigma^2_{p}(\bar{t})$ & $\sigma^2_{g_{v}}(\bar{t}) = H^2_{\bar{t}}*\sigma_z^2$ & Variance in viral part of spVL at $\bar{t}$ \\ 
+		$\sigma^2_{\epsilon}$ & $\sigma_{\epsilon}^2 = \sigma_z^2 - \sigma^2_{p} - \sigma^2_{h}$ & Variance in environmental part of spVL \\ 
 		$\bar{t}$ & 0.14 substitutions site$^{-1}$ yr$^{-1}$ & Mean root-tip time in viral phylogeny \\ 
 		$\bm{g}_v$ & $\bm{g}_v \sim Norm(\bm{\mu}_{OU}, \boldsymbol{\Sigma}_{OU})$ & Viral part of spVL for all individuals \\ 
 		$\theta$ & 4.5 log copies/mL & Optimal spVL value \\
-		$g_{0}$ & 4.5 log copies/mL & $g_v$ at the root of the phylogeny  \\ 
+		$g_{0}$ & 4.5 log copies/mL & $g$ at the root of the phylogeny  \\ 
 		$\alpha$ & varied & Selection strength of OU process \\ 
-		$\sigma$ & $\sigma = \sqrt{\frac{2\alpha\sigma^2_{g_{v}}(\bar{t})}{1 - exp(-2\alpha\bar{t})}}$ & Time-unit standard deviation of OU process \\ 
+		$\sigma$ & $\sigma = \sqrt{\frac{-2\alpha H^2 \sigma^2_z (0.75 - H^2)}{(H^2 - 1)(1 - exp(-2\alpha\bar{t}))}}$ & Time-unit standard deviation of OU process \\ 
 		$\Psi$ & branch lengths $\sim Exp(\bar{t})$ & Viral phylogeny \\ 
 		$g_{h_i}$ & \makecell{$g_{h_i} = \delta \sum_{j = 1}^{j = M/2}{G_{ij}} - \\ \delta \sum_{j = M/2}^{j = M}{G_{ij}}$} & Host part of spVL for individual $i$ \\ 
 		$G_{N \times M}$ & \makecell{$G_{ij} \sim Binom(2, p)\ \\ \forall i \in {1...N}, \forall j \in {1...M}$} & Host genotype matrix \\
@@ -377,28 +391,28 @@ For phylogenetic inference, we retained sequences from 1,493 individuals with no
 For GWAS, we retained data from 1,392 of the 1,493 SHCS individuals with European ancestry who were not closely related to other individuals in the cohort (Table \ref{tab:sample-filtering}). These were 227 females and 1165 males. Ancestry was determined by plotting individuals along the three primary axes of genotypic variation from a combined dataset of SHCS samples and HapMap populations (Figure \ref{fig:PCA}). Kinship was evaluated using PLINK version 2.3 \citep{Chang2015}; we used the --king-cutoff option to exclude one from each pair of individuals with a kinship coefficient $>$ 0.09375. Initial host genotyping quality control and imputation were done as in \cite{Thorball2021GeneticLymphoma}. Subsequent genotyping quality control was performed using PLINK version 2.3 \citep{Chang2015}. We used the options --maf 0.01, --geno 0.01, and --hwe 0.00005 to remove variants with minor allele frequency less than 0.01, missing call rate greater than 0.05, or Hardy-Weinberg equilibrium exact test p-value less than 5x10$^-5$. After quality filtering, approximately 6.2 million genetic variants from the 1,392 individuals were retained for GWAS (Table \ref{tab:variant-filtering}). 
 
 \subsection*{\emph{A. thaliana}-\emph{X. arboricola} data}
-\emph{A. thaliana} genotypes were downloaded from the 1001 Genomes project \citep{Alonso-Blanco20161135Thaliana}. Quantitative diseases resistance (QDR) score measurements and \emph{X. arboricola} genotypes were provided by the authors of \citep{Wang2018Two-wayGenomes}. The \emph{X. arboricola} QDR trait values were generated in a fully-crossed experimental design, where each host type (accession) was infected with each pathogen strain. QDR was measured on 4 leaves for each host-pathogen pairing. 
+\emph{A. thaliana} and \emph{X. arboricola} genotyping and quantitative disease resistance (QDR) measurements are described in detail in \citep{Wang2018Two-wayGenomes}. Briefly, \citep{Wang2018Two-wayGenomes} infected different \emph{A. thaliana} host accessions with different \emph{X. arboricola} pathogen strains in a fully-crossed experimental design. They infected up to 4 leaves on each of three biological replicates for each host-pathogen pair. Then, they scored QDR for each leaf on a scale of 0 (resistant) to 4 (susceptible). A genotype matrix with allele dosage of 33,610 SNPs for the 22 \emph{X. arboricola} pathogen strains used was downloaded from the supplemental material of \citep{Wang2018Two-wayGenomes}. A VCF file with allele dosage of 12,883,854 SNPs for different \emph{A. thaliana} accessions was downloaded from the 1001 Genomes project \citep{Alonso-Blanco20161135Thaliana}. QDR measurements were provided directly by the authors of \citep{Wang2018Two-wayGenomes}.
 
-For phylogenetic inference, the \emph{X. arboricola} genotype matrix consisted of allele dosage information for 33,610 SNPs in 22 strains. We used the ``dist.gene'' and ``nj'' functions from the ape package in R to construct a pairwise genetic distance matrix and then a neighbor-joining tree from these data. We calculated mean QDR across all leaves infected on all hosts for each \emph{X. arboricola} strain.
+For phylogenetic inference, we used the ``dist.gene'' and ``nj'' functions from the ape package in R to construct a pairwise genetic distance matrix and then a neighbor-joining tree from the \emph{X. arboricola} pathogen genotype matrix. For the trait value to fit the POUMM, we calculated mean QDR across all leaves infected on all hosts for each \emph{X. arboricola} strain.
 
-For GWAS, we retained data from 133 \emph{A. thaliana} accessions with associated QDR measurements.
+For GWAS, we retained genotype data from 132 \emph{A. thaliana} accessions with associated QDR measurements. We used the options --maf 0.1 and --max-alleles 2 to remove variants with minor allele frequency less than 0.1 as in \citep{Wang2018Two-wayGenomes} and multi-allelic variants. After filtering, approximately 1.7 million genetic variants from the 132 accessions were retained for GWAS (Table \ref{tab:variant-filtering-plants}). For the GWAS trait value, we randomly selected one pathogen pairing per host accession (weighted by number of leaves scored across the three replicates), so that the data is paired rather than fully-crossed and thus analogous to the HIV spVL GWAS analysis.
 
 \subsection*{POUMM parameter inference}
 
 We used the R package POUMM version 2.1.6 \citep{Mitov2017a-POUMM} to infer the POUMM parameters $g_0, \alpha, \theta, \sigma, \text{ and }\sigma_e$ from the HIV-1 and \emph{X. arboricola} phylogenies and associated spVL and QDR trait values. The Bayesian inference method implemented in this package requires specification of a prior distribution for each parameter. For HIV-1 spVL, we used the same, broad prior distributions as in \citet{Mitov2018}, namely: $g_{0} \sim \mathcal{N}(4.5,\ 3)$, $\alpha \sim Exp(0.02)$, $\theta \sim \mathcal{N}(4.5,\ 3)$, $H^2_{\bar{t}} \sim \mathcal{U}(0,\ 1)$, and $\sigma^2_e \sim Exp(0.02)$. For \emph{X. arboricola} QDR, we modified the $g_0$ and $\theta$ priors to match the empirical mean and standard deviation of QDR trait values in the dataset: $g_{0} \sim \mathcal{N}(0.4,\ 0.2)$ and $\theta \sim \mathcal{N}(0.4,\ 0.2)$. We ran two MCMC chains for 4x10$^6$ samples each with a target sample acceptance rate of 0.01 and a thinning interval of 1000 for both analyses. The first 2x10$^5$ samples of each chain were used for automatic adjustment of the MCMC proposal distribution. Figure \ref{fig:poumm-parameters} shows the posterior distributions for inferred parameters. Table \ref{tab:POUMM-parameters-our-estimates} gives the posterior mean values used for subsequent calculations.
 
 \subsection*{Phylogenetic trait correction}
-We corrected HIV-1 spVL and \emph{X. arboricola} QDR trait values using the method described in this paper. For each host individual, we estimated the pathogen part of their trait value using equation \ref{eq:MuG} and the corresponding non-pathogen part using equation \ref{eq:EHat}. For the POUMM parameters $\alpha$, $\sigma$, $\theta$, and $\sigma_e$, we used the posterior mean estimates generated as described above. For the \emph{A. thaliana}-\emph{X. arboricola} trait correction and downstream GWAS, we randomly selected one pathogen pairing for each host to analyze. This makes the dataset analogous to the observational HIV-1 dataset. All the code used to implement the method is available at https://github.com/cevo-public/POUMM-GWAS.
+We corrected HIV-1 spVL and \emph{X. arboricola} QDR trait values using the method described in this paper. For each host individual, we estimated the pathogen part of their trait value using equation \ref{eq:MuG} and the corresponding non-pathogen part using equation \ref{eq:EHat}. For the POUMM parameters $\alpha$, $\sigma$, $\theta$, and $\sigma_e$, we used the posterior mean estimates generated as described above. As mentioned above, we randomly selected one \emph{X. arboricola} pathogen strain pairing per \emph{A. thaliana} host accession to be analogous to the human infectious disease case. Thus, trait values for GWAS were calculated as average QDR across three replicates for a particular pathogen-host pairing, while the strain-specific trait correction was calculated based on average QDR across all host pairings. All the code used to implement the method is available at https://github.com/cevo-public/POUMM-GWAS.
 
 \subsection*{Association testing}
-We performed two GWAS using the same human genotype data from the SHCS. For the first ``GWAS with standard trait value'' we used total calculated spVL ($\bm{z}$) as the response variable for association testing, replicating prior GWAS for host genetic determinants of spVL. For the second ``GWAS with estimated non-pathogen part of trait'' we replaced total spVL with the estimated non-viral component of spVL ($\hat{\bm{e}}$) as the response variable. Association testing was performed using a linear association model in PLINK version 2.3 \citep{Chang2015} with sex and the top 5 principle components of host genetic variation included as covariates. The sex and principle components covariates were included to reduce residual variance in spVL and control for confounding from host population structure, respectively. 
+We performed two comparative GWAS for each infectious disease trait (HIV-1 spVL and \emph{X. arboricola} QDR). For the first ``GWAS with standard trait value'' we used the total (uncorrected) trait values ($\bm{z}$) as the response variable for association testing, replicating a standard GWAS set-up. For the second ``GWAS with estimated non-pathogen part of trait'' we replaced total trait values with the estimated non-pathogen component of the trait ($\hat{\bm{e}}$) as the response variable. Association testing was performed using a linear association model in PLINK version 2.3 \citep{Chang2015} with the top 5 principle components of host genetic variation included as covariates. In the HIV-1 spVL case, sex was also used as a covariate. These covariates were included to reduce residual variance in the trait values (sex) and control for confounding from host population structure (principle components).
 
 \subsection*{Data availability}
-The simulated data underlying this article can be re-generated using the code available on the project GitHub at https://github.com/cevo-public/POUMM-GWAS. The HIV pathogen genome sequences, clinical data, and human genotypes cannot be shared publicly due to the privacy of individuals who participated in the cohort study. The data may be shared on reasonable request to the Swiss HIV Cohort Study at http://www.shcs.ch.
+The simulated data underlying this article can be re-generated using the code available on the project GitHub at https://github.com/cevo-public/POUMM-GWAS. The HIV pathogen genome sequences, clinical data, and human genotypes cannot be shared publicly due to the privacy of individuals who participated in the cohort study. The data may be shared on reasonable request to the Swiss HIV Cohort Study at http://www.shcs.ch. The \emph{X. arboricola} pathogen genotypes are available in the supplemental material of \citep{Wang2018Two-wayGenomes}, the \emph{A. thaliana} host genotypes are available at https://1001genomes.org/, and the \emph{A. thaliana}-\emph{X. arboricola} QDR measurements are available on request to the authors of \citep{Wang2018Two-wayGenomes}.
 
 \section*{Acknowledgments}
 
-This work was supported by ETH Zurich. We thank the patients who participate in the SHCS; the physicians and study nurses for excellent patient care; A. Scherrer,  E. Mauro, and K. Kusejko from the SHCS Data Centre for data management; and D. Perraudin and M. Amstad for administrative assistance. We also thank Michael Landis, who shared a LaTeX template for graphical model drawing.
+This work was supported by ETH Zurich. We thank the patients who participate in the SHCS; the physicians and study nurses for excellent patient care; A. Scherrer,  E. Mauro, and K. Kusejko from the SHCS Data Centre for data management; and D. Perraudin and M. Amstad for administrative assistance. We thank Joy Bergelson for sharing the \emph{A. thaliana}-\emph{X. arboricola} QDR measurements. We also thank Michael Landis, who shared a LaTeX template for graphical model drawing.
  
 The members of the SHCS are:
 Abela I, Aebi-Popp K, Anagnostopoulos A, Battegay M, Bernasconi E, Braun DL, Bucher HC, Calmy A, Cavassini M, Ciuffi A, Dollenmaier G, Egger M, Elzi L, Fehr J, Fellay J, Furrer H, Fux CA, Günthard HF (President of the SHCS), Hachfeld A, Haerry D (deputy of "Positive Council"), Hasse B, Hirsch HH, Hoffmann M, Hösli I, Huber M, Kahlert CR (Chairman of the Mother & Child Substudy), Kaiser L, Keiser O, Klimkait T, Kouyos RD, Kovari H, Kusejko K (Head of Data Centre), Martinetti G, Martinez de Tejada B, Marzolini C, Metzner KJ, Müller N, Nemeth J, Nicca D, Paioni P, Pantaleo G, Perreau M, Rauch A (Chairman of the Scientific Board), Schmid P, Speck R, Stöckle M (Chairman of the Clinical and Laboratory Committee), Tarr P, Trkola A, Wandeler G, Yerly S.
@@ -442,18 +456,18 @@ Here we show the root mean square error (RMSE) of $\bm{z} - \bm{\bar{z}}$ as an 
 Note that $z - \bar{z}$ differs from $h$ due to a viral effect and an environmental effect. So the term inside the square root equals the combined variance of these two effects:
 
 \begin{equation}
-    RMSE = \sqrt{\sigma^2_{g_v} + \sigma^2_\epsilon}
+    RMSE = \sqrt{\sigma^2_{p} + \sigma^2_\epsilon}
 \end{equation}
 
-We can calculate the variance due to these two effects because the total variance in spVL $\sigma^2_z$, and the fraction of the total variance due to host genetic effects, $\sigma^2_{g_h}$, are fixed parameters in our simulation scheme.
+We can calculate the variance due to these two effects because the total variance in spVL $\sigma^2_z$, and the fraction of the total variance due to host genetic effects, $\sigma^2_{h}$, are fixed parameters in our simulation scheme.
 
 \begin{equation}
 \begin{split}
-    \sigma^2_{g_h} + \sigma^2_{g_v} + \sigma^2_\epsilon = \sigma^2_z \\
-    0.25 * \sigma^2_{z} + \sigma^2_{g_v} + \sigma^2_\epsilon = \sigma^2_z \\
-    \sigma^2_{g_v} + \sigma^2_\epsilon = 0.75 * \sigma^2_z \\
-    \sigma^2_{g_v} + \sigma^2_\epsilon = 0.75 * 0.73 \\
-    \sigma^2_{g_v} + \sigma^2_\epsilon = 0.55
+    \sigma^2_{h} + \sigma^2_{p} + \sigma^2_\epsilon = \sigma^2_z \\
+    0.25 * \sigma^2_{z} + \sigma^2_{p} + \sigma^2_\epsilon = \sigma^2_z \\
+    \sigma^2_{p} + \sigma^2_\epsilon = 0.75 * \sigma^2_z \\
+    \sigma^2_{p} + \sigma^2_\epsilon = 0.75 * 0.73 \\
+    \sigma^2_{p} + \sigma^2_\epsilon = 0.55
 \end{split}
 \end{equation}
 
@@ -470,7 +484,7 @@ Therefore, we can expect the RMSE for $\bm{z} - \bm{\bar{z}}$ as an estimate for
 	\node[constnode] (H2h) at (0, 0) {0.25};
 	\node[constnode] (varz) at ($(H2h) + (1.8, 0)$) {$\sigma^2_z$};
 	\node[constnode] (H2) at ($(H2h) + (3.6, 0)$) {\textcolor{red}{$H^2_{\bar{t}}$}};
-	\node[detnode] (varh) at ($(H2h) + (0.9, 1.5)$) {$\sigma^2_{g_h}$};
+	\node[detnode] (varh) at ($(H2h) + (0.9, 1.5)$) {$\sigma^2_{h}$};
 	\node[detnode] (varv) at ($(varz) + (0.9, 1.5)$) {\tiny $\sigma^2_{g_{v}}(\bar{t})$};
 	\node[detnode] (vare) at ($(varh) + (0.9, 1.5)$) {$\sigma^2_{\epsilon}$};
 	\draw[taro] (H2h) -- (varh);
@@ -492,7 +506,7 @@ Therefore, we can expect the RMSE for $\bm{z} - \bm{\bar{z}}$ as an estimate for
 	\node[constnode] (tree) at (7.2, 1.5) {$\Psi$};
 	\node[detnode] (varv) at (3.6+0.9, 0) {\tiny $\sigma^2_{g_{v}}(\bar{t})$};
 	\node[constnode] (tbar) at (3.6+0.9+1.8, 0) {$\bar{t}$};
-	\node[snode] (v) at (3.6, 3.25) {$\vec{g_v}$};
+	\node[snode] (v) at (3.6, 3.25) {$\vec{p}$};
 	\draw[taro] (theta) -- (v);
 	\draw[taro] (g0) -- (v);
 	\draw[taro] (alpha) -- (v);
@@ -513,13 +527,13 @@ Therefore, we can expect the RMSE for $\bm{z} - \bm{\bar{z}}$ as an estimate for
 	\begin{scope}[xshift = 0cm, yshift = -7.5cm]
 	\node[anchor = west] (clabel) at (-1, 5.55) {\textbf{C} Generating host effects};
 	\node[constnode] (d) at (1.8, 1.5) {2};
-	\node[detnode] (p) at (3.6, 1.5) {$p$};
+	\node[detnode] (p) at (3.6, 1.5) {$g$};
 	\node[snode] (G) at (1.8, 3) {$G$};
 	\node[rectangle, dashed, very thick, inner sep=4mm, draw=black!100, fit = (G) ] (Gplate) {};
 	\node[anchor=north west, inner sep=3pt] at (Gplate.north west) {\tiny $N\times M$};
-	\node[detnode] (varh) at (3.6, 0) {$\sigma^2_{g_h}$};
+	\node[detnode] (varh) at (3.6, 0) {$\sigma^2_{h}$};
 	\node[constnode] (delta) at (3.6, 3) {$\delta$};
-	\node[detnode] (h) at (3.6, 4.5) {$\vec{g_h}$};
+	\node[detnode] (h) at (3.6, 4.5) {$\vec{h}$};
 	\node[constnode] (M) at (5.4, 3) {$M$};
 	\draw[taro] (d) -- (G);
 	\draw[taro] (p) -- (G);
@@ -552,7 +566,7 @@ Therefore, we can expect the RMSE for $\bm{z} - \bm{\bar{z}}$ as an estimate for
 	\end{scope}
 	
 	\end{tikzpicture}
-	\caption{A graphical model representation of our simulation scheme, following the recommendations in \cite{Hohna2014}. Variables in solid squares are constants, with the two master control variables that we vary from simulation to simulation highlighted in red. Variables in solid circles are realizations of random variables and variables in dashed circles are determined as a function of other variables. Arrows represent dependencies among variables and the dashed square represents repetition. All parameters are defined in Table \ref{tab:sim-params}, as well as the values or expressions used for them. (A) shows how the variance in the simulated environmental effect $\sigma^2_{\epsilon}$ is smaller if the master pathogen heritability value $H^2_{\bar{t}}$ is higher and vice-versa. (B) shows the OU parameters and the pathogen phylogeny, which generate the Gaussian-distributed pathogen effects. The OU parameters $\theta$ and $g_0$ are fixed, whereas $\sigma$ is a deterministic function of the variance in the pathogen effect and the value of $\alpha$. In other words, we use $\sigma$ to maintain the desired pathogen heritability while varying $\alpha$. We generate a new random phylogeny for each simulation. (C) shows how host genotypes are drawn to generate host effects. The host genotype matrix $G$ contains the number of copies (0, 1, or 2) for each of $M$ causal variants with effect size $\delta$. We assume half the variants have a positive effect and half have a negative effect. The allele frequency $p$ for the causal variants set so that we achieve the desired variance in the host effects. (D) shows that the environmental effect is drawn from a Gaussian distribution with mean zero and variance as determined in part (A).}
+	\caption{A graphical model representation of our simulation scheme, following the recommendations in \cite{Hohna2014}. Variables in solid squares are constants, with the two master control variables that we vary from simulation to simulation highlighted in red. Variables in solid circles are realizations of random variables and variables in dashed circles are determined as a function of other variables. Arrows represent dependencies among variables and the dashed square represents repetition. All parameters are defined in Table \ref{tab:sim-params}, as well as the values or expressions used for them. (A) shows how the variance in the simulated environmental effect $\sigma^2_{\epsilon}$ is smaller if the master pathogen heritability value $H^2_{\bar{t}}$ is higher and vice-versa. (B) shows the OU parameters and the pathogen phylogeny, which generate the Gaussian-distributed pathogen effects. The OU parameters $\theta$ and $g_0$ are fixed, whereas $\sigma$ is a deterministic function of the variance in the pathogen effect and the value of $\alpha$. In other words, we use $\sigma$ to maintain the desired pathogen heritability while varying $\alpha$. We generate a new random phylogeny for each simulation. (C) shows how host genotypes are drawn to generate host effects. The host genotype matrix $G$ contains the number of copies (0, 1, or 2) for each of $M$ causal variants with effect size $\delta$. We assume half the variants have a positive effect and half have a negative effect. The allele frequency $g$ for the causal variants set so that we achieve the desired variance in the host effects. (D) shows that the environmental effect is drawn from a Gaussian distribution with mean zero and variance as determined in part (A).}
 	\label{fig:sim-design}
 \end{figure}
 
@@ -729,7 +743,8 @@ Therefore, we can expect the RMSE for $\bm{z} - \bm{\bar{z}}$ as an estimate for
 	Variant filter & Number of variants remaining \\
 	\hline 
 	Raw data & 12883854 \\
-	Bi-allelic variants & 11769920 \\ \hline			
+	Bi-allelic variants & 11769920 \\
+	Minor allele frequency $<$ 0.1 & 1743952 \\ \hline
 	\end{tabularx}
 	\label{tab:variant-filtering-plants}
 \end{table}
