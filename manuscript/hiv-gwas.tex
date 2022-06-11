@@ -107,7 +107,7 @@ $*$Corresponding author: tanja.stadler@bsse.ethz.ch
 A key goal of genome-wide association studies (GWAS) is to understand the genetic basis of phenotypic variation among individuals. In a typical GWAS, millions of genetic variants from across an organism's genome are screened for statistical association with a trait of interest. Ideally, this procedure identifies variants that are located in, or are in linkage disequilibrium with, alleles that directly affect the trait. If GWAS finds a variant strongly associated with a disease trait, the gene product may be a good drug target \citep{Okada2014}. Even if no single variant has a strong association, many small associations can be aggregated into a polygenic risk score to identify susceptible individuals \citep{Dudbridge2013}.
 
 % Overview of relevant methods and why we don't use them
-It is well-known that GWAS can be sensitive to confounding variables. Shared ancestry among individuals, especially between close relatives, can give rise to spurious genetic correlations with a trait. Corrections for these types of population structure are well-developed and widely accepted  \citep{Astle2009, Price2006}. More recently, analogous methods have been developed for microbial GWAS, where clonal reproduction exacerbates population structure \citep{Power2017}. Microbial GWAS-specific phylogenetic methods to account for population structure in microbial GWAS include explicitly testing for lineage-specific effects as in \citep{Earle2016} and modified association tests that account for phylogenetic relationships amongst samples as in \citep{collins_phylogenetic_nodate}. 
+It is well-known that GWAS can be sensitive to confounding variables. Shared ancestry among individuals, especially between close relatives, can give rise to spurious genetic correlations with a trait. Corrections for these types of population structure in human GWAS cohorts are well-developed and widely accepted  \citep{Astle2009, Price2006}. More recently, analogous methods have been developed for microbial GWAS, where clonal reproduction exacerbates population structure \citep{Power2017}. Microbial GWAS-specific phylogenetic methods to account for population structure in microbial GWAS include explicitly testing for lineage-specific effects as in \citep{Earle2016} and modified association tests that account for phylogenetic relationships amongst samples as in \citep{collins_phylogenetic_nodate}. 
 % \citep{Earle2016} simultaneously test for pathogen lineage and locus-level associations with a trait using a linear mixed model framework. \citep{collins_phylogenetic_nodate} test for locus-level associations that are significantly stronger than expected under a null model considering shared pathogen ancestry. 
 These approaches are designed to quantify genetic effects from one organism on a trait. 
 
@@ -198,7 +198,7 @@ Next, we remember that $\epsilon$ is the non-heritable part of the trait. $\epsi
 Finally, broad-sense trait heritability can be calculated as the fraction of total trait variance that is heritable:
 
 \begin{equation}
-	H^2_{\bar{t}} = \frac{Var[g(t)]}{Var[g(t)] + Var(\epsilon)} = \frac{\frac{\sigma^2}{2\alpha}(1 - e^{-2\alpha t})}{\frac{\sigma^2}{2\alpha}(1 - e^{-2\alpha t}) + \sigma^2_\epsilon}
+	H^2_{t} = \frac{Var[g(t)]}{Var[g(t)] + Var(\epsilon)} = \frac{\frac{\sigma^2}{2\alpha}(1 - e^{-2\alpha t})}{\frac{\sigma^2}{2\alpha}(1 - e^{-2\alpha t}) + \sigma^2_\epsilon}
 	\label{eq:POUMM-H2}
 \end{equation}
 
@@ -265,7 +265,7 @@ We propose to improve standard GWAS for infectious diseases by estimating and re
 
 To test the theoretical best-case performance of our method, we simulated data under the POUMM and applied our framework to the simulated data. We parameterized our simulation scheme with the time-scale and other parameters of an HIV-1 outbreak in mind, with spVL as the trait of interest. 
 
-We first simulated a phylogeny of 500 tips with exponentially distributed branch lengths and mean root-to-tip time of 0.14 substitutions per site per year as in \cite{Hodcroft2014}. Then, we simulated pathogen trait values $g$ along this phylogeny using the POUMM package in R \citep{Mitov2017a-POUMM}. For the simulation, we considered a range of pathogen heritability parameter values $H^2$, from 15 to 75\%, and a range of selection strength parameters values $\alpha$, from 0.1 to 60 time$^{-1}$. The intensity of stochastic fluctuations parameter $\sigma$ was determined based $H^2$ and $\alpha$ (a re-arrangement of equation \ref{eq:POUMM-H2} given the partition of trait variance described below). These values ranged from XX to XX, depending on alpha. We recorded the simulated pathogen part of the trait value for each tip in the phylogeny.
+We first simulated a phylogeny of 500 tips with exponentially distributed branch lengths and mean root-to-tip time of 0.14 substitutions per site per year as in \cite{Hodcroft2014}. Then, we simulated pathogen trait values $g$ along this phylogeny using the POUMM package in R \citep{Mitov2017a-POUMM}. For the simulation, we considered a range of pathogen heritability parameter values $H^2$, from 15 to 75\%, and a range of selection strength parameters values $\alpha$, from 0.1 to 60 time$^{-1}$. The intensity of stochastic fluctuations parameter $\sigma$ was determined based $H^2$ and $\alpha$ (a re-arrangement of equation \ref{eq:OUVar}). The relationship between $\alpha$ and $\sigma$ at different values of $H^2$ is shown in Figure TODO. We recorded the simulated pathogen part of the trait value for each tip in the phylogeny.
 
 We paired each tip's simulated pathogen trait value with a simulated host trait value. Simulated hosts had 100 genome positions. We sampled alleles (0, 1, or 2) for each position from a binomial distribution with probability 0.13. 10 random positions had an effect size of 0.2 on the trait and 10 had an effect size of -0.2. The other 80 positions had no effect on the trait. This parameterization produced roughly normally distributed host trait values centered at 0 with variance equal to 25\% of the total trait variance, which we constrained to 0.73 based on the variance in log spVL values measured by \cite{Mitov2018}. We used 25\% host heritability for spVL based on \cite{McLaren2015}.
 
@@ -293,7 +293,7 @@ Next, we characterized the evolutionary scenarios under which our framework can 
 \begin{figure}[H]
 	\begin{center}
 		\includegraphics[width=\linewidth]{figures/example_simulation_trait_values}
-		\caption{Example simulated data from two evolutionary scenarios where (left) a phylogenetic correction to trait values does not improve GWAS power and (right) where it does. These examples correspond to the empty points in Figure \ref{fig:simulationResults}. Apparent is that the phylogenetically-corrected trait values (y-axis) correspond better with the true host part of the trait when trait heritability due to the pathogen is higher (right side). Selection strength was fixed to 0.1 time $^{-1}$ for both scenarios and all other parameters were fixed as in the full simulation study. }
+		\caption{Example simulated data from two evolutionary scenarios where a phylogenetic correction to trait values improves GWAS power (right side) and where it does not (left side). These examples correspond to the empty points in Figure \ref{fig:simulationResults}. (A) and (B) show simulated pathogen trait values for a sub-clade of the 500-tip phylogeny with either (A) pathogen heritability of 15\% or (B) 65\%. Pathogen trait values at clustered tips are (A) less or (B) more correlated, depending on the heritability. (C) shows that our method produces corrected trait values (y-axis) that better match the true simulated host part of the trait (x-axis) when pathogen heritability is high (right side). Selection strength was fixed to 5 time $^{-1}$ for both scenarios and all other parameters were fixed as in the full simulation study.}
 		\label{fig:simulationTraitExample}
 	\end{center}
 \end{figure}
@@ -369,7 +369,7 @@ Whenever possible, we tried to parameterize our simulation model for spVL using 
 		$\theta$ & 4.5 log copies/mL & Optimal spVL value \\
 		$g_{0}$ & 4.5 log copies/mL & $g$ at the root of the phylogeny  \\ 
 		$\alpha$ & varied & Selection strength of OU process \\ 
-		$\sigma$ & $\sigma = \sqrt{\frac{-2\alpha H^2 \sigma^2_z (0.75 - H^2)}{(H^2 - 1)(1 - exp(-2\alpha\bar{t}))}}$ & Time-unit standard deviation of OU process \\ 
+		$\sigma$ & $\sigma = \sqrt{\frac{2\alpha\sigma^2_{g_{v}}(\bar{t})}{1 - exp(-2\alpha\bar{t})}}$ & Time-unit standard deviation of OU process \\ 
 		$\Psi$ & branch lengths $\sim Exp(\bar{t})$ & Viral phylogeny \\ 
 		$g_{h_i}$ & \makecell{$g_{h_i} = \delta \sum_{j = 1}^{j = M/2}{G_{ij}} - \\ \delta \sum_{j = M/2}^{j = M}{G_{ij}}$} & Host part of spVL for individual $i$ \\ 
 		$G_{N \times M}$ & \makecell{$G_{ij} \sim Binom(2, p)\ \\ \forall i \in {1...N}, \forall j \in {1...M}$} & Host genotype matrix \\
