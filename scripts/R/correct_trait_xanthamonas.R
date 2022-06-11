@@ -74,6 +74,12 @@ phenotypes <- read.table("data/arabidopsis_xanthomonas/full_phenotype_data.txt",
         Leaf_2 = as.integer(Leaf_2),
         Leaf_3 = as.integer(Leaf_3),
         Leaf_4 = as.integer(Leaf_4)
+    ) %>%
+    tidyr::pivot_longer(
+      cols = c("Leaf_1", "Leaf_2", "Leaf_3", "Leaf_4"), 
+      values_to = "QDR_score", 
+      names_to = "Leaf", 
+      names_prefix = "Leaf_"
     )
 
 # Load host genotype accession IDs from 1001 genomes project
@@ -81,28 +87,41 @@ host_genotype_accession_ids <- read.csv("data/arabidopsis_xanthomonas/host_acces
     select(c(V1, V3)) %>%
     rename("id" = "V1", "Name_acc" = "V3")
 
-# Filter to accesssions & strains with genotype data
+# Filter to accesssions & strains with genotype data, scored leaves
 phenotypes_filtered <- phenotypes %>%
+  filter(!is.na(QDR_score)) %>%
   filter(Strain %in% inference_results$id) %>%
   filter(Name_acc %in% host_genotype_accession_ids$Name_acc)
 
-# Pick a random host/pathogen pair for each host plant (from pairings with 4 leaves scored)
+# Calculate mean QDR score across 3 replicates for each plant/pathogen pairing
+mean_phenotypes <- phenotypes_filtered %>%
+  group_by(Strain, Name_acc) %>%
+  summarize(n_leaves_scored = n(), mean_QDR_score = mean(QDR_score), .groups = "drop")
+
+# Pick a random host/pathogen pair for each host plant (prioritizing more leaves scored)
 set.seed(54321)
-phenotypes_for_gwas <- phenotypes_filtered %>%
-    filter(!is.na(Leaf_1), !is.na(Leaf_2), !is.na(Leaf_3), !is.na(Leaf_4)) %>%
+phenotypes_for_gwas <- mean_phenotypes %>%
     group_by(Name_acc) %>%
-    slice_sample(n = 1) %>%
-    mutate(mean_QDR_score = mean(c(Leaf_1, Leaf_2, Leaf_3, Leaf_4)))
+    slice_sample(n = 1, weight_by = n_leaves_scored)
+phenotypes_for_gwas_summary <- phenotypes_for_gwas %>%
+  group_by(Strain) %>%
+  summarize(n_plant_accessions_paired = n())
+write.table(
+  x = phenotypes_for_gwas_summary,
+  file = "output_arabidopsis_xanthomonas/host_pathogen_pairings_for_gwas.txt"
+)
 
 # Generate phenotypes file for PLINK (with accession ids matching vcf file from 1001 genomes)
-phenotypes_for_gwas_with_id <- phenotypes_for_gwas %>% left_join(host_acccession_ids)
+phenotypes_for_gwas_with_id <- phenotypes_for_gwas %>% left_join(host_genotype_accession_ids)
 
 phenotypes_for_gwas_with_correction <- phenotypes_for_gwas_with_id %>%
     full_join(inference_results, by = c("Strain" = "id")) %>%
     mutate(non_pathogen_trait = mean_QDR_score - v.MWA) %>% 
     ungroup()
 
-phenotypes <- phenotypes_for_gwas_with_correction %>% select(id, id, non_pathogen_trait, mean_QDR_score)
+phenotypes <- phenotypes_for_gwas_with_correction %>% 
+  select(id, non_pathogen_trait, mean_QDR_score) %>%
+  rename("IID" = "id", "h.MWA" = "non_pathogen_trait", "trait" = "mean_QDR_score")
 
 write.table(
   x = phenotypes,
@@ -113,7 +132,7 @@ write.table(
 
 # Write out list of samples to filter host VCF to
 write.table(
-  x = phenotypes$id,
+  x = phenotypes$IID,
   file = "output_arabidopsis_xanthomonas/gwas_host_ids.txt",
   quote = F,
   row.names = F,
