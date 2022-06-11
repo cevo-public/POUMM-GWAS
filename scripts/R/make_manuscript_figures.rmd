@@ -450,19 +450,19 @@ mar <- 20
 lo_h2_tree <- ggtree(single_clade) %<+% example_data_lo_h2 + 
         geom_tippoint(aes(color = v), size = 3) + 
         scale_color_viridis_b(name = "Pathogen\npart of trait") + 
-        theme_tree(plot.margin=margin(mar, mar, mar, mar))
+        theme_tree(plot.margin=margin(0, mar, 0, mar))
 
 hi_h2_tree <- ggtree(single_clade) %<+% example_data_hi_h2 + 
         geom_tippoint(aes(color = v), size = 3) + 
         scale_color_viridis_b(name = "Pathogen\npart of trait") + 
-        theme_tree(plot.margin=margin(mar, mar, mar, mar))
+        theme_tree(plot.margin=margin(0, mar, 0, mar))
 
 # Plot trait value accuracy
 p1 <- ggplot(data = example_data, aes(x = h, y = h.MWA)) +
       geom_point() +
       facet_grid(. ~ Heritability, labeller = "label_both") + 
       shared_theme +
-      labs(x = "Simulated host part of trait", y = ehat_name)
+      labs(x = "Simulated host part of trait", y = "Estimated non-pathogen\npart of trait")
 
 # Arrange plots together
 top_row <- plot_grid(
@@ -478,7 +478,7 @@ plot_grid(top_row, get_legend(lo_h2_tree),
           rel_widths = c(1, 0.2),
           labels = c("", "", "C"))
 ggsave(filename = paste(FIGDIR, "example_simulation_trait_values.png", sep = "/"),
-      width = linewidth, height = height * 1.3, unit = "cm")
+      width = linewidth, height = height, unit = "cm")
 ```
 
 PCA of cohort genotypes
