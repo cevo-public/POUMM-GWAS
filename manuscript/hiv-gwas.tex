@@ -330,13 +330,7 @@ We compared our proposed GWAS framework with a more standard approach by perform
 
 \subsection*{GWAS on the \emph{A. thaliana}-\emph{X. arboricola} pathosystem}
 
-\begin{figure}[H]
-	\begin{center}
-		\includegraphics[width=\linewidth]{figures/gwas_results}
-		\caption{Results from comparative GWAS. (A) shows association p-values for the same host variants from the SHCS cohort in GWAS with two different response variables. On the left, we used unmodified (total) spVL values. On the right, we used our estimates for the non-pathogen effects on spVL. The alternating shades correspond to different chromosomes. (B) compares the strength of association for variants in the \emph{CCR5} and MHC regions between the two GWAS (positions 45.4 - 47Mb on chromosome 3 and 29.5 - 33.5Mb on chromosome 6 for the \emph{CCR5} and MHC, respectively). Base positions are with reference to genome build GRCh37. The color of each point represents the difference in -log$_{10}$ p-value between the two GWAS. Red means taking into account phylogenetic information decreased the strength of association and blue means it increased it. The dashed lines show genome-wide significance at p = $5 \times 10^{-8}$.}
-		\label{fig:gwas-results}
-	\end{center}
-\end{figure}
+
 
 \section*{Discussion}
 % State the importance of your findings
@@ -605,7 +599,7 @@ Therefore, we can expect the RMSE for $\bm{z} - \bm{\bar{z}}$ as an estimate for
 \begin{figure}[H]
 	\centering
 		\includegraphics[width=0.7\linewidth]{figures/poumm_parameter_estimates.png}
-		\caption{Posterior distributions compared to the prior for POUMM parameter estimates based on SHCS data. We ran two different MCMC chains to ensure the estimates converged. The black point on the x-axis shows the posterior mean value, which was used to estimate the pathogen- and non-pathogen effects on spVL.}
+		\caption{Posterior distributions compared to the prior for POUMM parameter estimates based on SHCS data. We ran two different MCMC chains to ensure the estimates converged.}
 \label{fig:poumm-parameters}
 \end{figure}
 
@@ -620,6 +614,36 @@ Therefore, we can expect the RMSE for $\bm{z} - \bm{\bar{z}}$ as an estimate for
 	\includegraphics[width=\linewidth]{figures/host_genotype_pca.png}
 	\caption{SHCS individuals and HapMap3 individuals plotted along the top three principle components of genetic variation. Points with black borders are within the thresholds used to select individuals of likely European ancestry.}
 	\label{fig:PCA}
+\end{figure}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width = \linewidth]{figures/qdr_on_tree_arboricola.png}
+	\caption{Inferred \emph{X. arboricola} phylogeny with tips colored by (A) calculated QDR, (B) estimated non-pathogen effects on QDR and (C) estimated pathogen effects on QDR.}
+	\label{fig:qdr-on-tree}
+	\end{center}
+\end{figure}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width = 0.462\linewidth]{figures/trait_values_arboricola.png}
+	\caption{A comparison of measured (calculated) QDR values versus our estimated non-pathogen effect on QDR for each selected \emph{A. thaliana} host - \emph{X. arboricola} pathogen pairing selected for the GWAS. The histograms show the marginal distribution of each value across the individual pairings.}
+	\label{fig:trait-comparison-qdr}
+	\end{center}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+		\includegraphics[width=0.7\linewidth]{figures/poumm_parameter_estimates_arboricola.png}
+		\caption{Posterior distributions compared to the prior for POUMM parameter estimates based on \emph{A. thaliana}-\emph{X. arboricola} data. We ran two different MCMC chains to ensure the estimates converged.}
+\label{fig:poumm-parameters-qdr}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\linewidth]{figures/gwas_results_xanthomonas.png}
+	\caption{Results from comparative GWAS on \emph{A. thaliana}-\emph{X. arboricola} QDR. Points are association p-values for the same \emph{A. thaliana} host variants in GWAS with two different response variables. On the left, we used unmodified (total) QDR values. On the right, we used our estimates for the non-pathogen effects on QDR. The alternating shades correspond to different chromosomes. The dashed lines show significance at $\alpha$ = 0.05 with a Bonferroni correction for multiple-testing.}
+	\label{fig:gwas-results-qdr}
 \end{figure}
 
 \end{doublespace}  % don't doublespace tables
@@ -638,6 +662,20 @@ Therefore, we can expect the RMSE for $\bm{z} - \bm{\bar{z}}$ as an estimate for
 	$H^2_{\bar{t}}$ & 0.45 & (0.24, 0.67) \\ \hline
 	\end{tabularx}
 	\label{tab:POUMM-parameters-our-estimates}
+\end{table}
+
+\begin{table}[H]
+\caption{POUMM parameter estimates for QDR based on \emph{A. thaliana}-\emph{X. arboricola} data data. HPD = Highest posterior density.}
+	\begin{tabularx}{\linewidth}{XXX} \hline 
+	Parameter & Posterior mean & 95\% HPD \\ \hline 
+	${g_{0}}$ & 0.40 & (0.01, 0.78) \\
+	$\theta$ & 0.39 & (0.30, 0.49) \\
+	$\sigma$ & 0.03 & (0.0, 0.06) \\
+	$\alpha$ & 0.03 & (0.0, 0.05) \\
+	$\sigma_e$ & 0.18 & (0.08, 0.27) \\ 
+	$H^2_{\bar{t}}$ & 0.33 & (0.0, 0.77) \\ \hline
+	\end{tabularx}
+	\label{tab:POUMM-parameters-our-estimates-qdr}
 \end{table}
 
 % latex table generated in R 4.1.1 by xtable 1.8-4 package
