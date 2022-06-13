@@ -224,6 +224,22 @@ example_data2$inference.method <- factor(
         example_data2$inference.method,
         levels = c("h.plus.e.p.value", "h.MWA.p.value", "norm.z.p.value"),
         labels = c(e_name, ehat_name, z_minus_zbar_name))
+example_data3 <- data.frame(
+        inference.method = "h.MWA.p.value",
+        H2 = get_xval_for_sim_plots(real_vals = c(0.15, 0.25, 0.35, 0.45, 0.55, 0.65, 0.75, 0.85), estimate = 0.15),
+        alpha = get_xval_for_sim_plots(real_vals = c(0.1, 0.5, 1, 5, 10, 20, 30, 40, 50, 60, 70), estimate = 60))
+example_data3$inference.method <- factor(
+        example_data3$inference.method,
+        levels = c("h.plus.e.p.value", "h.MWA.p.value", "norm.z.p.value"),
+        labels = c(e_name, ehat_name, z_minus_zbar_name))
+example_data4 <- data.frame(
+        inference.method = "h.MWA.p.value",
+        H2 = get_xval_for_sim_plots(real_vals = c(0.15, 0.25, 0.35, 0.45, 0.55, 0.65, 0.75, 0.85), estimate = 0.75),
+        alpha = get_xval_for_sim_plots(real_vals = c(0.1, 0.5, 1, 5, 10, 20, 30, 40, 50, 60, 70), estimate = 60))
+example_data4$inference.method <- factor(
+        example_data4$inference.method,
+        levels = c("h.plus.e.p.value", "h.MWA.p.value", "norm.z.p.value"),
+        labels = c(e_name, ehat_name, z_minus_zbar_name))
 
 # Summarize results for plotting
 error.cols <- c("RMSE.z.h", "RMSE.h.MWA.h")
@@ -270,6 +286,8 @@ rmse_plot <- plotHeatmap(
         geom_point(data = qdr_data, fill = "black", aes(shape = "QDR")) + 
         geom_point(data = example_data1, fill = "black", aes(shape = "Example")) + 
         geom_point(data = example_data2, fill = "black", aes(shape = "Example")) +
+        geom_point(data = example_data3, fill = "black", aes(shape = "Example")) + 
+        geom_point(data = example_data4, fill = "black", aes(shape = "Example")) +
         scale_shape_manual(values = c("QDR" = 16, "spVL" = 4, "Example" = 1), name = element_blank())
 
 data <- tidyr::gather(
@@ -328,6 +346,8 @@ tpr_plot <- makeTPRPlot(
         geom_point(data = qdr_data, fill = "black", aes(shape = "QDR")) + 
         geom_point(data = example_data1, fill = "black", aes(shape = "Example")) + 
         geom_point(data = example_data2, fill = "black", aes(shape = "Example")) +
+        geom_point(data = example_data3, fill = "black", aes(shape = "Example")) + 
+        geom_point(data = example_data4, fill = "black", aes(shape = "Example")) +
         scale_shape_manual(values = c("QDR" = 16, "spVL" = 4, "Example" = 1), name = element_blank())
 
 shape_legend <- get_legend(rmse_plot + guides(fill = "none") + theme(legend.position = "bottom"))
@@ -979,4 +999,26 @@ p1 <- ggplot(data = traits_arboricola, aes(x = trait, y = h.MWA)) +
 p2 <- ggExtra::ggMarginal(p1, type="histogram")
 ggsave(plot = p2, filename = paste(FIGDIR, "trait_values_arboricola.png", sep = "/"),
       width = linewidth * 2/3, height = height * 2/3, units = "cm")
+```
+Compare variance-covariance matrix under POUMM
+```{r}
+# Get variance-covariance matrix from POUMM
+corr_HIV <- POUMM::covVTipsGivenTreePOUMM(
+        tree = tree, 
+        alpha = poumm_parameter_estimates[[which(poumm_parameter_estimates$stat == 'alpha'), 'PostMean']], 
+        sigma = poumm_parameter_estimates[[which(poumm_parameter_estimates$stat == 'sigma'), 'PostMean']], 
+        sigmae = poumm_parameter_estimates[[which(poumm_parameter_estimates$stat == 'sigmae'), 'PostMean']],
+        corr = T
+)
+corr_arboricola <- POUMM::covVTipsGivenTreePOUMM(
+        tree = tree_arboricola, 
+        alpha = poumm_parameter_estimates_arboricola[[which(poumm_parameter_estimates_arboricola$stat == 'alpha'), 'PostMean']], 
+        sigma = poumm_parameter_estimates_arboricola[[which(poumm_parameter_estimates_arboricola$stat == 'sigma'), 'PostMean']], 
+        sigmae = poumm_parameter_estimates_arboricola[[which(poumm_parameter_estimates_arboricola$stat == 'sigmae'), 'PostMean']],
+        corr = T
+)
+max(corr_HIV[upper.tri(corr_HIV)])
+min(corr_HIV[upper.tri(corr_HIV)])
+max(corr_arboricola[upper.tri(corr_arboricola)])
+min(corr_arboricola[upper.tri(corr_arboricola)])
 ```
