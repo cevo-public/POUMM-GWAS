@@ -293,7 +293,7 @@ Next, we characterized the evolutionary scenarios under which our framework can 
 \begin{figure}[H]
 	\begin{center}
 		\includegraphics[width=\linewidth]{figures/example_simulation_trait_values}
-		\caption{Example simulated data from two evolutionary scenarios where a phylogenetic correction to trait values improves GWAS power (right side) and where it does not (left side). These examples correspond to the empty points in Figure \ref{fig:simulationResults}. (A) and (B) show simulated pathogen trait values for 15 randomly selected tips from the simulated phylogeny where pathogen heritability was (A)  15\% or (B) 75\%. Pathogen trait values at clustered tips are (A) less or (B) more correlated, depending on the heritability. (C) shows that our method produces corrected trait values (y-axis) that better match the true simulated host part of the trait (x-axis) when pathogen heritability is high (right side). Selection strength was fixed to 5 time $^{-1}$ for both scenarios and all other parameters were fixed as in the full simulation study.}
+		\caption{Simulated data from two evolutionary scenarios where a phylogenetic correction to trait values improves GWAS power (right side) and where it does not (left side). These examples correspond to the empty points in Figure \ref{fig:simulationResults}. (A) and (B) show total trait values for 12 randomly selected tips from the simulated phylogeny with pathogen heritability 15 and 75\%, respectively. Depending on the pathogen heritability, trait values are more or less correlated at clustered tips. (C) compares our method's estimate for the non-pathogen part of trait values (y-axis) with true simulated host trait values (x-axis) with pathogen heritability 15 and 75\%. The solid line is the y=x line. Selection strength was fixed to 0.1 time $^{-1}$ for both scenarios and all other parameters were fixed as in the full simulation study.}
 		\label{fig:simulationTraitExample}
 	\end{center}
 \end{figure}
@@ -329,6 +329,14 @@ We compared our proposed GWAS framework with a more standard approach by perform
 \end{table}
 
 \subsection*{GWAS on the \emph{A. thaliana}-\emph{X. arboricola} pathosystem}
+
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[width=\linewidth]{figures/gwas_results}
+		\caption{Results from comparative GWAS. (A) shows association p-values for the same host variants from the SHCS cohort in GWAS with two different response variables. On the left, we used unmodified (total) spVL values. On the right, we used our estimates for the non-pathogen effects on spVL. The alternating shades correspond to different chromosomes. (B) compares the strength of association for variants in the \emph{CCR5} and MHC regions between the two GWAS (positions 45.4 - 47Mb on chromosome 3 and 29.5 - 33.5Mb on chromosome 6 for the \emph{CCR5} and MHC, respectively). Base positions are with reference to genome build GRCh37. The color of each point represents the difference in -log$_{10}$ p-value between the two GWAS. Red means taking into account phylogenetic information decreased the strength of association and blue means it increased it. The dashed lines show genome-wide significance at p = $5 \times 10^{-8}$.}
+		\label{fig:gwas-results}
+	\end{center}
+\end{figure}
 
 \section*{Discussion}
 % State the importance of your findings
