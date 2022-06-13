@@ -17,6 +17,7 @@ library(treeio)
 library(ggExtra)
 library(tidyr)
 library(xtable)
+library(ggedit)
 
 FIGDIR <- "figures"
 OUTDIR <- "output"
@@ -47,14 +48,19 @@ genome_wide_significance <- 5E-8
 
 Load data
 ```{r}
-accuracy_simulation_results <- read.delim("output_revisions/2022-06-11_estimator_accuracy_MLE.txt")
-tpr_simulation_results <- read.delim("output_revisions/2022-06-11_GWAS_TPR_MLE.txt")
+accuracy_simulation_results <- read.delim("output/2021-08-31_estimator_accuracy_MLE.txt")
+tpr_simulation_results <- read.delim("output/2021-08-31_GWAS_TPR_MLE.txt")
 example_simulation_results <- read.delim("output_revisions/2022-06-11_simulateFullDataset.txt")
 tree <- ape::read.tree(file = paste(OUTDIR, "pathogen_no_outgroup.newick", sep = "/"))
+tree_arboricola <- ape::read.tree(file = paste(OUTDIR_XANTHAMONAS, "pathogen_nj.newick", sep = "/"))
 traits <- read.csv(file = paste(OUTDIR, "poumm_corrected_traits.csv", sep = "/"))
+traits_arboricola <- read.csv(file = paste(OUTDIR_XANTHAMONAS, "poumm_corrected_traits.csv", sep = "/"))
 tree_w_trait_data <- treeio::full_join(tree, traits, by = "label")
+tree_w_trait_data_arboricola <- treeio::full_join(tree_arboricola, traits_arboricola, by = "label")
 POUMM_fit <- get(load(file = paste(OUTDIR, "POUMM_fit.RData", sep = "/")))
+POUMM_fit_arboricola <- get(load(file = paste(OUTDIR_XANTHAMONAS, "POUMM_fit.RData", sep = "/")))
 poumm_parameter_estimates <- read.csv(file = paste(OUTDIR, "poumm_parameter_estimates.csv", sep = "/"))
+poumm_parameter_estimates_arboricola <- read.csv(file = paste(OUTDIR_XANTHAMONAS, "poumm_parameter_estimates.csv", sep = "/"))
 pc_scores <- read.csv(file = paste(OUTDIR, "shcs_vs_hapmap_pc_scores.csv", sep = "/"))
 gwas_results <- read.delim(file = paste(OUTDIR, "gwas_results.pvals.effectsize.txt", sep = "/"), sep = "", header = T)
 gwas_results_xanthomonas <- read.delim(file = paste(OUTDIR_XANTHAMONAS, "gwas_results.pvals.effectsize.txt", sep = "/"), sep = "", header = T)
@@ -165,12 +171,16 @@ dev.off()
 
 Simulation results
 ```{r}
-# Get POUMM values for HIV spVL to annotate plot with
+# Get POUMM values for HIV spVL and X. arboricola QDR to annotate plot with
 H2_estimate <- poumm_parameter_estimates[poumm_parameter_estimates$stat == "H2tMean", "PostMean"]
 alpha_estimate <- poumm_parameter_estimates[poumm_parameter_estimates$stat == "alpha", "PostMean"]
 
+H2_estimate_arboricola <- poumm_parameter_estimates_arboricola [poumm_parameter_estimates_arboricola $stat == "H2tMean", "PostMean"]
+alpha_estimate_arboricola  <- poumm_parameter_estimates_arboricola [poumm_parameter_estimates_arboricola $stat == "alpha", "PostMean"]
+
 # Breaks scale is defined as seq(0.5, n.breaks - 0.5, 1) in plotting function, need to translate real values to breaks scale
 get_xval_for_sim_plots <- function(real_vals, estimate) {
+      if (estimate < min(real_vals)) { return(0.1) }  # an approximation, plot actually only starts at alpha = 0.1
       base_val <- rev(real_vals[real_vals <= estimate])[1]
       next_val <- real_vals[real_vals > estimate][1]
       base_xval <- which(real_vals == base_val)
@@ -188,11 +198,20 @@ spvl_data$inference.method <- factor(
         levels = c("h.plus.e.p.value", "h.MWA.p.value", "norm.z.p.value"),
         labels = c(e_name, ehat_name, z_minus_zbar_name))
 
+qdr_data <- data.frame(
+        inference.method = "h.MWA.p.value",
+        H2 = get_xval_for_sim_plots(real_vals = c(0.15, 0.25, 0.35, 0.45, 0.55, 0.65, 0.75), estimate = H2_estimate_arboricola),
+        alpha = get_xval_for_sim_plots(real_vals = c(0.1, 0.5, 1, 5, 10, 20, 30, 40, 50, 60), estimate = alpha_estimate_arboricola))
+qdr_data$inference.method <- factor(
+        qdr_data$inference.method,
+        levels = c("h.plus.e.p.value", "h.MWA.p.value", "norm.z.p.value"),
+        labels = c(e_name, ehat_name, z_minus_zbar_name))
+
 # Get example simulation POUMM values to annotate plot with
 example_data1 <- data.frame(
         inference.method = "h.MWA.p.value",
         H2 = get_xval_for_sim_plots(real_vals = c(0.15, 0.25, 0.35, 0.45, 0.55, 0.65, 0.75), estimate = 0.15),
-        alpha = get_xval_for_sim_plots(real_vals = c(0.1, 0.5, 1, 5, 10, 20, 30, 40, 50, 60), estimate = 5))
+        alpha = get_xval_for_sim_plots(real_vals = c(0.1, 0.5, 1, 5, 10, 20, 30, 40, 50, 60), estimate = 0.1))
 example_data1$inference.method <- factor(
         example_data1$inference.method,
         levels = c("h.plus.e.p.value", "h.MWA.p.value", "norm.z.p.value"),
@@ -200,7 +219,7 @@ example_data1$inference.method <- factor(
 example_data2 <- data.frame(
         inference.method = "h.MWA.p.value",
         H2 = get_xval_for_sim_plots(real_vals = c(0.15, 0.25, 0.35, 0.45, 0.55, 0.65, 0.75, 0.85), estimate = 0.65),
-        alpha = get_xval_for_sim_plots(real_vals = c(0.1, 0.5, 1, 5, 10, 20, 30, 40, 50, 60), estimate = 5))
+        alpha = get_xval_for_sim_plots(real_vals = c(0.1, 0.5, 1, 5, 10, 20, 30, 40, 50, 60), estimate = 0.1))
 example_data2$inference.method <- factor(
         example_data2$inference.method,
         levels = c("h.plus.e.p.value", "h.MWA.p.value", "norm.z.p.value"),
@@ -247,9 +266,11 @@ rmse_plot <- plotHeatmap(
              y = expression("Heritability (" * italic('H'^2) * ")")) +
         shared_theme +
         theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
-        geom_point(data = spvl_data, fill = "black") + 
-        geom_point(data = example_data1, fill = "black", shape = 1) + 
-        geom_point(data = example_data2, fill = "black", shape = 1)
+        geom_point(data = spvl_data, fill = "black", aes(shape = "spVL")) + 
+        geom_point(data = qdr_data, fill = "black", aes(shape = "QDR")) + 
+        geom_point(data = example_data1, fill = "black", aes(shape = "Example")) + 
+        geom_point(data = example_data2, fill = "black", aes(shape = "Example")) +
+        scale_shape_manual(values = c("QDR" = 16, "spVL" = 4, "Example" = 1), name = element_blank())
 
 data <- tidyr::gather(
         data = tpr_simulation_results,
@@ -303,13 +324,23 @@ tpr_plot <- makeTPRPlot(
              y = expression("Heritability (" * italic('H'^2) * ")")) +
         shared_theme +
         theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
-        geom_point(data = spvl_data, fill = "black") + 
-        geom_point(data = example_data1, fill = "black", shape = 1) + 
-        geom_point(data = example_data2, fill = "black", shape = 1)
+        geom_point(data = spvl_data, fill = "black", aes(shape = "spVL")) + 
+        geom_point(data = qdr_data, fill = "black", aes(shape = "QDR")) + 
+        geom_point(data = example_data1, fill = "black", aes(shape = "Example")) + 
+        geom_point(data = example_data2, fill = "black", aes(shape = "Example")) +
+        scale_shape_manual(values = c("QDR" = 16, "spVL" = 4, "Example" = 1), name = element_blank())
 
-top_row <- plot_grid(NULL, rmse_plot, rel_widths = c(1.03, 3), labels = c("", "A"))
+shape_legend <- get_legend(rmse_plot + guides(fill = "none") + theme(legend.position = "bottom"))
+top_row <- plot_grid(NULL, rmse_plot + guides(shape = "none"), rel_widths = c(1.03, 3), labels = c("", "A"))
 png(filename = "figures/simulation_results.png", width = linewidth, height = height, unit = "cm", res = 300)
-plot_grid(top_row, tpr_plot, align = "v", axis = "tb", nrow = 2, labels = c("", "B"))
+plot_grid(
+        top_row, 
+        tpr_plot + guides(shape = "none"), 
+        shape_legend, 
+        rel_heights = c(1, 1, 0.1),
+        align = "v", axis = "tb", nrow = 3, 
+        labels = c("", "B", "")
+)
 dev.off()
 ```
 
@@ -377,6 +408,8 @@ p <- plots$densplot +
         labs(x = "Value", y = "Density") +
         scale_y_continuous(expand = c(0, 0)) +
         theme(legend.position = "bottom")
+# Remove maximum log-likelihood point
+p <- remove_geom(p, 'point')
 ggsave(plot = p, filename = paste(FIGDIR, "poumm_parameter_estimates.png", sep = "/"),
        width = linewidth, height = height, units = "cm")
 ```
@@ -830,72 +863,7 @@ ggsave(plot = p, filename = paste(FIGDIR, "qq_plots_xanthomonas.png", sep = "/")
 
 Manhattan plot of Arabidopsis-Xanthomonas GWAS results
 ```{r}
-pt_size <- 1
-
-# Add genome position to data
-chr_lengths <- gwas_results_xanthomonas %>%
-        group_by(CHROM) %>%
-        summarise(chr_len = max(POS))
-chr_starts <- chr_lengths %>%
-        mutate(CHR_start = cumsum(as.numeric(chr_len)) - chr_len) %>%
-        select(-chr_len)
-gwas_results_annotated <- left_join(gwas_results_xanthomonas, chr_starts, by = "CHROM")
-gwas_results_annotated <- gwas_results_annotated %>%
-        arrange(CHROM, POS) %>%
-        mutate(BP_position = CHR_start + POS)
-
-# This is maybe not the best way, but makes sure tick marks and labels are at the center of each chromosome
-x_axis_ticks <- chr_starts
-max_BP_position <- max(gwas_results_annotated[gwas_results_annotated$CHROM == 5, "BP_position"])
-x_axis_ticks <- rbind(
-        x_axis_ticks,
-        data.frame(
-                CHROM = c(5, 6),
-                CHR_start = c(max_BP_position, max_BP_position + 1000)))
-x_axis_ticks$midpoint <- x_axis_ticks$CHR_start + (lead(x_axis_ticks$CHR_start) - x_axis_ticks$CHR_start)/2
-
-# Format data for plotting
-results_long <- tidyr::pivot_longer(
-        data = gwas_results_annotated,
-        cols = c("P_standard", "P_corrected"),
-        names_to = "gwas_type",
-        names_prefix = "P_",
-        values_to = "P")
-
-# Fix facet labels for plotting
-results_long$gwas_type <- factor(
-        results_long$gwas_type,
-        levels = c("standard", "corrected"),
-        labels = c(standard_gwas_name, corrected_gwas_name))
-
-# Make comparative GWAS overview plot
-bonferroni_signifiance_threshold <- 0.05 / nrow(gwas_results_annotated)
-overview_comparison <- ggplot(
-        data = results_long %>% sample_frac(0.1),  # TODO: plot all of results, not sub-sample of them
-        aes(x = BP_position, y = -log10(P))) +
-        geom_point(aes(color = CHROM %% 2 == 0), size = pt_size) +
-        scale_color_manual(values = c("grey", "dark grey")) +
-        scale_x_continuous(
-                breaks = x_axis_ticks$midpoint,
-                labels = x_axis_ticks$CHROM,
-                expand = c(0.01, 0.01)) +
-        scale_y_continuous(limits = c(0, 16), expand = c(0, 0)) +
-        labs(x = "Chromosome", y = expression('-Log'[10]*'(p)')) +
-        geom_hline(
-                yintercept = -log10(bonferroni_signifiance_threshold),
-                linetype = "dashed") +
-        shared_theme +
-        theme(
-                panel.grid.major.x = element_blank(),
-                panel.grid.minor.x = element_blank(),
-                legend.position = "none"
-        ) +
-        facet_grid(. ~ gwas_type)
-ggsave(
-        plot = overview_comparison,
-        filename = paste(FIGDIR, "gwas_results_xanthomonas.png", sep = "/"),
-        width = linewidth, height = height / 2, unit = "cm"
-)
+# See script: scripts/R/plot_manhattan_euler.R (plotting ran out of memory on my laptop)
 ```
 
 Get the most highly-associated and most changed SNPs from the Xanthomonas GWAS results
@@ -925,4 +893,90 @@ most_changed_positive <- gwas_results_annotated %>%
 
 write.csv(x = most_changed_positive,
           file = paste(OUTDIR, "most_increased_association_xanthomonas.csv", sep = "/"), row.names = F)
+```
+Inferred phylogeny Xanthomonas
+```{r}
+legend_width <- 15
+
+# Plot tree with tip colors by spVL components
+legend_x_pos <- 0.99
+legend_y_pos <- 0.45
+
+x_max <- 20000
+v_tree <- ggtree(tree_w_trait_data_arboricola, ladderize = F) +
+        geom_tippoint(aes(color = v.MWA)) +
+        geom_tiplab(aes(label = id), size = 3, hjust = -0.1) + 
+        xlim(c(0, x_max)) +
+        scale_color_viridis_c(
+                option = "plasma",
+                direction = -1,
+                limits = c(0, max(traits_arboricola$trait))) +
+        theme(legend.position = "bottom") +
+        guides(color = guide_colorbar(title.position="top", title.hjust = 0.5)) +
+        labs(color = yulab.utils::str_wrap(gvhat_name, width = legend_width))
+
+h_tree <- ggtree(tree_w_trait_data_arboricola, ladderize = F) +
+        geom_tippoint(aes(color = h.MWA)) +
+        geom_tiplab(aes(label = id), size = 3, hjust = -0.1) + 
+        xlim(c(0, x_max)) +
+        scale_color_viridis_c() +
+        theme(legend.position = "bottom") +
+        guides(color = guide_colorbar(title.position="top", title.hjust = 0.5)) +
+        labs(color = yulab.utils::str_wrap(ehat_name, width = legend_width))
+
+qdr_tree_same_scale <- ggtree(tree_w_trait_data_arboricola, ladderize = F) +
+        geom_tippoint(aes(color = trait)) +
+        geom_tiplab(aes(label = id), size = 3, hjust = -0.1) + 
+        xlim(c(0, x_max)) +
+        scale_color_viridis_c(
+                option = "plasma",
+                direction = -1,
+                limits =  c(0, max(traits_arboricola$trait))) +
+        theme(legend.position = "bottom") +
+        guides(color = guide_colorbar(title.position="top", title.hjust = 0.5)) +
+        labs(color = yulab.utils::str_wrap("Calculated QDR", width = legend_width)) +
+        scale_fill_identity(name = '', guide = 'legend', labels = c('oob'))
+
+png(file = paste(FIGDIR, "qdr_on_tree_arboricola.png", sep = "/"),
+    height = height, width = linewidth,
+    units = "cm",
+    res = 300)
+plot_grid(qdr_tree_same_scale + theme(legend.position = "none"),
+          h_tree + theme(legend.position = "none"),
+          v_tree + theme(legend.position = "none"),
+          get_legend(qdr_tree_same_scale), get_legend(h_tree), get_legend(v_tree),
+          nrow = 2, align = "v", axis = "tb",
+          rel_heights = c(3, 1),
+          labels = c("A", "B", "C", "", "", ""))
+dev.off()
+```
+
+POUMM parameter estimates Xanthomonas
+```{r}
+# Generate figures, write out estimates
+plots <- plot(POUMM_fit_arboricola, doZoomIn = TRUE, doPlot = F)
+p <- plots$densplot +
+        scale_fill_manual(
+                values = RColorBrewer::brewer.pal(n = 3, name = diverging_palette),
+                aesthetics = c("fill", "color"),
+                labels = c("Prior", "Chain 1", "Chain 2"),
+                name = element_blank()) +
+        theme_bw() +
+        labs(x = "Value", y = "Density") +
+        scale_y_continuous(expand = c(0, 0)) +
+        theme(legend.position = "bottom")
+p <- remove_geom(p, 'point')
+ggsave(plot = p, filename = paste(FIGDIR, "poumm_parameter_estimates_arboricola.png", sep = "/"),
+       width = linewidth, height = height, units = "cm")
+```
+
+Estimated trait values Xanthomonas
+```{r}
+p1 <- ggplot(data = traits_arboricola, aes(x = trait, y = h.MWA)) +
+      geom_point() +
+      shared_theme +
+      labs(x = "Calculated QDR trait", y = ehat_name)
+p2 <- ggExtra::ggMarginal(p1, type="histogram")
+ggsave(plot = p2, filename = paste(FIGDIR, "trait_values_arboricola.png", sep = "/"),
+      width = linewidth * 2/3, height = height * 2/3, units = "cm")
 ```
