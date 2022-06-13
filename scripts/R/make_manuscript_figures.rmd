@@ -521,12 +521,16 @@ tip_pair_data_corelations <- tmp2 %>%
         group_by(H2, alpha, runID, dist_decile_rank) %>%
         summarize(correlation = cor(z_1, z_2))
 
-ggplot(data = tip_pair_data_corelations, aes(x = factor(dist_decile_rank), y = correlation)) +
+tip_pair_data_to_plot <- tip_pair_data_corelations %>%
+        rename("Selection strength" = alpha) %>%
+        mutate(Heritability = factor(H2, levels = c(0.75, 0.15)))
+
+ggplot(data = tip_pair_data_to_plot, aes(x = factor(dist_decile_rank), y = correlation)) +
         geom_boxplot() + 
-        facet_grid(alpha ~ H2, labeller = plot_labeller) + 
+        facet_grid(Heritability ~ `Selection strength`, labeller = label_both) + 
         labs(x = "Tree distance decile", y = "Pearson correlation in trait value") + 
         shared_theme
-ggsave(filename = "figures/tip_trait_correlation.png", width = linewidth, height = height, unit = "cm")
+ggsave(filename = "figures/tip_trait_correlation.png", width = linewidth, height = height * 2/3, unit = "cm")
 
 pruned_tree <- ape::keep.tip(phy = simulation_tree, tip = sample(simulation_tree$tip.label, size = 12))  # keep some random tips
 # pruned_tree <- ape::extract.clade(phy = simulation_tree, 516)  # keep some small clade
