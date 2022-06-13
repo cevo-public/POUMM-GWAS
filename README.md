@@ -143,7 +143,7 @@ docker build -t run-gwas -f Dockerfile-run-gwas .
 docker run --volume=`pwd`/output:/output run-gwas
 ```
 
-### Run comparative GWAS (ATOMM)
+<!-- ### Run comparative GWAS (ATOMM)
 * Format host genotype data into haplotype genotype matrices.
 ```
 docker build -t plink -f Dockerfile-plink .
@@ -156,7 +156,10 @@ docker run -it --rm --mount type=bind,src=$PWD/scripts,dst=/scripts --mount type
 Rscript get_atomm_pathogen_genotypes.R
 ```
 * Format phenotype data into required tabular format
-* Run program as in demo.m, testing only marginal effects on the host side
+* Run program as in demo.m, testing only marginal effects on the host side 
+
+I didn't continue this analysis since I got access to the data used in the ATOMM study to run our method on.
+Anyways I was having trouble getting the awk-based replacement to work to transform the host genotypes. -->
 
 ## Apply method to GWAS for A. thaliana genetic determinants of QDR against X. arboricola
 
@@ -174,14 +177,75 @@ Rscript get_atomm_pathogen_genotypes.R
 
 ### Fit the POUMM, apply phylogenetic correction to QDR trait
 
-* `scripts/R/fit_poumm_xanthamonas.R`
-* `scripts/R/correct_trait_xanthamonas.R`
-
-### Prepare host genotype data
+* `scripts/R/fit_poumm_xanthamonas.R` fits the POUMM to the tree and the mean QDR score across all hosts & leaves
+* `scripts/R/correct_trait_xanthamonas.R` uses the maximum posterior POUMM parameters to estiamtes the pathogen part of the mean QDR score for each pathogen strain, then randomly selects one pathogen/host pairing per host type and subtracts the pathogen part for the respective pathogen from the mean QDR score for that host
 
 On Euler cluster:
 ```
-cd $SCRATCH
+cd $SCRATCH/arabidopsis_gwas
 wget https://1001genomes.org/data/GMI-MPI/releases/v3.1/1001genomes_snp-short-indel_only_ACGTN.vcf.gz
+
+# Transfer phenotype file and list of samples to filter host VCF to Euler (gwas_host_ids.txt and gwas_phenotypes.txt)
+
+# Filter host VCF file to only samples with phenotypes
+env2lmod
+module load bcftools/1.12 htslib/1.12
+bsub "tabix -p vcf 1001genomes_snp-short-indel_only_ACGTN.vcf.gz"
+bsub "bcftools view --samples-file gwas_host_ids.txt 1001genomes_snp-short-indel_only_ACGTN.vcf.gz > host_genotypes.vcf"
+
+# Get host genotypes in PLINK bed format
+bsub -N "$HOME/programs/plink2 --vcf host_genotypes.vcf --max-alleles 2 --make-bed --out arabidopsis"
+
+# Filter data to clean dataset
+bsub -N "$HOME/programs/plink2 \
+--bfile arabidopsis \
+--maf 0.1 \
+--make-bed \
+--out arabidopsis.filtered"
+
+# Get top 5 PCs for covariates based on all SNPs
+bsub -N "$HOME/programs/plink2 \
+--bfile arabidopsis.filtered \
+--pca \
+--out arabidopsis.filtered"
+
+awk '{print $1,$2,$3,$4,$5,$6,$7}' arabidopsis.filtered.eigenvec >  arabidopsis.filtered.pc5.txt
+
+# Run GWAS
+bsub -N "$HOME/programs/plink2 \
+--bfile arabidopsis \
+--pheno gwas_phenotypes.txt \
+--glm \
+--covar arabidopsis.filtered.pc5.txt \
+--out arabidopsis.filtered"
+
+# Paste results from both trait values together
+paste "arabidopsis.filtered.trait.glm.linear" "arabidopsis.filtered.h.MWA.glm.linear" | awk '{print $1, $2, $3, $9, $12, $21, $24}' > gwas_results.txt
+HEADER="CHROM POS ID BETA_standard P_standard BETA_corrected P_corrected"
+sed -i.bak "1 s/^.*$/$HEADER/" gwas_results.txt
+
+# Add p-value column to results
+awk '
+function abs(v) { return v < 0 ? -v : v }
+BEGIN { OFS = " " }
+NR == 1 {
+$8 = "neg_log10_P_standard";
+$9 = "neg_log10_P_corrected";
+$10 = "neg_log10_P_standard_minus_corrected";
+$11 = "abs_neg_log10_P_standard_minus_corrected" }
+NR >= 2 {
+$8 = -log($5)/log(10);
+$9 = -log($7)/log(10);
+$10 = $8 - $9
+$11 = abs($10)} 1' < gwas_results.txt > gwas_results.pvals.txt
+
+# Add beta (effect size) column to results
+awk '
+function abs(v) { return v < 0 ? -v : v }
+BEGIN { OFS = " " }
+NR == 1 {
+$12 = "abs_BETA_standard_minus_corrected" }
+NR >= 2 {
+$12 = abs($4 - $6) } 1' < gwas_results.pvals.txt > gwas_results.pvals.effectsize.txt
 
 ```
