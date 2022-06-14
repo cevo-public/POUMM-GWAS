@@ -255,7 +255,7 @@ simulateGWASPValuesWithPLINK <- function(tree, N, g0, alpha, theta, M, K, d, p =
   return(p.values)
 }
 
-simulateGWASPValues <- function(tree, N, g0, alpha, theta, M, K, d, p = NA, delta = NA, H2, H2.h, var.z, is.MLE = T) {
+simulateGWASPValues <- function(tree, N, g0, alpha, theta, M, K, d = 2, p = NA, delta = NA, H2, H2.h =0.25, var.z, is.MLE = T) {
   print(paste0("Simulating for GWAS + POUMM TPR with these parameters: alpha=", alpha, ", H2=", H2, ", H2.h=", H2.h, ", var.z=", var.z))
   # Simulate data
   epidemic <- simulateEpidemic(
@@ -266,11 +266,11 @@ simulateGWASPValues <- function(tree, N, g0, alpha, theta, M, K, d, p = NA, delt
     theta = theta,
     M = M,
     K = K, 
-    d = 2, 
+    d = d, 
     p = p,
     delta = delta,
     H2 = H2,
-    H2.h = 0.25,
+    H2.h = H2.h,
     var.z = var.z,
     is.MLE = T)
 
@@ -286,7 +286,7 @@ simulateGWASPValues <- function(tree, N, g0, alpha, theta, M, K, d, p = NA, delt
   return(p.values)
 }
 
-simulatePGLSPValues <- function(tree, N, g0, alpha, theta, M, K, d, p = NA, delta = NA, H2, H2.h, var.z, is.MLE = T, is.estimatePOUMMparams = T) {
+simulatePGLSPValues <- function(tree, N, g0, alpha, theta, M, K, d = 2, p = NA, delta = NA, H2, H2.h = 0.25, var.z, is.MLE = T, is.estimatePOUMMparams = T) {
   print(paste0("Simulating for GWAS + PGLS TPR with these parameters: alpha=", alpha, ", H2=", H2, ", H2.h=", H2.h, ", var.z=", var.z))
   # Simulate data
   epidemic <- simulateEpidemic(
@@ -297,11 +297,11 @@ simulatePGLSPValues <- function(tree, N, g0, alpha, theta, M, K, d, p = NA, delt
     theta = theta,
     M = M,
     K = K, 
-    d = 2, 
+    d = d, 
     p = p,
     delta = delta,
     H2 = H2,
-    H2.h = 0.25,
+    H2.h = H2.h,
     var.z = var.z,
     is.MLE = T)
   
