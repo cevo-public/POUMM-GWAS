@@ -49,7 +49,8 @@ genome_wide_significance <- 5E-8
 Load data
 ```{r}
 accuracy_simulation_results <- read.delim("output/2021-08-31_estimator_accuracy_MLE.txt")
-tpr_simulation_results <- read.delim("output/2021-08-31_GWAS_TPR_MLE.txt")
+tpr_simulation_results_old <- read.delim("output/2021-08-31_GWAS_TPR_MLE.txt")
+tpr_simulation_results <- read.delim("output_revisions/2022-06-13_GWAS_TPR_MLE.txt")
 example_simulation_results <- read.delim("output_revisions/2022-06-11_simulateFullDataset.txt")
 tree <- ape::read.tree(file = paste(OUTDIR, "pathogen_no_outgroup.newick", sep = "/"))
 tree_arboricola <- ape::read.tree(file = paste(OUTDIR_XANTHAMONAS, "pathogen_nj.newick", sep = "/"))
@@ -63,7 +64,6 @@ poumm_parameter_estimates <- read.csv(file = paste(OUTDIR, "poumm_parameter_esti
 poumm_parameter_estimates_arboricola <- read.csv(file = paste(OUTDIR_XANTHAMONAS, "poumm_parameter_estimates.csv", sep = "/"))
 pc_scores <- read.csv(file = paste(OUTDIR, "shcs_vs_hapmap_pc_scores.csv", sep = "/"))
 gwas_results <- read.delim(file = paste(OUTDIR, "gwas_results.pvals.effectsize.txt", sep = "/"), sep = "", header = T)
-gwas_results_xanthomonas <- read.delim(file = paste(OUTDIR_XANTHAMONAS, "gwas_results.pvals.effectsize.txt", sep = "/"), sep = "", header = T)
 spvl_values <- read.csv(file = paste(OUTDIR, "spvl_values.csv", sep = "/"))
 ```
 
@@ -300,7 +300,7 @@ data <- tidyr::gather(
 sig.level <- correctSignificanceLevelForMultTesting(
         significance.level = 0.05,
         significance.correction = "Bonferroni",
-        N.tests = 20)
+        N.tests = 100)
 data$TP <- ifelse(data$p.value < sig.level & data$is.causal.variant, T, F)
 data$FP <- ifelse(data$p.value < sig.level & !(data$is.causal.variant), T, F)
 data.TPR <- as.data.frame(
@@ -349,6 +349,10 @@ tpr_plot <- makeTPRPlot(
         geom_point(data = example_data3, fill = "black", aes(shape = "Example")) + 
         geom_point(data = example_data4, fill = "black", aes(shape = "Example")) +
         scale_shape_manual(values = c("QDR" = 16, "spVL" = 4, "Example" = 1), name = element_blank())
+
+fp_summary <- data %>%
+        group_by(inference.method) %>%
+        summarise(FPR = sum(FP, na.rm = T) / sum(!is.na(FP)), n_non_na = sum(!is.na(FP)))
 
 shape_legend <- get_legend(rmse_plot + guides(fill = "none") + theme(legend.position = "bottom"))
 top_row <- plot_grid(NULL, rmse_plot + guides(shape = "none"), rel_widths = c(1.03, 3), labels = c("", "A"))
@@ -1025,4 +1029,23 @@ max(corr_HIV[upper.tri(corr_HIV)])
 min(corr_HIV[upper.tri(corr_HIV)])
 max(corr_arboricola[upper.tri(corr_arboricola)])
 min(corr_arboricola[upper.tri(corr_arboricola)])
+```
+Look for false positives in the simulated data
+```{r}
+sig.level <- correctSignificanceLevelForMultTesting(
+        significance.level = 0.05,
+        significance.correction = "Bonferroni",
+        N.tests = 100)
+
+example_simulation_results <- example_simulation_results %>%
+        mutate(
+                FP <- ifelse(p.value < sig.level & !(is.causal.variant), T, F)
+        )
+```
+Compare other ML phylogenies for HIV data
+```{r}
+trees <- ape::read.tree("output_revisions/pathogen.treels.head500")
+
+# Calculate tree distances
+tree_dists <- dist.topo(trees, method = "PH85")
 ```
