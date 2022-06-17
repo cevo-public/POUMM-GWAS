@@ -121,6 +121,8 @@ docker run \
 * ```fit_poumm.R``` fits the POUMM to the phylogeny and calculated spVL values, generating maximum-likelihood parameter estimates.
 * ```correct_trait.R``` generates estimates for individual-specific viral, environmental parts of trait using POUMM parameters and trait values.
 
+Note: results in `output_revisions` are from fitting the POUMM and correcting trait values based on a different approximate ML tree output by IQ-TREE using the `-wt` parameter.
+
 ### Prepare human genotype data
 * `scripts/R/filter_gwas_individuals.R` generates a list of SHCS individuals of European descent carrying subtype B HIV.
 * Filter the host genotype files based on individuals to keep, variant thresholds.
