@@ -145,24 +145,6 @@ docker build -t run-gwas -f Dockerfile-run-gwas .
 docker run --volume=`pwd`/output:/output run-gwas
 ```
 
-<!-- ### Run comparative GWAS (ATOMM)
-* Format host genotype data into haplotype genotype matrices.
-```
-docker build -t plink -f Dockerfile-plink .
-# Run image interactively:
-docker run -it --rm --mount type=bind,src=$PWD/scripts,dst=/scripts --mount type=bind,src=$PWD/output,dst=/output plink
-# Run the commands in scripts/bash/get_atomm_host_genotypes.sh
-```
-* Format pathogen genotype data into haplotype genotype matrices.
-```
-Rscript get_atomm_pathogen_genotypes.R
-```
-* Format phenotype data into required tabular format
-* Run program as in demo.m, testing only marginal effects on the host side 
-
-I didn't continue this analysis since I got access to the data used in the ATOMM study to run our method on.
-Anyways I was having trouble getting the awk-based replacement to work to transform the host genotypes. -->
-
 ## Apply method to GWAS for A. thaliana genetic determinants of QDR against X. arboricola
 
 ### Data
@@ -202,29 +184,37 @@ bsub -N "$HOME/programs/plink2 --vcf host_genotypes.vcf --max-alleles 2 --make-b
 bsub -N "$HOME/programs/plink2 \
 --bfile arabidopsis \
 --maf 0.1 \
+--max-maf 0.9 \
 --make-bed \
---out arabidopsis.filtered"
+--out arabidopsis.filtered.maxmaf"
 
 # Get top 5 PCs for covariates based on all SNPs
 bsub -N "$HOME/programs/plink2 \
---bfile arabidopsis.filtered \
+--bfile arabidopsis.filtered.maxmaf \
 --pca \
---out arabidopsis.filtered"
+--out arabidopsis.filtered.maxmaf"
 
-awk '{print $1,$2,$3,$4,$5,$6,$7}' arabidopsis.filtered.eigenvec >  arabidopsis.filtered.pc5.txt
+awk '{print $1,$2,$3,$4,$5,$6,$7}' arabidopsis.filtered.maxmaf.eigenvec >  arabidopsis.filtered.maxmaf.pc5.txt
 
 # Run GWAS
 bsub -N "$HOME/programs/plink2 \
---bfile arabidopsis \
+--bfile arabidopsis.filtered.maxmaf \
 --pheno gwas_phenotypes.txt \
 --glm \
---covar arabidopsis.filtered.pc5.txt \
---out arabidopsis.filtered"
+--covar arabidopsis.filtered.maxmaf.pc5.txt \
+--out arabidopsis.filtered.maxmaf"
+
+# Extract SNP-only results, without covariates
+head -1 arabidopsis.filtered.maxmaf.trait.glm.linear >arabidopsis.filtered.maxmaf.trait.glm.linear.nocovariates
+grep -h 'ADD' arabidopsis.filtered.maxmaf.trait.glm.linear >> arabidopsis.filtered.maxmaf.trait.glm.linear.nocovariates
+
+head -1 arabidopsis.filtered.maxmaf.h.MWA.glm.linear > arabidopsis.filtered.maxmaf.h.MWA.glm.linear.nocovariates
+grep -h 'ADD' arabidopsis.filtered.maxmaf.h.MWA.glm.linear >> arabidopsis.filtered.maxmaf.h.MWA.glm.linear.nocovariates
 
 # Paste results from both trait values together
-paste "arabidopsis.filtered.trait.glm.linear" "arabidopsis.filtered.h.MWA.glm.linear" | awk '{print $1, $2, $3, $9, $12, $21, $24}' > gwas_results.txt
+paste "arabidopsis.filtered.maxmaf.trait.glm.linear.nocovariates" "arabidopsis.filtered.maxmaf.h.MWA.glm.linear.nocovariates" | awk '{print $1, $2, $3, $9, $12, $21, $24}' > gwas_results.maxmaf.txt
 HEADER="CHROM POS ID BETA_standard P_standard BETA_corrected P_corrected"
-sed -i.bak "1 s/^.*$/$HEADER/" gwas_results.txt
+sed -i.bak "1 s/^.*$/$HEADER/" gwas_results.maxmaf.txt
 
 # Add p-value column to results
 awk '
@@ -239,15 +229,5 @@ NR >= 2 {
 $8 = -log($5)/log(10);
 $9 = -log($7)/log(10);
 $10 = $8 - $9
-$11 = abs($10)} 1' < gwas_results.txt > gwas_results.pvals.txt
-
-# Add beta (effect size) column to results
-awk '
-function abs(v) { return v < 0 ? -v : v }
-BEGIN { OFS = " " }
-NR == 1 {
-$12 = "abs_BETA_standard_minus_corrected" }
-NR >= 2 {
-$12 = abs($4 - $6) } 1' < gwas_results.pvals.txt > gwas_results.pvals.effectsize.txt
-
+$11 = abs($10)} 1' < gwas_results.maxmaf.txt > gwas_results.maxmaf.pvals.txt
 ```
