@@ -22,7 +22,7 @@ height <- 11  # cm
 # Load data
 print("Loading data")
 gwas_results_xanthomonas <- read.delim(
-    file = paste(OUTDIR, "gwas_results.pvals.effectsize.txt", sep = "/"), 
+    file = paste("gwas_results.maxmaf.pvals.txt", sep = "/"), 
     sep = "", 
     header = T
 )
@@ -47,8 +47,8 @@ max_BP_position <- max(gwas_results_annotated[gwas_results_annotated$CHROM == 5,
 x_axis_ticks <- rbind(
         x_axis_ticks,
         data.frame(
-                CHROM = c(5, 6),
-                CHR_start = c(max_BP_position, max_BP_position + 1000)))
+                CHROM = c(6),
+                CHR_start = c(max_BP_position)))
 x_axis_ticks$midpoint <- x_axis_ticks$CHR_start + (lead(x_axis_ticks$CHR_start) - x_axis_ticks$CHR_start)/2
 
 # Format data for plotting
@@ -69,7 +69,7 @@ results_long$gwas_type <- factor(
 print("Making plot")
 bonferroni_signifiance_threshold <- 0.05 / nrow(gwas_results_annotated)
 overview_comparison <- ggplot(
-        data = results_long %>% sample_frac(0.1),  # TODO: plot all of results, not sub-sample of them
+        data = results_long,
         aes(x = BP_position, y = -log10(P))) +
         geom_point(aes(color = CHROM %% 2 == 0), size = pt_size) +
         scale_color_manual(values = c("grey", "dark grey")) +
@@ -93,6 +93,30 @@ overview_comparison <- ggplot(
 print("Saving plot")
 ggsave(
         plot = overview_comparison,
-        filename = paste(OUTDIR, "gwas_results_xanthomonas.png", sep = "/"),
+        filename = paste("gwas_results_xanthomonas.png", sep = "/"),
         width = linewidth, height = height / 2, unit = "cm"
 )
+
+# Make qq-plot
+# Fiter to variants with p-value calculated
+gwas_results_xanthomonas_filtered <- gwas_results_xanthomonas %>% filter(!is.na(P_standard))
+
+qq_data_standard <- data.frame(
+        observed_log10p = -log10(sort(gwas_results_xanthomonas_filtered$P_standard, decreasing = F)),
+        expected_log10p = -log10(ppoints(nrow(gwas_results_xanthomonas_filtered))),
+        gwas_type = standard_gwas_name)
+qq_data_phylo <- data.frame(
+        observed_log10p = -log10(sort(gwas_results_xanthomonas_filtered$P_corrected, decreasing = F)),
+        expected_log10p = -log10(ppoints(nrow(gwas_results_xanthomonas_filtered))),
+        gwas_type = corrected_gwas_name)
+qq_results <- rbind(qq_data_standard, qq_data_phylo)
+
+p <- ggplot(data = qq_results, aes(x = expected_log10p, y = observed_log10p)) +
+        geom_point() +
+        geom_abline(slope = 1, intercept = 0, linetype = "dashed",
+                    color = "blue") +
+        facet_wrap(. ~ gwas_type) +
+        labs(x = expression("expected log"[10]*"(p)"), y = expression("observed log"[10]*"(p)")) +
+        shared_theme
+ggsave(plot = p, filename = paste("qq_plots.png", sep = "/"),
+       width = linewidth, height = height * 2/3, units = "cm")
