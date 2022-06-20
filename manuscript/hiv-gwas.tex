@@ -318,14 +318,22 @@ Next, we characterized the evolutionary scenarios under which our framework can 
 
 \subsection*{Application to HIV-1 set-point viral load}
 
-We applied our framework to empirical data from two different host-pathogen systems. First, we used data collected by the Swiss HIV Cohort Study (SHCS) from 1,392 individuals in Switzerland infected with HIV-1 subtype B between 1994 and 2018. The SHCS provided viral load measurements, $pol$ gene sequences, and human genotype data for these individuals. We followed the method outlined above to estimate the pathogen and non-pathogen effects on spVL for the cohort from these data. Figure \ref{fig:spvl-calc-comparison} shows the calculated (total) spVL values, which vary between approximately 1 and 6 log copies/mL in the cohort.  We estimated spVL heritability in this cohort to be 45\% (95\% highest posterior density, HPD, 24 - 67\%) and selection strength to be 58 time$^{-1}$ (95\% HPD 19 - 95) (Figure \ref{fig:poumm-parameters}, Table \ref{tab:POUMM-parameters-our-estimates}). To put these values into the context of our simulation study, they are shown as points on Figure \ref{fig:simulationResults}. The highest expected correlation in trait values between any two tips in the HIV-1 phylogeny under the POUMM was 0.45. However, Figure \ref{fig:spvl-on-tree} shows that this trait is not obviously phylogenetically structured in the cohort in general, despite high heritability. Finally, figure \ref{fig:trait-comparison} shows that the estimated non-pathogen effects on spVL correlate quite strongly with total spVL. 
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width = \linewidth]{figures/application_experimental_setups.pdf}
+	\caption{A high-level schematic of the experimental setup for the two application datasets. For application (A) to HIV-1 spVL in the Swiss HIV Cohort Study, data are paired viral and human genotypes and associated spVL measurements. We fit the POUMM to the viral phylogeny and spVL values associated with each infected individual ($z_1$, $z_2$, ..., $z_{1493}$). For application (B) to \emph{A. thaliana}-\emph{X. Arboricola} QDR from \cite{Wang2018Two-wayGenomes}, data are bacterial and plant genotypes with QDR measurements for all possible combinations of pathogen and host plant strains. We fit the POUMM to the bacterial phylogeny and mean QDR calculated for each pathogen strain across all the hosts plant types ($\bar{z}_1$, $\bar{z}_2$, ..., $\bar{z}_{22}$).}
+	\label{fig:application-exp-setup}
+	\end{center}
+\end{figure}
+
+We applied our framework to empirical data from two different host-pathogen systems with different experimental setups (Figure \ref{fig:application-exp-setup}). First, we used data collected by the Swiss HIV Cohort Study (SHCS) from 1,392 individuals in Switzerland infected with HIV-1 subtype B between 1994 and 2018. The SHCS provided viral load measurements, $pol$ gene sequences, and human genotype data for these individuals. We followed the method outlined above to estimate the pathogen and non-pathogen effects on spVL for the cohort from these data. Figure \ref{fig:spvl-calc-comparison} shows the calculated (total) spVL values, which vary between approximately 1 and 6 log copies/mL in the cohort.  We estimated spVL heritability in this cohort to be 45\% (95\% highest posterior density, HPD, 24 - 67\%) and selection strength to be 58 time$^{-1}$ (95\% HPD 19 - 95) (Figure \ref{fig:poumm-parameters}, Table \ref{tab:POUMM-parameters-our-estimates}). To put these values into the context of our simulation study, they are shown as points on Figure \ref{fig:simulationResults}. The highest expected correlation in trait values between any two tips in the HIV-1 phylogeny under the POUMM was 0.45. However, Figure \ref{fig:spvl-on-tree} shows that this trait is not obviously phylogenetically structured in the cohort in general, despite high heritability. Finally, figure \ref{fig:trait-comparison} shows that the estimated non-pathogen effects on spVL correlate quite strongly with total spVL. 
 
 We compared our proposed GWAS framework with a more standard approach by performing two different GWAS on the same SHCS human genotypes. In the (i) ``GWAS with standard trait value'' we used the total trait value, our calculated spVL values, as the GWAS response variable. In the (ii) ``GWAS with estimated non-pathogen part of trait'' we used our estimates for the non-pathogen effects on spVL. Figure \ref{fig:gwas-results}A shows that results are qualitatively similar between the two GWAS. Q-Q plots show the distribution of p-values are very similar as well (Figure \ref{fig:qq-plots}). Figure \ref{fig:gwas-results}B shows how the strength of association changed for some variants in the MHC and \emph{CCR5} regions. Taking into account phylogenetic information slightly decreased association strength for most variants in the \emph{CCR5} region. Association strength increased for some variants in the MHC, for example, SNP rs9265880 had the greatest increase in significance in the MHC region, from a p-value of $3.5 \times 10^{-07}$ to $7.7 \times 10^{-09}$. However, the top-associated variants in the MHC and \emph{CCR5} regions were consistent regardless of the GWAS response variable used (Table \ref{tab:gwas-top-associations}). Finally Table \ref{tab:comp-gwas-mclaren-snps} shows how our GWAS results compare for the two top-associated SNPs identified by \citet{McLaren2015}, who performed the largest standard GWAS for HIV spVL to date. In summary, there are no clear patterns that point to new regions of association in the human genome with spVL when we take into account the pathogen phylogeny.
 
 \begin{figure}[H]
 	\begin{center}
 		\includegraphics[width=\linewidth]{figures/gwas_results}
-		\caption{Results from comparative GWAS. (A) shows association p-values for the same host variants from the SHCS cohort in GWAS with two different response variables. On the left, we used unmodified (total) spVL values. On the right, we used our estimates for the non-pathogen effects on spVL. The alternating shades correspond to different chromosomes. (B) compares the strength of association for variants in the \emph{CCR5} and MHC regions between the two GWAS (positions 45.4 - 47Mb on chromosome 3 and 29.5 - 33.5Mb on chromosome 6 for the \emph{CCR5} and MHC, respectively). Base positions are with reference to genome build GRCh37. The color of each point represents the difference in -log$_{10}$ p-value between the two GWAS. Red means taking into account phylogenetic information decreased the strength of association and blue means it increased it. The dashed lines show genome-wide significance at p = $5 \times 10^{-8}$.}
+		\caption{Results from comparative GWAS on HIV-1 spVL data. (A) shows association p-values for the same host variants from the SHCS cohort in GWAS with two different response variables. On the left, we used unmodified (total) spVL values. On the right, we used our estimates for the non-pathogen effects on spVL. The alternating shades correspond to different chromosomes. (B) compares the strength of association for variants in the \emph{CCR5} and MHC regions between the two GWAS (positions 45.4 - 47Mb on chromosome 3 and 29.5 - 33.5Mb on chromosome 6 for the \emph{CCR5} and MHC, respectively). Base positions are with reference to genome build GRCh37. The color of each point represents the difference in -log$_{10}$ p-value between the two GWAS. Red means taking into account phylogenetic information decreased the strength of association and blue means it increased it. The dashed lines show genome-wide significance at p = $5 \times 10^{-8}$.}
 		\label{fig:gwas-results}
 	\end{center}
 \end{figure}
@@ -348,9 +356,9 @@ We compared our proposed GWAS framework with a more standard approach by perform
 
 \subsection*{Application to the \emph{A. thaliana}-\emph{X. arboricola} pathosystem}
 
-Next, we applied our method to data collected from the \emph{A. thaliana}-\emph{X. arboricola} pathosystem by \cite{Wang2018Two-wayGenomes}. \cite{Wang2018Two-wayGenomes} performed a fully-crossed experiment in which they infected genetically diverse \emph{A. thaliana} accessions with genetically diverse strains of the phytopathogenic bacteria \emph{X. arboricola}. They scored quantitative disease resistance (QDR) on a scale of 0 (resistant) to 4 (susceptible) for up to four infected leaves for three replicates of each \emph{A. thaliana}-\emph{X. arboricola} pairing. Figure \ref{fig:qdr-on-tree} shows the inferred \emph{X. arboricola} pathogen phylogeny. Mean QDR calculated across all \emph{A. thaliana} pairings and all replicates for each \emph{X. arboricola} strain was generally low, varying between 0.11 for strain NL\_P126 and 0.78 for strain FOR\_F21. Fitting the POUMM yielded very low selection strength $\alpha$ and intensity of stochastic fluctuations  $\sigma$ parameter estimates (posterior mean 0.03 with 95\% HPD 0.0 - 0.05 and 0.03 with 95\% HPD 0.0 - 0.06, respectively; Table \ref{tab:POUMM-parameters-our-estimates-qdr}). These values deviated significantly from the respective priors (Figure \ref{fig:poumm-parameters-qdr}). Heritability, on the other hand, was quite uncertain (posterior mean 0.33 with 95\% HPD 0.0 - 0.77; Table \ref{tab:POUMM-parameters-our-estimates-qdr}). The posterior mean selection strength and heritability values are also shown in the context of the simulation study as points on Figure \ref{fig:simulationResults}.
+Next, we applied our method to data collected from the \emph{A. thaliana}-\emph{X. arboricola} pathosystem by \cite{Wang2018Two-wayGenomes}. \cite{Wang2018Two-wayGenomes} performed a fully-crossed experiment in which they infected genetically diverse \emph{A. thaliana} accessions with genetically diverse strains of the phytopathogenic bacteria \emph{X. arboricola}. They scored quantitative disease resistance (QDR) on a scale of 0 (resistant) to 4 (susceptible) for up to four infected leaves for three replicates of each \emph{A. thaliana}-\emph{X. arboricola} pairing. Our method requires a single trait value per pathogen strain, so we used mean QDR calculated for each pathogen strain across all the host \emph{A. thaliana} types (Figure \ref{fig:application-exp-setup}B). Figure \ref{fig:qdr-on-tree}A shows the inferred \emph{X. arboricola} pathogen phylogeny annotated with the  mean QDR trait value used for each strain. Mean QDR  was generally low, varying between 0.11 for strain NL\_P126 and 0.78 for strain FOR\_F21. Fitting the POUMM yielded very low selection strength $\alpha$ and intensity of stochastic fluctuations  $\sigma$ parameter estimates (posterior mean 0.03 with 95\% HPD 0.0 - 0.05 and 0.03 with 95\% HPD 0.0 - 0.06, respectively; Table \ref{tab:POUMM-parameters-our-estimates-qdr}). These values deviated significantly from the respective priors (Figure \ref{fig:poumm-parameters-qdr}). Heritability, on the other hand, was quite uncertain (posterior mean 0.33 with 95\% HPD 0.0 - 0.77; Table \ref{tab:POUMM-parameters-our-estimates-qdr}). The posterior mean selection strength and heritability values are also shown in the context of the simulation study as points on Figure \ref{fig:simulationResults}.
 
-Given the posterior mean estimates for the POUMM parameters, expected correlation in trait values between tips were very low (maximum value $3.2 \times 10^{-12}$ compared to maximum value of 0.45 in the HIV-1 spVL application). Thus, the phylogeny is not very informative for a trait value correction. Indeed, mean QDR values for each \emph{X. arboricola} strain calculated across all \emph{A. thaliana} pairings and all replicates is simply scaled by our method (Figure \ref{fig:trait-comparison-qdr}).
+Given the posterior mean estimates for the POUMM parameters, expected correlation in trait values between tips were very low (maximum value $3.2 \times 10^{-12}$ compared to maximum value of 0.45 in the HIV-1 spVL application). Thus, the phylogeny is not very informative for a trait value correction. Indeed, the estimated pathogen part of the QDR trait calculated by our method is simply a scaling of the total QDR trait value (Figure \ref{fig:trait-comparison-qdr}). We anyways selected 22 random host-pathogen strain pairings to perform a comparative GWAS analogous to that for HIV-1 spVL, where each host is infected with a single pathogen strain. In the first GWAS, we used the specific QDR measurement for each selected host-pathogen pairing. I.e., with reference to Figure \ref{fig:application-exp-setup}, we selected $z_{11}$ for the first sample, $z_{23}$ for the second sample, and so on. In the second GWAS, we used our (very uncertain) estimates for the non-pathogen effects on QDR for each pairing. Since our method did not utilize phylogenetic information in this case, the estimated non-pathogen part of the trait is simply the specific QDR for each selected host-pathogen pairing, minus mean QDR for the respective pathogen strain, calculated across all the host \emph{A. thaliana} types. I.e., with reference to Figure \ref{fig:application-exp-setup}, we used a scaled version of $z_{11} - \bar{z}_1$ for the first sample, $z_{23} - \bar{z}_2$ for the first sample, and so on. Figure \ref{fig:gwas-results-qdr} shows that XXX.
 
 \section*{Discussion}
 % State the importance of your findings
@@ -431,6 +439,9 @@ We corrected HIV-1 spVL and \emph{X. arboricola} mean QDR trait values using the
 
 \subsection*{Association testing}
 We performed two GWAS using the same human genotype data from the SHCS. For the first ``GWAS with standard trait value'' we used the total (uncorrected) trait values ($\bm{z}$) as the response variable for association testing, replicating a standard GWAS set-up. For the second ``GWAS with estimated non-pathogen part of trait'' we replaced total trait values with the estimated non-pathogen component of the trait ($\hat{\bm{e}}$) as the response variable. Association testing was performed using a linear association model in PLINK version 2.3 \citep{Chang2015} with sex and the top 5 principle components of host genetic variation included as covariates. The sex and principle components covariates were included to reduce residual variance in spVL and control for confounding from host population structure, respectively. 
+
+\subsection{Phylogenetic uncertainty}
+Our method assumes the phylogeny accurately reflects the evolutionary relationships between pathogen strains. Previously, \cite{Hodcroft2014} observed HIV spVL heritability estimates based on $pol$ gene sequences were robust to including or not including resistance-associated codons. Our analysis includes these codons. For the HIV application, we additionally tested the sensitivity of the inference to phylogenetic uncertainty. We inferred the phylogeny again, this time using the IQ-TREE option ``wt'' to output all locally optimal trees. We fit the POUMM to two randomly selected trees from this set. Posterior mean parameter estimates were within the 95\% HPD intervals inferred from the maximum likelihood tree. GWAS results were also comparable. 
 
 \subsection*{Data availability}
 The simulated data underlying this article can be re-generated using the code available on the project GitHub at https://github.com/cevo-public/POUMM-GWAS. The HIV pathogen genome sequences, clinical data, and human genotypes cannot be shared publicly due to the privacy of individuals who participated in the cohort study. The data may be shared on reasonable request to the Swiss HIV Cohort Study at http://www.shcs.ch. The \emph{X. arboricola} pathogen genotypes are available in the supplemental material of \citep{Wang2018Two-wayGenomes}, the \emph{A. thaliana} host genotypes are available at https://1001genomes.org/, and the \emph{A. thaliana}-\emph{X. arboricola} QDR measurements are available on request to the authors of \citep{Wang2018Two-wayGenomes}.
@@ -670,6 +681,14 @@ Therefore, we can expect the RMSE for $\bm{z} - \bm{\bar{z}}$ as an estimate for
 	\end{center}
 \end{figure}
 
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width = \linewidth]{figures/gwas_results_xanthomonas.png}
+	\caption{Results from comparative GWAS on \emph{A. thaliana}-\emph{X. arboricola} QDR data. The two facets show association p-values for the same host \emph{A. thaliana} variants in GWAS with two different response variables. On the left, we used unmodified (total) QDR values. On the right, we used our estimates for the non-pathogen effects on QDR. In this case, these values are total QDR minus a pathogen strain-specific scaled mean QDR. The alternating shades correspond to different chromosomes. The dashed lines show significance at significance level 0.05 with a Bonferroni correction for multiple testing.}
+	\label{fig:gwas-results-qdr}
+	\end{center}
+\end{figure}
+
 \end{doublespace}  % don't doublespace tables
 
 \newpage
@@ -777,7 +796,7 @@ Therefore, we can expect the RMSE for $\bm{z} - \bm{\bar{z}}$ as an estimate for
 \end{table}
 
 \begin{table}[H]
-\caption{Number of samples for GWAS after sequential filtering steps.}
+\caption{Number of samples for HIV-1 spVL GWAS after sequential filtering steps.}
     \begin{tabularx}{\linewidth}{XX}
     \hline
     Sample filter & Number of samples remaining \\
@@ -793,7 +812,7 @@ Therefore, we can expect the RMSE for $\bm{z} - \bm{\bar{z}}$ as an estimate for
 \end{table}
 
 \begin{table}[H]
-\caption{Number of variants for GWAS after sequential filtering steps.}
+\caption{Number of variants for HIV-1 spVL GWAS after sequential filtering steps.}
 	\begin{tabularx}{\linewidth}{XX}
 	\hline
 	Variant filter & Number of variants remaining \\
@@ -804,6 +823,19 @@ Therefore, we can expect the RMSE for $\bm{z} - \bm{\bar{z}}$ as an estimate for
 	Minor allele frequency $<$ 0.01 & 6228626 \\ \hline			
 	\end{tabularx}
 	\label{tab:variant-filtering}
+\end{table}
+
+\begin{table}[H]
+\caption{Number of variants for \emph{A. thaliana} QDR GWAS after sequential filtering steps.}
+	\begin{tabularx}{\linewidth}{XX}
+	\hline
+	Variant filter & Number of variants remaining \\
+	\hline 
+	Raw data & 11769920 \\
+	Minor allele frequency $<$ 0.1 & 1743952 \\
+	NA p-value due to too-high correlation with a covariate & 1070541 \hline			
+	\end{tabularx}
+	\label{tab:variant-filtering-qdr}
 \end{table}
 
 \stopsection
@@ -868,7 +900,7 @@ I also have some more minor comments:
     
     \textcolor{blue}{We also highlight the linear mixed model approach presented in ATOMM as an alternate means to take pathogen effects into accout: ``As in the \emph{A. thaliana}-\emph{X. arboricola} application, fitting the POUMM may reveal that expected phylogenetic correlations between samples are not strong enough to justify using the corrected trait values in a GWAS. In this case, one may wish to use a linear mixed model as in \citep{Wang2018Two-wayGenomes}, where the pathogen effect is co-estimated as a random effect.''}
     \item As I understand it the POUMM method assumes a 'correct' phylogeny. Do the authors have any thoughts about including uncertainty in the phylogeny (for example by using a posterior sample from e.g. mrbayes) and whether this may affect their approach? Relatedly, does a tree from just pol sequences (L342) give enough resolution? \\
-    \textcolor{blue}{TODO: improve phylogeny by masking sites under selection. We randomly chose an alternate tree from the collection of optimal trees produced with the IQ-TREE ``wt'' option and re-fit the POUMM. Posterior mean parameter estimates were comparable. TODO: re-correct trait values and re-run the GWAS using a few different trees.}
+    \textcolor{blue}{This is correct, our method assumes the phylogeny accurately reflects the evolutionary history of the pathogen strains. We tested the sensitivity of the method to phylogenetic uncertainty in the HIV application. This is described in the section ``'': ``''.}
     
     \item It would be useful to include more histograms and scatterplots of traits before/after the adjustment, as in figure S4. In particular, doing this plot again for one of the simulations where it does improve power would be informative. In my opinion, these could be a main figure. \\
     \textcolor{blue}{We implemented this suggestion and added two new main text figures. They are discussed in the section ``Estimator accuracy'': ``Figure \ref{fig:simulationTraitExample} gives some intuition for how this correction works by contrasting simulated scenarios with high and low heritability and low selection strength/ low stochastic fluctuations. These parameter combinations mean trait values are phylogentically correlated at clustered tips in the phylogeny. This information is the basis from which our method estimates the pathogen and corresponding non-pathogen effects on the trait. Figure \ref{fig:tip-trait-correlation} shows in more detail how trait values are correlated at closely clustered tips when an infectious disease trait is highly heritable and selection strength is low/ stochastic fluctuations are low.''}
