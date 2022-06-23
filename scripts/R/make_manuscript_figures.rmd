@@ -356,7 +356,7 @@ fp_summary <- data %>%
 
 shape_legend <- get_legend(rmse_plot + guides(fill = "none") + theme(legend.position = "bottom"))
 top_row <- plot_grid(NULL, rmse_plot + guides(shape = "none"), rel_widths = c(1.03, 3), labels = c("", "A"))
-png(filename = "figures/simulation_results.png", width = linewidth, height = height, unit = "cm", res = 300)
+
 plot_grid(
         top_row, 
         tpr_plot + guides(shape = "none"), 
@@ -365,7 +365,7 @@ plot_grid(
         align = "v", axis = "tb", nrow = 3, 
         labels = c("", "B", "")
 )
-dev.off()
+ggsave(filename = "figures/simulation_results.pdf", width = linewidth, height = height, unit = "cm")
 ```
 
 Inferred phylogeny
@@ -534,7 +534,7 @@ ggplot(data = tip_pair_data_to_plot, aes(x = factor(dist_decile_rank), y = corre
         facet_grid(Heritability ~ `Selection strength`, labeller = label_both) + 
         labs(x = "Tree distance decile", y = "Pearson correlation in trait value") + 
         shared_theme
-ggsave(filename = "figures/tip_trait_correlation.png", width = linewidth, height = height * 2/3, unit = "cm")
+ggsave(filename = "figures/tip_trait_correlation.pdf", width = linewidth, height = height * 2/3, unit = "cm")
 
 pruned_tree <- ape::keep.tip(phy = simulation_tree, tip = sample(simulation_tree$tip.label, size = 12))  # keep some random tips
 # pruned_tree <- ape::extract.clade(phy = simulation_tree, 516)  # keep some small clade
@@ -580,7 +580,7 @@ plot_grid(top_row, get_legend(lo_h2_tree),
           rel_heights = c(1, 1.5),
           rel_widths = c(1, 0.2),
           labels = c("", "", "C"))
-ggsave(filename = paste(FIGDIR, "example_simulation_trait_values.png", sep = "/"),
+ggsave(filename = paste(FIGDIR, "example_simulation_trait_values.pdf", sep = "/"),
       width = linewidth, height = height, unit = "cm")
 ```
 
@@ -732,11 +732,11 @@ p_vals_regional <- ggplot(
 # Assemble the plots as subplots
 aligned_plots <- align_plots(overview_comparison, p_vals_regional, align = "h", axis = "tb")
 
-png(
-        filename = paste(FIGDIR, "gwas_results.png", sep = "/"),
-        width = linewidth, height = height, unit = "cm", res = 300)
 plot_grid(aligned_plots[[1]], aligned_plots[[2]], nrow = 2, labels = c("A", "B"))
-dev.off()
+ggsave(
+        filename = paste(FIGDIR, "gwas_results.pdf", sep = "/"),
+        width = linewidth, height = height, unit = "cm"
+)
 ```
 
 Get the most highly-associated and most changed SNPs from the GWAS results
@@ -1048,4 +1048,84 @@ trees <- ape::read.tree("output_revisions/pathogen.treels.head500")
 
 # Calculate tree distances
 tree_dists <- dist.topo(trees, method = "PH85")
+```
+Make A. thaliana GWAS figures (here or use scripts/R/plot_manhattan_euler.R)
+```{R}
+# Load data
+print("Loading data")
+gwas_results_xanthomonas <- read.delim(
+    file = paste(OUTDIR_XANTHAMONAS, "gwas_results.maxmaf.pvals.txt", sep = "/"), 
+    sep = "", 
+    header = T
+)
+
+pt_size <- 1
+
+# Add genome position to data
+chr_lengths <- gwas_results_xanthomonas %>%
+        group_by(CHROM) %>%
+        summarise(chr_len = max(POS))
+chr_starts <- chr_lengths %>%
+        mutate(CHR_start = cumsum(as.numeric(chr_len)) - chr_len) %>%
+        select(-chr_len)
+gwas_results_annotated <- left_join(gwas_results_xanthomonas, chr_starts, by = "CHROM")
+gwas_results_annotated <- gwas_results_annotated %>%
+        arrange(CHROM, POS) %>%
+        mutate(BP_position = CHR_start + POS)
+
+# This is maybe not the best way, but makes sure tick marks and labels are at the center of each chromosome
+x_axis_ticks <- chr_starts
+max_BP_position <- max(gwas_results_annotated[gwas_results_annotated$CHROM == 5, "BP_position"])
+x_axis_ticks <- rbind(
+        x_axis_ticks,
+        data.frame(
+                CHROM = c(6),
+                CHR_start = c(max_BP_position)))
+x_axis_ticks$midpoint <- x_axis_ticks$CHR_start + (lead(x_axis_ticks$CHR_start) - x_axis_ticks$CHR_start)/2
+
+# Format data for plotting
+results_long <- tidyr::pivot_longer(
+        data = gwas_results_annotated,
+        cols = c("P_standard", "P_corrected"),
+        names_to = "gwas_type",
+        names_prefix = "P_",
+        values_to = "P")
+
+# Fix facet labels for plotting
+results_long$gwas_type <- factor(
+        results_long$gwas_type,
+        levels = c("standard", "corrected"),
+        labels = c(standard_gwas_name, corrected_gwas_name))
+
+# Make comparative GWAS overview plot
+print("Making plot")
+bonferroni_signifiance_threshold <- 0.05 / nrow(gwas_results_annotated)
+overview_comparison <- ggplot(
+        data = results_long,
+        aes(x = BP_position, y = -log10(P))) +
+        geom_point(aes(color = CHROM %% 2 == 0), size = pt_size) +
+        scale_color_manual(values = c("grey", "dark grey")) +
+        scale_x_continuous(
+                breaks = x_axis_ticks$midpoint,
+                labels = x_axis_ticks$CHROM,
+                expand = c(0.01, 0.01)) +
+        scale_y_continuous(limits = c(0, 16), expand = c(0, 0)) +
+        labs(x = "Chromosome", y = expression('-Log'[10]*'(p)')) +
+        geom_hline(
+                yintercept = -log10(bonferroni_signifiance_threshold),
+                linetype = "dashed") +
+        shared_theme +
+        theme(
+                panel.grid.major.x = element_blank(),
+                panel.grid.minor.x = element_blank(),
+                legend.position = "none"
+        ) +
+        facet_grid(. ~ gwas_type)
+
+print("Saving plot")
+ggsave(
+        plot = overview_comparison,
+        filename = paste(FIGDIR, "gwas_results_xanthomonas.pdf", sep = "/"),
+        width = linewidth, height = height / 2, unit = "cm"
+)
 ```
