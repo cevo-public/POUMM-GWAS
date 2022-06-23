@@ -61,10 +61,10 @@
 
 \begin{document}
 
-\begin{flushright} % for MBE submission
-Submission type: Article\\
-Section: Methods
-\end{flushright}
+% \begin{flushright} % for MBE submission
+% Submission type: Article\\
+% Section: Methods
+% \end{flushright}
 
 \begin{center}
 	\Large{\textbf{A phylogeny-aware GWAS framework to correct for heritable pathogen effects on infectious disease traits}}
@@ -154,7 +154,13 @@ Variation in infectious disease traits like viral load or infection severity can
 
 Broad-sense pathogen heritability $H^2$ quantifies the fraction of total variance in a trait that is ``inherited'' from infection partner to infection partner, i.e., due to pathogen factors. To characterize $H^2$ and the heritable and non-heritable factors that determine infectious disease traits, we use a phylogenetic mixed model (PMM) \citep{Housworth2004}. PMMs assume continuous traits are the sum of independent heritable and non-heritable parts. In the infectious disease GWAS case, we assume the heritable part comprises pathogen genetic factors and all other factors are non-heritable. The heritable pathogen part is modeled by a random process occurring in continuous time along the branches of the pathogen phylogeny, as in Figure \ref{fig:spVLModel}A. The non-heritable part is modeled as Gaussian noise added to sampled individuals at the tips of the phylogeny.
 
-% Figure 1 location
+\begin{figure}[H]
+	\begin{center}
+	\includegraphics[width = \linewidth]{figures/simulation_setup.png}
+	\caption{A high-level schematic of our phylogenetic Ornstein-Uhlenbeck mixed model (POUMM)-based simulation framework in the context of HIV-1 set-point viral load (spVL). (A) shows how the viral effects on spVL evolve along the viral phylogeny according to an Ornstein-Uhlenbeck process. (B) shows how human host genetic effects are the sum of independent effects from several causal variants. Each variant can be present in 0, 1, or 2 copies. Half the variants have a positive effect of size $\delta$ and half have a negative effect of size $\delta$. (C) shows how other environmental effects are independently drawn from a Gaussian distribution centered at 0. These three effects sum to the trait value for each simulated individual.}
+		\label{fig:spVLModel}
+	\end{center}
+\end{figure}
 
 PMMs have previously been applied to the study of infectious disease traits using two different types of random processes to model trait evolution. The Brownian Motion (BM) process assumes unbounded trait values, i.e. the trait can attain any value. The Ornstein-Uhlenbeck (OU) process assumes trait values fluctuate around an optimal value, i.e. extreme trait values are unlikely. Here, we assume the more flexible OU process as it encompasses a wider variety of evolutionary scenarios. For example, \citet{Mitov2018} and \citet{Bertels2018} previously showed the OU process has higher statistical support for HIV-1 spVL. This makes sense given that spVL is likely under stabilizing selection to maximize viral transmission potential \citep{Fraser2014}. The full model is called the phylogenetic Ornstein-Uhlenbeck mixed model (POUMM) and is described in detail by \citet{Mitov2018}. Here, we review the main points relevant to our method.
 
@@ -285,19 +291,67 @@ Next, we characterized the evolutionary scenarios under which our framework can 
 % More accurate estimation of the non-viral part of spVL does not guarantee improved GWAS power. For example, if the viral part of spVL were constant across all viruses, association results (significance and effect size) would not be effected by a viral contribution to the trait. 
 % Under our simulation set-up a standard GWAS would have $\approx$ 30\% power to detect a host variant explaining 1.25\% of the variability in spVL. This matches simulation results (figure \ref{fig:simulationResults}B, scaled spVL). 
 
-% Figure 2-4 location
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[width=\linewidth]{figures/simulation_results}
+		\caption{Results from the simulation study. We simulated host, pathogen, and environmental effects on a trait under the phylogenetic Ornstein-Uhlenbeck mixed model (POUMM) with different heritability ($H^2$; y-axis) and selection strength ($\alpha$; x-axis) parameters. For each simulated dataset, we applied our method to estimate the non-pathogen effects and performed GWAS with these values. (A) shows the root mean squared error (RMSE) of our estimator (left) compared to un-corrected trait values, scaled by their mean (right) under each simulated evolutionary scenario. The RMSE is with reference to the true (simulated) host part of the trait values. Thus, more accurate estimates (lower RMSE) mean the trait value used for GWAS will be closer to the true host part of the trait value. (B) shows how genome-wide association study (GWAS) power can improve given the true, simulated non-pathogen effect on spVL (left) and using our estimate for this value (middle) compared to using the scaled trait value (right). Each tile's color corresponds to the average value across 20 simulated datasets of 500 samples. The points highlight specific heritability and selection strength values from the \emph{A. thaliana}-\emph{X. arboricola} quantitative disease resistance (QDR) analysis, HIV-1 spVL analysis, and four simulated scenarios that are presented in more detail in Figure \ref{fig:tip-trait-correlation}.}
+		\label{fig:simulationResults}
+	\end{center}
+\end{figure}
+
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[width=\linewidth]{figures/example_simulation_trait_values.pdf}
+		\caption{Simulated data from two evolutionary scenarios where a phylogenetic correction to trait values improves genome-wide association study (GWAS) power (right side) and where it does not (left side). These examples correspond to two of the unfilled points in Figure \ref{fig:simulationResults}. (A) and (B) show total trait values for 12 randomly selected tips from the simulated phylogeny with pathogen heritability $H^2$ of 15 and 75\%, respectively. Depending on the pathogen heritability, trait values are more or less correlated at clustered tips. (C) compares our method's estimate for the non-pathogen part of trait values (y-axis) with true simulated host trait values (x-axis) with pathogen heritability of 15 and 75\%. The solid line is the y=x line. Selection strength $\alpha$ was fixed to 0.1 time $^{-1}$ for both scenarios and all other parameters were fixed as in the full simulation study.}
+		\label{fig:simulationTraitExample}
+	\end{center}
+\end{figure}
+
+\begin{figure}[H]
+\begin{center}
+    \includegraphics[width = \linewidth]{figures/tip_trait_correlation.pdf}
+	\caption{Correlations between trait values in pairs of tips in four simulated scenarios. These examples correspond to the four unfilled points in Figure \ref{fig:simulationResults}. Correlations are calculated for pairs of tips binned by phylogenetic distance (into deciles) across the 20 replicate simulations for each of the four evolutionary scenarios. Trait values are only noticeably correlated for closely clustered tips under the scenario with high pathogen heritability $H^2$ and low selection strength $\alpha$/ low stochastic fluctuations $\sigma$ (upper left facet).}
+	\label{fig:tip-trait-correlation}
+	\end{center}
+\end{figure}
 
 \subsection*{Application to HIV-1 set-point viral load}
 
 We applied our framework to empirical data from two different host-pathogen systems with different experimental setups (Figure \ref{fig:application-exp-setup}). First, we used data collected by the Swiss HIV Cohort Study (SHCS) from 1,493 individuals in Switzerland infected with HIV-1 subtype B between 1994 and 2018. The SHCS provided viral load measurements, $pol$ gene sequences, and human genotype data for these individuals. We followed the method outlined above to estimate the pathogen and non-pathogen effects on spVL for the cohort from these data. Figure \ref{fig:spvl-calc-comparison} shows the calculated (total) spVL values, which vary between approximately 1 and 6 log copies/mL in the cohort.  We estimated spVL heritability in this cohort to be 45\% (95\% highest posterior density, HPD, 24 - 67\%) and selection strength to be 58 time$^{-1}$ (95\% HPD 19 - 95) (Figure \ref{fig:poumm-parameters}, Table \ref{tab:POUMM-parameters-our-estimates}). To put these values into the context of our simulation study, they are shown as points on Figure \ref{fig:simulationResults}. The highest expected correlation in trait values between any two tips in the HIV-1 phylogeny under the POUMM was 0.45. However, Figure \ref{fig:spvl-on-tree} shows that this trait is not obviously phylogenetically structured in the cohort in general, despite high heritability. Finally, figure \ref{fig:trait-comparison} shows that the estimated non-pathogen effects on spVL correlate quite strongly with total spVL. 
 
-% Figure 5 location
+\begin{figure}[H]
+\begin{center}
+    \includegraphics[width = \linewidth]{figures/application_experimental_setups.pdf}
+	\caption{A high-level schematic of the experimental setup for the two application datasets. For (A) HIV-1 set-point viral load (spVL) in the Swiss HIV Cohort Study, data are paired viral and human genotypes and associated spVL measurements. We fit the phylogenetic Ornstein-Uhlenbeck mixed model (POUMM) to the viral phylogeny and spVL values associated with each infected individual ($z_1$, $z_2$, ..., $z_{1493}$). For (B) \emph{A. thaliana}-\emph{X. arboricola} quantitative disease resistance (QDR) from \cite{Wang2018Two-wayGenomes}, data are bacterial and plant genotypes with QDR measurements for all possible combinations of pathogen and host plant strains. We fit the POUMM to the bacterial phylogeny and mean QDR calculated for each pathogen strain across all the hosts plant types ($\bar{z}_1$, $\bar{z}_2$, ..., $\bar{z}_{22}$).}
+	\label{fig:application-exp-setup}
+	\end{center}
+\end{figure}
 
 We compared our proposed GWAS framework with a more standard approach by performing two different GWAS on the same SHCS human genotypes. We retained 1,392 individuals of European ancestry for the GWAS. In the (i) ``GWAS with standard trait value'' we used the total trait value, calculated spVL values, as the GWAS response variable. In the (ii) ``GWAS with estimated non-pathogen part of trait'' we used our estimates for the non-pathogen effects on spVL. Figure \ref{fig:gwas-results}A shows that results are qualitatively similar between the two GWAS. Q-Q plots show the distribution of p-values are very similar as well (Figure \ref{fig:qq-plots}). Figure \ref{fig:gwas-results}B shows how the strength of association changed for some variants in the MHC and \emph{CCR5} regions. Taking into account phylogenetic information slightly decreased association strength for most variants in the \emph{CCR5} region. Association strength increased for some variants in the MHC, for example, SNP rs9265880 had the greatest increase in significance in the MHC region, from a p-value of $3.5 \times 10^{-07}$ to $7.7 \times 10^{-09}$. However, the top-associated variants in the MHC and \emph{CCR5} regions were consistent regardless of the GWAS response variable used (Table \ref{tab:gwas-top-associations}). Finally, Table \ref{tab:comp-gwas-mclaren-snps} shows how our GWAS results compare for the two top-associated SNPs identified by \citet{McLaren2015}, who performed the largest standard GWAS for HIV spVL to date. Effect sizes are smaller with a phylogenetic correction and p-values are slightly increased. We repeated the analysis using three different approximate maximum-likelihood phylogenies and these results were consistent (see Materials and Methods; Table \ref{tab:comp-gwas-mclaren-snps-alt-trees}). In summary, there are no clear patterns that point to new regions of association in the human genome with spVL when we take into account the pathogen phylogeny.
 
-% Figure 6 location
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[width=\linewidth]{figures/gwas_results}
+		\caption{Results from comparative genome-wide association studies (GWAS) on HIV-1 set-point viral load (spVL) data. (A) shows association p-values for the same host variants from the Swiss HIV cohort in GWAS with two different response variables. On the left, we used unmodified (total) spVL values. On the right, we used our estimates for the non-pathogen effects on spVL. The alternating shades correspond to different chromosomes. (B) compares the strength of association for variants in the \emph{CCR5} and MHC regions between the two GWAS (positions 45.4 - 47Mb on chromosome 3 and 29.5 - 33.5Mb on chromosome 6 for the \emph{CCR5} and MHC, respectively). Base positions are with reference to genome build GRCh37. The color of each point represents the difference in -log$_{10}$ p-value between the two GWAS. Red means taking into account phylogenetic information decreased the strength of association and blue means it increased it. The dashed lines show genome-wide significance at p = $5 \times 10^{-8}$.}
+		\label{fig:gwas-results}
+	\end{center}
+\end{figure}
 
-% Table 1 location
+\begin{table}[H]
+\centering
+\caption{Top association results from \citet{McLaren2015} compared to results from this study. Results from this study are for host variants from the SHCS in GWAS with two different response variables. ``Standard trait value'' means we used the unmodified (total) spVL value and ``Estimated non-pathogen part of trait'' means we used our estimates for the non-pathogen effects on spVL.}
+\begin{tabularx}{\linewidth}{p{1cm}p{1.8cm}p{2.4cm}p{1.8cm}p{2cm}p{1.8cm}p{2cm}} % {lrrrrrr} {llclcccc}
+\hline
+& & \makecell{McLaren \\ et al.}  & \multicolumn{2}{l}{\makecell{Standard \\ trait value}} & \multicolumn{2}{l}{\makecell{Estimated non-pathogen \\ part of trait}} \\ 
+  \hline
+ Region & Variant & p-value & Effect size & p-value & Effect size & p-value \\
+  \hline
+    MHC & rs59440261 & $2.0 \times 10^{-83}$ & -0.4 & $3.3 \times 10^{-11}$ & -0.22 & $2.6 \times 10^{-10}$ \\ 
+    \emph{CCR5} & rs1015164 & $1.5 \times 10^{-19}$ & 0.15 & $7.5 \times 10^{-7}$ & 0.078 & $8.5 \times 10^{-6}$ \\ 
+   \hline
+\end{tabularx}
+\label{tab:comp-gwas-mclaren-snps}
+\end{table}
 
 \subsection*{Application to the \emph{A. thaliana}-\emph{X. arboricola} pathosystem}
 
@@ -305,7 +359,13 @@ Next, we applied our method to data collected from the \emph{A. thaliana}-\emph{
 
 Given the posterior mean estimates for the POUMM parameters, expected correlation in trait values between tips were very low (maximum value $3.2 \times 10^{-12}$ compared to maximum value of 0.45 in the HIV-1 spVL application). Thus, the phylogeny is not very informative for a trait value correction. Indeed, the estimated pathogen part of the QDR trait calculated by our method is simply a scaling of the total QDR trait value (Figure \ref{fig:trait-comparison-qdr}). We anyways selected 22 random host-pathogen strain pairings to perform a comparative GWAS analogous to that for HIV-1 spVL, where each host is infected with a single pathogen strain. In the first GWAS, we used the specific QDR measurement for each selected host-pathogen pairing. I.e., with reference to Figure \ref{fig:application-exp-setup}, we selected $z_{11}$ for the first sample, $z_{23}$ for the second sample, and so on. In the second GWAS, we used our estimates for the non-pathogen effects on QDR for each pairing. Since our method did not utilize phylogenetic information in this case, the estimated non-pathogen part of the trait is simply the specific QDR for each selected host-pathogen pairing, minus mean QDR for the respective pathogen strain, calculated across all the host \emph{A. thaliana} types. I.e., with reference to Figure \ref{fig:application-exp-setup}, we used a scaled version of $z_{11} - \bar{z}_1$ for the first sample, $z_{23} - \bar{z}_2$ for the first sample, and so on. Figure \ref{fig:gwas-results-qdr} shows that results are qualitatively similar between the two GWAS, with a slight decrease in association strength for the top-associated variants. Q-Q plots show the distribution of p-values are also very similar (Figure \ref{fig:qq-plots-qdr}). In the first, standard GWAS, one \emph{A. thaliana} loci just exceeds the threshold for significant association after correction for multiple testing. In the second, corrected GWAS, no \emph{A. thaliana} variants are significantly associated with QDR to \emph{X. arboricola}.
 
-% Figure 7 location
+\begin{figure}[H]
+\begin{center}
+    \includegraphics[width = \linewidth]{figures/gwas_results_xanthomonas_maxmaf.pdf}
+	\caption{Results from comparative genome-wide association studies (GWAS) on \emph{A. thaliana} quantitative disease resistance (QDR) to \emph{X. arboricola}. The two facets show association p-values for the same host \emph{A. thaliana} variants in GWAS with two different response variables. On the left, we used unmodified (total) QDR values for each of the 22 selected host-pathogen pairings on which these results are based. On the right, we used our estimates for the non-pathogen effects on QDR for these samples. In this case, estimated non-pathogen effects are the specific QDR for each selected host-pathogen pairing, minus mean QDR for the respective pathogen strain, calculated across all the host \emph{A. thaliana} types. The alternating shades correspond to different chromosomes. The dashed lines show significance at significance level 0.05 with a Bonferroni correction for multiple testing.}
+	\label{fig:gwas-results-qdr}
+	\end{center}
+\end{figure}
 
 \section*{Discussion}
 % State the importance of your findings
@@ -382,82 +442,6 @@ The Swiss HIV Cohort Study is supported by the Swiss National Science Foundation
 \bibliography{manuscript/references_synced}
 
 \newpage
-
-% Main text table
-
-\begin{table}[H]
-\centering
-\caption{Top association results from \citet{McLaren2015} compared to results from this study. Results from this study are for host variants from the SHCS in GWAS with two different response variables. ``Standard trait value'' means we used the unmodified (total) spVL value and ``Estimated non-pathogen part of trait'' means we used our estimates for the non-pathogen effects on spVL.}
-\begin{tabularx}{\linewidth}{p{1cm}p{1.8cm}p{2.4cm}p{1.8cm}p{2cm}p{1.8cm}p{2cm}} % {lrrrrrr} {llclcccc}
-\hline
-& & \makecell{McLaren \\ et al.}  & \multicolumn{2}{l}{\makecell{Standard \\ trait value}} & \multicolumn{2}{l}{\makecell{Estimated non-pathogen \\ part of trait}} \\ 
-  \hline
- Region & Variant & p-value & Effect size & p-value & Effect size & p-value \\
-  \hline
-    MHC & rs59440261 & $2.0 \times 10^{-83}$ & -0.4 & $3.3 \times 10^{-11}$ & -0.22 & $2.6 \times 10^{-10}$ \\ 
-    \emph{CCR5} & rs1015164 & $1.5 \times 10^{-19}$ & 0.15 & $7.5 \times 10^{-7}$ & 0.078 & $8.5 \times 10^{-6}$ \\ 
-   \hline
-\end{tabularx}
-\label{tab:comp-gwas-mclaren-snps}
-\end{table}
-
-% Main text figure legends
-
-\begin{figure}[H]
-	\begin{center}
-% 	\includegraphics[width = \linewidth]{figures/simulation_setup.png}
-	\caption{A high-level schematic of our phylogenetic Ornstein-Uhlenbeck mixed model (POUMM)-based simulation framework in the context of HIV-1 set-point viral load (spVL). (A) shows how the viral effects on spVL evolve along the viral phylogeny according to an Ornstein-Uhlenbeck process. (B) shows how human host genetic effects are the sum of independent effects from several causal variants. Each variant can be present in 0, 1, or 2 copies. Half the variants have a positive effect of size $\delta$ and half have a negative effect of size $\delta$. (C) shows how other environmental effects are independently drawn from a Gaussian distribution centered at 0. These three effects sum to the trait value for each simulated individual.}
-		\label{fig:spVLModel}
-	\end{center}
-\end{figure}
-
-\begin{figure}[H]
-	\begin{center}
-% 		\includegraphics[width=\linewidth]{figures/simulation_results}
-		\caption{Results from the simulation study. We simulated host, pathogen, and environmental effects on a trait under the phylogenetic Ornstein-Uhlenbeck mixed model (POUMM) with different heritability ($H^2$; y-axis) and selection strength ($\alpha$; x-axis) parameters. For each simulated dataset, we applied our method to estimate the non-pathogen effects and performed GWAS with these values. (A) shows the root mean squared error (RMSE) of our estimator (left) compared to un-corrected trait values, scaled by their mean (right) under each simulated evolutionary scenario. The RMSE is with reference to the true (simulated) host part of the trait values. Thus, more accurate estimates (lower RMSE) mean the trait value used for GWAS will be closer to the true host part of the trait value. (B) shows how genome-wide association study (GWAS) power can improve given the true, simulated non-pathogen effect on spVL (left) and using our estimate for this value (middle) compared to using the scaled trait value (right). Each tile's color corresponds to the average value across 20 simulated datasets of 500 samples. The points highlight specific heritability and selection strength values from the \emph{A. thaliana}-\emph{X. arboricola} quantitative disease resistance (QDR) analysis, HIV-1 spVL analysis, and four simulated scenarios that are presented in more detail in Figure \ref{fig:tip-trait-correlation}.}
-		\label{fig:simulationResults}
-	\end{center}
-\end{figure}
-
-\begin{figure}[H]
-	\begin{center}
-% 		\includegraphics[width=\linewidth]{figures/example_simulation_trait_values.pdf}
-		\caption{Simulated data from two evolutionary scenarios where a phylogenetic correction to trait values improves genome-wide association study (GWAS) power (right side) and where it does not (left side). These examples correspond to two of the unfilled points in Figure \ref{fig:simulationResults}. (A) and (B) show total trait values for 12 randomly selected tips from the simulated phylogeny with pathogen heritability $H^2$ of 15 and 75\%, respectively. Depending on the pathogen heritability, trait values are more or less correlated at clustered tips. (C) compares our method's estimate for the non-pathogen part of trait values (y-axis) with true simulated host trait values (x-axis) with pathogen heritability of 15 and 75\%. The solid line is the y=x line. Selection strength $\alpha$ was fixed to 0.1 time $^{-1}$ for both scenarios and all other parameters were fixed as in the full simulation study.}
-		\label{fig:simulationTraitExample}
-	\end{center}
-\end{figure}
-
-\begin{figure}[H]
-\begin{center}
-    % \includegraphics[width = \linewidth]{figures/tip_trait_correlation.pdf}
-	\caption{Correlations between trait values in pairs of tips in four simulated scenarios. These examples correspond to the four unfilled points in Figure \ref{fig:simulationResults}. Correlations are calculated for pairs of tips binned by phylogenetic distance (into deciles) across the 20 replicate simulations for each of the four evolutionary scenarios. Trait values are only noticeably correlated for closely clustered tips under the scenario with high pathogen heritability $H^2$ and low selection strength $\alpha$/ low stochastic fluctuations $\sigma$ (upper left facet).}
-	\label{fig:tip-trait-correlation}
-	\end{center}
-\end{figure}
-
-\begin{figure}[H]
-\begin{center}
-    % \includegraphics[width = \linewidth]{figures/application_experimental_setups.pdf}
-	\caption{A high-level schematic of the experimental setup for the two application datasets. For (A) HIV-1 set-point viral load (spVL) in the Swiss HIV Cohort Study, data are paired viral and human genotypes and associated spVL measurements. We fit the phylogenetic Ornstein-Uhlenbeck mixed model (POUMM) to the viral phylogeny and spVL values associated with each infected individual ($z_1$, $z_2$, ..., $z_{1493}$). For (B) \emph{A. thaliana}-\emph{X. arboricola} quantitative disease resistance (QDR) from \cite{Wang2018Two-wayGenomes}, data are bacterial and plant genotypes with QDR measurements for all possible combinations of pathogen and host plant strains. We fit the POUMM to the bacterial phylogeny and mean QDR calculated for each pathogen strain across all the hosts plant types ($\bar{z}_1$, $\bar{z}_2$, ..., $\bar{z}_{22}$).}
-	\label{fig:application-exp-setup}
-	\end{center}
-\end{figure}
-
-\begin{figure}[H]
-	\begin{center}
-% 		\includegraphics[width=\linewidth]{figures/gwas_results}
-		\caption{Results from comparative genome-wide association studies (GWAS) on HIV-1 set-point viral load (spVL) data. (A) shows association p-values for the same host variants from the Swiss HIV cohort in GWAS with two different response variables. On the left, we used unmodified (total) spVL values. On the right, we used our estimates for the non-pathogen effects on spVL. The alternating shades correspond to different chromosomes. (B) compares the strength of association for variants in the \emph{CCR5} and MHC regions between the two GWAS (positions 45.4 - 47Mb on chromosome 3 and 29.5 - 33.5Mb on chromosome 6 for the \emph{CCR5} and MHC, respectively). Base positions are with reference to genome build GRCh37. The color of each point represents the difference in -log$_{10}$ p-value between the two GWAS. Red means taking into account phylogenetic information decreased the strength of association and blue means it increased it. The dashed lines show genome-wide significance at p = $5 \times 10^{-8}$.}
-		\label{fig:gwas-results}
-	\end{center}
-\end{figure}
-
-\begin{figure}[H]
-\begin{center}
-    % \includegraphics[width = \linewidth]{figures/gwas_results_xanthomonas_maxmaf.pdf}
-	\caption{Results from comparative genome-wide association studies (GWAS) on \emph{A. thaliana} quantitative disease resistance (QDR) to \emph{X. arboricola}. The two facets show association p-values for the same host \emph{A. thaliana} variants in GWAS with two different response variables. On the left, we used unmodified (total) QDR values for each of the 22 selected host-pathogen pairings on which these results are based. On the right, we used our estimates for the non-pathogen effects on QDR for these samples. In this case, estimated non-pathogen effects are the specific QDR for each selected host-pathogen pairing, minus mean QDR for the respective pathogen strain, calculated across all the host \emph{A. thaliana} types. The alternating shades correspond to different chromosomes. The dashed lines show significance at significance level 0.05 with a Bonferroni correction for multiple testing.}
-	\label{fig:gwas-results-qdr}
-	\end{center}
-\end{figure}
 
 %Additional ideas for supplemental materials:
 %\begin{itemize}
