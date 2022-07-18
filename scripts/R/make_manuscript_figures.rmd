@@ -49,8 +49,10 @@ genome_wide_significance <- 5E-8
 Load data
 ```{r}
 accuracy_simulation_results <- read.delim("output/2021-08-31_estimator_accuracy_MLE.txt")
-tpr_simulation_results_old <- read.delim("output/2021-08-31_GWAS_TPR_MLE.txt")
-tpr_simulation_results <- read.delim("output_revisions/2022-06-13_GWAS_TPR_MLE.txt")
+tpr_simulation_results <- read.delim("output/2021-08-31_GWAS_TPR_MLE.txt")
+N_TESTS <- 20
+# tpr_simulation_results <- read.delim("output_revisions/2022-06-13_GWAS_TPR_MLE.txt")  # includes non-causal variants to assess FPR
+# N_TESTS <- 100
 example_simulation_results <- read.delim("output_revisions/2022-06-11_simulateFullDataset.txt")
 tree <- ape::read.tree(file = paste(OUTDIR, "pathogen_no_outgroup.newick", sep = "/"))
 tree_arboricola <- ape::read.tree(file = paste(OUTDIR_XANTHAMONAS, "pathogen_nj.newick", sep = "/"))
@@ -300,7 +302,7 @@ data <- tidyr::gather(
 sig.level <- correctSignificanceLevelForMultTesting(
         significance.level = 0.05,
         significance.correction = "Bonferroni",
-        N.tests = 100)
+        N.tests = N_TESTS)
 data$TP <- ifelse(data$p.value < sig.level & data$is.causal.variant, T, F)
 data$FP <- ifelse(data$p.value < sig.level & !(data$is.causal.variant), T, F)
 data.TPR <- as.data.frame(
@@ -732,9 +734,15 @@ p_vals_regional <- ggplot(
 # Assemble the plots as subplots
 aligned_plots <- align_plots(overview_comparison, p_vals_regional, align = "h", axis = "tb")
 
-plot_grid(aligned_plots[[1]], aligned_plots[[2]], nrow = 2, labels = c("A", "B"))
+p <- plot_grid(aligned_plots[[1]], aligned_plots[[2]], nrow = 2, labels = c("A", "B"))
 ggsave(
-        filename = paste(FIGDIR, "gwas_results.pdf", sep = "/"),
+        plot = p,
+        filename = paste(FIGDIR, "gwas_results.tiff", sep = "/"),
+        width = linewidth, height = height, unit = "cm", compression = "lzw"
+)
+ggsave(
+        plot = p,
+        filename = paste(FIGDIR, "gwas_results.png", sep = "/"),
         width = linewidth, height = height, unit = "cm"
 )
 ```
@@ -1125,7 +1133,12 @@ overview_comparison <- ggplot(
 print("Saving plot")
 ggsave(
         plot = overview_comparison,
-        filename = paste(FIGDIR, "gwas_results_xanthomonas.pdf", sep = "/"),
+        filename = paste(FIGDIR, "gwas_results_xanthomonas.tiff", sep = "/"),
+        width = linewidth, height = height / 2, unit = "cm"
+)
+ggsave(
+        plot = overview_comparison,
+        filename = paste(FIGDIR, "gwas_results_xanthomonas.png", sep = "/"),
         width = linewidth, height = height / 2, unit = "cm"
 )
 ```
