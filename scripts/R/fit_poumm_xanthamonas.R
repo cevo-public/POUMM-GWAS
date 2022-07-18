@@ -18,7 +18,6 @@ require(POUMM)
 require(bayesmeta)
 require(dplyr)
 require(ggplot2)
-# require(la)
 
 set.seed(SEED)  # Seed for POUMM parameter inference
 
@@ -54,13 +53,13 @@ POUMM_spec <- POUMM::specifyPOUMM_ATH2tMeanSeG0(
   parPriorMCMC = function(par) {
       # alpha
       dexp(par[1], rate = 0.02, log = T) +
-      # g0 or theta
+      # theta
       dnorm(par[2], mean = 0.4, sd = 0.2, log = T) + 
       # H2
       dunif(par[3],  min = 0, max = 1, log = T) + 
       # SigmaE
       bayesmeta::drayleigh(par[4], scale = 1/sqrt(2*0.02), log = T) + 
-      # g0 or theta
+      # g0
       dnorm(par[5], mean = 0.4, sd = 0.2, log = T)
   },
   nAdaptMCMC = N_ADAPT_MCMC,
