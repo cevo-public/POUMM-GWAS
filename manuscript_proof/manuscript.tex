@@ -156,7 +156,7 @@ Broad-sense pathogen heritability $H^2$ quantifies the fraction of total varianc
 
 \begin{figure}[H]
 	\begin{center}
-	\includegraphics[width = \linewidth]{simulation_setup.png}
+	\includegraphics[width = \linewidth]{fig1_Stadler_MBE-21-1179.pdf}
 	\caption{A high-level schematic of our phylogenetic Ornstein-Uhlenbeck mixed model (POUMM)-based simulation framework in the context of HIV-1 set-point viral load (spVL). (A) shows how the viral effects on spVL evolve along the viral phylogeny according to an Ornstein-Uhlenbeck process. (B) shows how human host genetic effects are the sum of independent effects from several causal variants. Each variant can be present in 0, 1, or 2 copies. Half the variants have a positive effect of size $\delta$ and half have a negative effect of size $\delta$. (C) shows how other environmental effects are independently drawn from a Gaussian distribution centered at 0. These three effects sum to the trait value for each simulated individual.}
 		\label{fig:spVLModel}
 	\end{center}
@@ -293,7 +293,7 @@ Next, we characterized the evolutionary scenarios under which our framework can 
 
 \begin{figure}[H]
 	\begin{center}
-		\includegraphics[width=\linewidth]{simulation_results}
+		\includegraphics[width=\linewidth]{fig2_Stadler_MBE-21-1179.pdf}
 		\caption{Results from the simulation study. We simulated host, pathogen, and environmental effects on a trait under the phylogenetic Ornstein-Uhlenbeck mixed model (POUMM) with different heritability ($H^2$; y-axis) and selection strength ($\alpha$; x-axis) parameters. For each simulated dataset, we applied our method to estimate the non-pathogen effects and performed GWAS with these values. (A) shows the root mean squared error (RMSE) of our estimator (left) compared to un-corrected trait values, scaled by their mean (right) under each simulated evolutionary scenario. The RMSE is with reference to the true (simulated) host part of the trait values. Thus, more accurate estimates (lower RMSE) mean the trait value used for GWAS will be closer to the true host part of the trait value. (B) shows how genome-wide association study (GWAS) power can improve given the true, simulated non-pathogen effect on spVL (left) and using our estimate for this value (middle) compared to using the scaled trait value (right). Each tile's color corresponds to the average value across 20 simulated datasets of 500 samples. The points highlight specific heritability and selection strength values from the \emph{A. thaliana}-\emph{X. arboricola} quantitative disease resistance (QDR) analysis, HIV-1 spVL analysis, and four simulated scenarios that are presented in more detail in Figure \ref{fig:tip-trait-correlation}.}
 		\label{fig:simulationResults}
 	\end{center}
@@ -301,7 +301,7 @@ Next, we characterized the evolutionary scenarios under which our framework can 
 
 \begin{figure}[H]
 	\begin{center}
-		\includegraphics[width=\linewidth]{example_simulation_trait_values.pdf}
+		\includegraphics[width=\linewidth]{fig3_Stadler_MBE-21-1179.pdf}
 		\caption{Simulated data from two evolutionary scenarios where a phylogenetic correction to trait values improves genome-wide association study (GWAS) power (right side) and where it does not (left side). These examples correspond to two of the unfilled points in Figure \ref{fig:simulationResults}. (A) and (B) show total trait values for 12 randomly selected tips from the simulated phylogeny with pathogen heritability $H^2$ of 15 and 75\%, respectively. Depending on the pathogen heritability, trait values are more or less correlated at clustered tips. (C) compares our method's estimate for the non-pathogen part of trait values (y-axis) with true simulated host trait values (x-axis) with pathogen heritability of 15 and 75\%. The solid line is the y=x line. Selection strength $\alpha$ was fixed to 0.1 time $^{-1}$ for both scenarios and all other parameters were fixed as in the full simulation study.}
 		\label{fig:simulationTraitExample}
 	\end{center}
@@ -309,7 +309,7 @@ Next, we characterized the evolutionary scenarios under which our framework can 
 
 \begin{figure}[H]
 \begin{center}
-    \includegraphics[width = \linewidth]{tip_trait_correlation.pdf}
+    \includegraphics[width = \linewidth]{fig4_Stadler_MBE-21-1179.pdf}
 	\caption{Correlations between trait values in pairs of tips in four simulated scenarios. These examples correspond to the four unfilled points in Figure \ref{fig:simulationResults}. Correlations are calculated for pairs of tips binned by phylogenetic distance (into deciles) across the 20 replicate simulations for each of the four evolutionary scenarios. Trait values are only noticeably correlated for closely clustered tips under the scenario with high pathogen heritability $H^2$ and low selection strength $\alpha$/ low stochastic fluctuations $\sigma$ (upper left facet).}
 	\label{fig:tip-trait-correlation}
 	\end{center}
@@ -321,7 +321,7 @@ We applied our framework to empirical data from two different host-pathogen syst
 
 \begin{figure}[H]
 \begin{center}
-    \includegraphics[width = \linewidth]{application_experimental_setups.pdf}
+    \includegraphics[width = \linewidth]{fig5_Stadler_MBE-21-1179.pdf}
 	\caption{A high-level schematic of the experimental setup for the two application datasets. For (A) HIV-1 set-point viral load (spVL) in the Swiss HIV Cohort Study, data are paired viral and human genotypes and associated spVL measurements. We fit the phylogenetic Ornstein-Uhlenbeck mixed model (POUMM) to the viral phylogeny and spVL values associated with each infected individual ($z_1$, $z_2$, ..., $z_{1493}$). For (B) \emph{A. thaliana}-\emph{X. arboricola} quantitative disease resistance (QDR) from \cite{Wang2018Two-wayGenomes}, data are bacterial and plant genotypes with QDR measurements for all possible combinations of pathogen and host plant strains. We fit the POUMM to the bacterial phylogeny and mean QDR calculated for each pathogen strain across all the hosts plant types ($\bar{z}_1$, $\bar{z}_2$, ..., $\bar{z}_{22}$).}
 	\label{fig:application-exp-setup}
 	\end{center}
@@ -331,7 +331,7 @@ We compared our proposed GWAS framework with a more standard approach by perform
 
 \begin{figure}[H]
 	\begin{center}
-		\includegraphics[width=\linewidth]{gwas_results}
+		\includegraphics[width=\linewidth]{fig6_Stadler_MBE-21-1179}
 		\caption{Results from comparative genome-wide association studies (GWAS) on HIV-1 set-point viral load (spVL) data. (A) shows association p-values for the same host variants from the Swiss HIV cohort in GWAS with two different response variables. On the left, we used unmodified (total) spVL values. On the right, we used our estimates for the non-pathogen effects on spVL. The alternating shades correspond to different chromosomes. (B) compares the strength of association for variants in the \emph{CCR5} and MHC regions between the two GWAS (positions 45.4 - 47Mb on chromosome 3 and 29.5 - 33.5Mb on chromosome 6 for the \emph{CCR5} and MHC, respectively). Base positions are with reference to genome build GRCh37. The color of each point represents the difference in -log$_{10}$ p-value between the two GWAS. Red means taking into account phylogenetic information decreased the strength of association and blue means it increased it. The dashed lines show genome-wide significance at p = $5 \times 10^{-8}$.}
 		\label{fig:gwas-results}
 	\end{center}
@@ -361,7 +361,7 @@ Given the posterior mean estimates for the POUMM parameters, expected correlatio
 
 \begin{figure}[H]
 \begin{center}
-    \includegraphics[width = \linewidth]{gwas_results_xanthomonas}
+    \includegraphics[width = \linewidth]{fig7_Stadler_MBE-21-1179}
 	\caption{Results from comparative genome-wide association studies (GWAS) on \emph{A. thaliana} quantitative disease resistance (QDR) to \emph{X. arboricola}. The two facets show association p-values for the same host \emph{A. thaliana} variants in GWAS with two different response variables. On the left, we used unmodified (total) QDR values for each of the 22 selected host-pathogen pairings on which these results are based. On the right, we used our estimates for the non-pathogen effects on QDR for these samples. In this case, estimated non-pathogen effects are the specific QDR for each selected host-pathogen pairing, minus mean QDR for the respective pathogen strain, calculated across all the host \emph{A. thaliana} types. The alternating shades correspond to different chromosomes. The dashed lines show significance at significance level 0.05 with a Bonferroni correction for multiple testing.}
 	\label{fig:gwas-results-qdr}
 	\end{center}
@@ -441,430 +441,4 @@ The Swiss HIV Cohort Study is supported by the Swiss National Science Foundation
 \bibliographystyle{my_natbib}
 \bibliography{references_synced}
 
-\newpage
-
-%Additional ideas for supplemental materials:
-%\begin{itemize}
-%	\item Table of genotype samples by project (genotyping chip, number of samples, spVL distribution)
-%	\item Link to github with all the code used to run simulations and generate figures
-%	\item Example spVL plots
-%	\item Proof of robustness of method to inferred tree -- NA because I just re-ran the _whole_ thing and it's not that different
-%\end{itemize}
-
-\newpage
-\startsetups
-    \setcounter{figure}{0}
-    \renewcommand{\thefigure}{S\arabic{figure}}
-    \setcounter{table}{0}
-    \renewcommand{\thetable}{S\arabic{table}}
-\stopsetups
-\section*{Supplemental Material}\label{supp}
-\beginsupplement
-\setcounter{page}{1}
-
-\begin{doublespace}
-
-\subsection*{Expected results from simulations}
-
-Here we show the root mean square error (RMSE) of the scaled trait value for each individual, $z_i - \bar{z}$ as an estimate for the host part of the trait for each individual, ${h_i}$, should be $\approx$ 0.74 in our simulation scheme. First we write the expression for the RMSE:
-
-\begin{equation}
-    RMSE = \sqrt{\frac{\sum_i^N(z_i - \bar{z} - h_i)^2}{N}}
-\end{equation}
-
-Note that under our simulation setup, $z_i - \bar{z}$ differs from $h_i$ due to the individual pathogen effect $g_i$ and environmental effect $e_i$. So the term inside the square root equals the combined variance of these two effects:
-
-\begin{equation}
-    RMSE = \sqrt{\sigma^2_{g} + \sigma^2_e}
-\end{equation}
-
-We can calculate the variance due to these two effects because the total variance in spVL $\sigma^2_z$, and the fraction of the total variance due to host genetic effects, $\sigma^2_{h}$, are fixed parameters in our simulation scheme.
-
-\begin{equation}
-\begin{split}
-    \sigma^2_{h} + \sigma^2_{g} + \sigma^2_e = \sigma^2_z \\
-    0.25 * \sigma^2_{z} + \sigma^2_{g} + \sigma^2_e = \sigma^2_z \\
-    \sigma^2_{g} + \sigma^2_e = 0.75 * \sigma^2_z \\
-    \sigma^2_{g} + \sigma^2_e = 0.75 * 0.73 \\
-    \sigma^2_{g} + \sigma^2_e = 0.55
-\end{split}
-\end{equation}
-
-Therefore, we can expect the RMSE for $z_i - \bar{z}$ as an estimate for ${h_i}$ to be around $\sqrt{0.55} \approx 0.74$. 
-
-\newpage
-
-\begin{figure}[H]
-\begin{center}
-\includegraphics[width = 0.7\linewidth]{sigma_vs_alpha.png}
-	\caption{Relationship between the selection strength parameter $\alpha$ and the intensity of stochastic evolutionary fluctuations parameter $\sigma$ at two different heritability ($H^2$) values in the  simulation scheme. $\sigma$ was determined as a function of $\alpha$ and $H^2$ under the POUMM (function given in Table \ref{tab:sim-params}).}
-	\label{fig:sigma-vs-alpha}
-	\end{center}
-\end{figure}
-
-\begin{figure}[H]
-	\begin{tikzpicture}
-	
-	% Variance 
-	\begin{scope}[xshift = 0cm, yshift = 0cm]
-	\node[anchor = west] (alabel) at (-1, 4) {\textbf{A} Variance partitioning};
-	\node[constnode] (H2h) at (0, 0) {0.25};
-	\node[constnode] (varz) at ($(H2h) + (1.8, 0)$) {$\sigma^2_z$};
-	\node[constnode] (H2) at ($(H2h) + (3.6, 0)$) {\textcolor{red}{$H^2_{\bar{t}}$}};
-	\node[detnode] (varh) at ($(H2h) + (0.9, 1.5)$) {$\sigma^2_{h}$};
-	\node[detnode] (varv) at ($(varz) + (0.9, 1.5)$) {\tiny $\sigma^2_{g}(\bar{t})$};
-	\node[detnode] (vare) at ($(varh) + (0.9, 1.5)$) {$\sigma^2_{e}$};
-	\draw[taro] (H2h) -- (varh);
-	\draw[taro] (varz) -- (varh);
-	\draw[taro] (varz) -- (varv);
-	\draw[taro] (H2) -- (varv);
-	\draw[taro] (varh) -- (vare);
-	\draw[taro] (varv) -- (vare);
-	\draw[taro] (varz) -- (vare);
-	\end{scope}
-	
-	% Virus
-	\begin{scope}[xshift = 6cm, yshift = -0.5cm]
-	\node[anchor = west] (blabel) at (-1, 4.5) {\textbf{B} Generating pathogen effects};
-	\node[constnode] (theta) at (0, 1.5) {$\theta$};
-	\node[constnode] (g0) at (1.8, 1.5) {$g_{0}$};
-	\node[constnode] (alpha) at (3.6, 1.5) {\textcolor{red}{$\alpha$}};
-	\node[detnode] (sigma) at (5.4, 1.5) {$\sigma$};
-	\node[constnode] (tree) at (7.2, 1.5) {$\Psi$};
-	\node[detnode] (varv) at (3.6+0.9, 0) {\tiny $\sigma^2_{g}(\bar{t})$};
-	\node[constnode] (tbar) at (3.6+0.9+1.8, 0) {$\bar{t}$};
-	\node[snode] (v) at (3.6, 3.25) {$\vec{g}$};
-	\draw[taro] (theta) -- (v);
-	\draw[taro] (g0) -- (v);
-	\draw[taro] (alpha) -- (v);
-	\draw[taro] (sigma) -- (v);
-	\draw[taro] (tree) -- (v);
-	\draw[taro] (varv) -- (sigma);
-	\draw[taro] (tbar) -- (sigma);
-	\draw[taro] (tbar) -- (tree);
-	\draw[taro] (alpha) -- (sigma);
-	\node[white] (varpic) at (3.6+0.9, -1.75) {};
-	\draw[taro] (varpic) -- (varv);
-	\node (vdist) at ($(v) + (1.8, 0.3)$) {Gaussian};
-	\draw (v) -- (vdist);
-	\draw[decoration={brace, mirror, raise=18pt}, sloped, decorate] (7.2, 1.5 - .5) -- node[below = 18pt] {OU parameters} (7.2, 1.5 + .5);
-	\end{scope}
-	
-	% Host 
-	\begin{scope}[xshift = 0cm, yshift = -7.5cm]
-	\node[anchor = west] (clabel) at (-1, 5.55) {\textbf{C} Generating host effects};
-	\node[constnode] (d) at (1.8, 1.5) {2};
-	\node[detnode] (p) at (3.6, 1.5) {$p$};
-	\node[snode] (G) at (1.8, 3) {$G$};
-	\node[rectangle, dashed, very thick, inner sep=4mm, draw=black!100, fit = (G) ] (Gplate) {};
-	\node[anchor=north west, inner sep=3pt] at (Gplate.north west) {\tiny $N\times M$};
-	\node[detnode] (varh) at (3.6, 0) {$\sigma^2_{h}$};
-	\node[constnode] (delta) at (3.6, 3) {$\delta$};
-	\node[detnode] (h) at (3.6, 4.5) {$\vec{h}$};
-	\node[constnode] (M) at (5.4, 3) {$M$};
-	\draw[taro] (d) -- (G);
-	\draw[taro] (p) -- (G);
-	\draw[taro] (varh) -- (p);
-	\draw[taro] (delta) -- (p);
-	\draw[taro] (M) -- (p);
-	\draw[taro] (M) -- (h);
-	\draw[taro] (delta) -- (h);
-	\draw[taro] (G) -- (h);
-	\node[white] (varpic) at (3.6, -1.5) {};
-	\draw[taro] (varpic) -- (varh);
-	\node (hdist) at ($(h) + (2.7, 0.3)$) {$\approx$ Gaussian};
-	\draw (h) -- (hdist);
-	\node (gdist) at ($(G) + (-2, 0.6)$) {Binomial};
-	\draw (G) -- (gdist);
-	\end{scope}
-	
-	% Environment
-	\begin{scope}[xshift = 9cm, yshift = -6.5cm]
-	\node[anchor = west] (dlabel) at (-1, 3) {\textbf{D} Generating environmental effects};
-	\node[detnode] (vare) at (0, 0) {$\sigma^2_{e}$};
-	\node[constnode] (zero) at ($(vare) + (1.8, 0)$) {0};
-	\node[snode] (e) at ($(vare) + (1.8/2, 1.5)$) {$\vec{e}$};
-	\draw[taro] (zero) -- (e);
-	\draw[taro] (vare) -- (e);
-	\node[white] (varpic) at (0, -1.5) {};
-	\draw[taro] (varpic) -- (vare);
-	\node (edist) at ($(e) + (1.8, 0.3)$) {Gaussian};
-	\draw (e) -- (edist);
-	\end{scope}
-	
-	\end{tikzpicture}
-	\caption{A graphical model representation of our simulation scheme, following the recommendations in \cite{Hohna2014}. Variables in solid squares are constants, with the two master control variables that we vary from simulation to simulation highlighted in red. Variables in solid circles are realizations of random variables and variables in dashed circles are determined as a function of other variables. Arrows represent dependencies among variables and the dashed square represents repetition. All parameters are defined in Table \ref{tab:sim-params}, as well as the values or expressions used for them. (A) shows how the variance in the simulated environmental effect $\sigma^2_{e}$ is smaller if the master pathogen heritability value $H^2_{\bar{t}}$ is higher and vice-versa. (B) shows the OU parameters and the pathogen phylogeny, which generate the Gaussian-distributed pathogen effects. The OU parameters $\theta$ and $g_0$ are fixed, whereas $\sigma$ is a deterministic function of the variance in the pathogen effect and the value of $\alpha$. In other words, we use $\sigma$ to maintain the desired pathogen heritability while varying $\alpha$. (C) shows how host genotypes are drawn to generate host effects. The host genotype matrix $G$ contains the number of copies (0, 1, or 2) for each of $M$ causal variants with effect size $\delta$. We assume half the variants have a positive effect and half have a negative effect. The allele frequency $p$ for the causal variants set so that we achieve the desired variance in the host effects. (D) shows that the environmental effect is drawn from a Gaussian distribution with mean zero and variance as determined in part (A).}
-	\label{fig:sim-design}
-\end{figure}
-
-\begin{figure}[H]
-\begin{center}
-\includegraphics[width = 0.7\linewidth]{spvl_calculation_comparison.png}
-	\caption{A comparison of different ways to calculate spVL based on viral load measurements provided by the SHCS. The stricter filtering excludes all measurements possibly $<$ 6 months after infection and after treatment or AIDS, whereas the more lenient filtering excludes only measurements after treatment. We used the lenient filter, mean measurement values because these correlate well with the values from the stricter filter but allow us to retain many more individuals from the cohort for our study.}
-	\label{fig:spvl-calc-comparison}
-	\end{center}
-\end{figure}
-
-\begin{figure}[H]
-	\centering
-		\includegraphics[width=0.7\linewidth]{poumm_parameter_estimates.png}
-		\caption{Posterior distributions compared to the prior for POUMM parameter estimates based on HIV-1 spVL data from the SHCS. We ran two different MCMC chains to ensure the estimates converged.}
-\label{fig:poumm-parameters}
-\end{figure}
-
-\begin{figure}[H]
-\begin{center}
-\includegraphics[width = \linewidth]{spvl_on_tree.png}
-	\caption{Inferred HIV-1 $pol$ gene phylogeny with tips colored by (A) calculated spVL, (B) estimated non-pathogen effects on spVL and (C) estimated pathogen effects on spVL.}
-	\label{fig:spvl-on-tree}
-	\end{center}
-\end{figure}
-
-\begin{figure}[H]
-\begin{center}
-\includegraphics[width = 0.462\linewidth]{trait_values.png}
-	\caption{A comparison of measured (calculated) spVL values versus our estimated non-pathogen effect on spVL for each SHCS cohort member used in the study. The histograms show the marginal distribution of each value across the individuals.}
-	\label{fig:trait-comparison}
-	\end{center}
-\end{figure}
-
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=\linewidth]{qq_plots.png}
-	\caption{Quartile-quartile plots from HIV-1 spVL association tests. The dashed green line shows the y = x line.}
-	\label{fig:qq-plots}
-\end{figure}
-
-\begin{figure}[H]
-\begin{center}
-\includegraphics[width = \linewidth]{qdr_on_tree_arboricola.png}
-	\caption{Inferred \emph{X. arboricola} phylogeny with tips colored by (A) calculated QDR, (B) estimated non-pathogen effects on QDR and (C) estimated pathogen effects on QDR.}
-	\label{fig:qdr-on-tree}
-	\end{center}
-\end{figure}
-
-\begin{figure}[H]
-	\centering
-		\includegraphics[width=0.7\linewidth]{poumm_parameter_estimates_arboricola.png}
-		\caption{Posterior distributions compared to the prior for POUMM parameter estimates based on \emph{A. thaliana}-\emph{X. arboricola} data. We ran two different MCMC chains to ensure the estimates converged.}
-\label{fig:poumm-parameters-qdr}
-\end{figure}
-
-\begin{figure}[H]
-\begin{center}
-\includegraphics[width = 0.462\linewidth]{trait_values_arboricola.png}
-	\caption{A comparison of measured (calculated) mean QDR values across all \emph{A. thaliana} accession pairings and replicates  versus our estimated non-pathogen effect on mean QDR for each \emph{X. arboricola} pathogen strain. The histograms show the marginal distribution of each value across the strains. The Pearson correlation coefficient is 1.}
-	\label{fig:trait-comparison-qdr}
-	\end{center}
-\end{figure}
-
-\begin{figure}[H]
-\begin{center}
-\includegraphics[width = \linewidth]{qq_plots_arabidopsis_xanthomonas.png}
-	\caption{Quartile-quartile plots from \emph{A. thaliana}-\emph{X. arboricola} QDR association tests. The dashed blue line shows the y = x line.}
-	\label{fig:qq-plots-qdr}
-	\end{center}
-\end{figure}
-
-\begin{figure}[H]
-	\includegraphics[width=\linewidth]{host_genotype_pca.png}
-	\caption{SHCS individuals and HapMap3 individuals plotted along the top three principle components of genetic variation. Points with black borders are within the thresholds used to select individuals of likely European ancestry.}
-	\label{fig:PCA}
-\end{figure}
-
-\end{doublespace}  % don't doublespace tables
-
-\newpage
-
-\begin{table}[H]
-	\caption{Simulation model parameters. For a full graphical model representation of the simulation scheme, including how these parameters are related, see Figure \ref{fig:sim-design}.}
-	\begin{tabularx}{\linewidth}{p{1.5cm}p{6.5cm}l} \toprule 
-		Variable & Expression & Definition \\ \midrule 
-		$\sigma^2_z$ &  0.73 log copies$^{2}$/mL$^{2}$ & Total spVL variance \\ 
-		$H^2_h$ & 0.25 & Host heritability of spVL \\
-		$H^2_{\bar{t}}$ & varied & Pathogen heritability of spVL at $\bar{t}$ \\
-		$\sigma^2_{h}$ & $\sigma_{h}^2 = 0.25*\sigma_z^2$ & Variance in host part of spVL \\
-		$\sigma^2_{g}(\bar{t})$ & $\sigma^2_{g}(\bar{t}) = H^2_{\bar{t}}*\sigma_z^2$ & Variance in pathogen part of spVL at $\bar{t}$ \\ 
-		$\sigma^2_{e}$ & $\sigma_{e}^2 = \sigma_z^2 - \sigma^2_{g} - \sigma^2_{h}$ & Variance in environmental part of spVL \\ 
-		$\bar{t}$ & 0.14 substitutions site$^{-1}$ yr$^{-1}$ & Mean root-tip time in pathogen phylogeny \\ 
-		$\bm{g}$ & $\bm{g} \sim Norm(\bm{\mu}_{OU}, \boldsymbol{\Sigma}_{OU})$ & Pathogen part of spVL for all individuals \\ 
-		$\theta$ & 4.5 log copies/mL & Optimal spVL value \\
-		$g_{0}$ & 4.5 log copies/mL & $g$ at the root of the phylogeny  \\ 
-		$\alpha$ & varied & Selection strength of OU process \\ 
-		$\sigma$ & $\sigma = \sqrt{\frac{2\alpha\sigma^2_{g}(\bar{t})}{1 - exp(-2\alpha\bar{t})}}$ & Time-unit standard deviation of OU process \\ 
-		$\Psi$ & branch lengths $\sim Exp(\bar{t})$ & Pathogen phylogeny \\ 
-		$h_i$ & $h_i = \delta \sum_{j = 1}^{j = M/2}{G_{ij}} - \delta \sum_{j = M/2}^{j = M}{G_{ij}}$ & Host part of spVL for individual $i$ \\ 
-		$G_{N \times M}$ & \makecell{$G_{ij} \sim Binom(2, p)\ \\ \forall i \in {1...N}, \forall j \in {1...M}$} & Host genotype matrix \\
-		$p$ & $p = \frac{1}{2} - \sqrt{\frac{1}{4} - \frac{H_{h}^2\sigma^2_z}{2\delta^2M}}$ &  Host variant allele frequency \\ 
-		$\delta$ & 0.2 & Host variant effect size \\ 
-		$M$ & 20 & Number of causal host variants \\ 
-		$e_i$ & $ e_i \sim Norm(0, \sigma^2_{e})$ & Environmental part of spVL for individual $i$ \\ 
-		$N$ & 500 & Number of simulated samples \\ \bottomrule 
-	\end{tabularx}
-	\label{tab:sim-params}
-\end{table}
-
-\begin{table}[H]
-\caption{POUMM parameter estimates for spVL based on SHCS data. HPD = Highest posterior density.}
-	\begin{tabularx}{\linewidth}{XXX} \hline 
-	Parameter & Posterior mean & 95\% HPD \\ \hline 
-	${g_{0}}$ & 4.23 & (1.72, 6.71) \\
-	$\theta$ & 4.47 & (4.37, 4.58) \\
-	$\sigma$ & 5.25 & (2.37, 7.9) \\
-	$\alpha$ & 57.65 & (19.49, 95.2) \\
-	$\sigma_\epsilon$ & 0.54 & (0.43, 0.65) \\ 
-	$H^2_{\bar{t}}$ & 0.45 & (0.24, 0.67) \\ \hline
-	\end{tabularx}
-	\label{tab:POUMM-parameters-our-estimates}
-\end{table}
-
-% latex table generated in R 4.1.1 by xtable 1.8-4 package
-% Sat Oct 30 10:31:16 2021
-\begin{table}[ht]
-\caption{Effect size and p-values from the top most strongly associated variants in the $\emph{CCR5}$ and MCR regions from each of the two GWAS performed in our study. ``Standard'' means the GWAS with standard spVL trait values and ``Corrected'' means the GWAS with the estimated non-pathogen part of the trait. Entries above the dividing line are the top-associated variants from the ``Standard'' GWAS and entries below the dividing line are the top-associated variants from the ``Corrected'' GWAS. Many entries overlap between the two.}
-\begin{tabularx}{\linewidth}{XXXXXXX}
-  \hline
-    Region & Position & Variant & Standard effect size & Standard p-value & Corrected effect size & Corrected p-value \\ 
-  \hline
-    $\emph{CCR5}$ & 46531144 & rs9845968 & -0.16 & $5.6 \times 10^{-9}$ & -0.083 & $1.2 \times 10^{-7}$ \\ 
-    $\emph{CCR5}$ & 46537849 & rs867620 & -0.16 & $3.2 \times 10^{-9}$ & -0.085 & $6 \times 10^{-8}$ \\ 
-    $\emph{CCR5}$ & 46539864 & rs11130092 & -0.16 & $1.1 \times 10^{-9}$ & -0.087 & $2.6 \times 10^{-8}$ \\ 
-    $\emph{CCR5}$ & 46540932 & rs10865942 & -0.16 & $8.4 \times 10^{-9}$ & -0.081 & $4 \times 10^{-7}$ \\ 
-    $\emph{CCR5}$ & 46541147 & rs7430431 & -0.17 & $9.2 \times 10^{-10}$ & -0.088 & $2.3 \times 10^{-8}$ \\ 
-    MHC & 31274380 & rs9264942 & -0.21 & $4.5 \times 10^{-13}$ & -0.12 & $3.7 \times 10^{-13}$ \\ 
-    MHC & 31321919 & rs1055821 & -0.33 & $9.4 \times 10^{-13}$ & -0.19 & $1.4 \times 10^{-12}$ \\ 
-    MHC & 31380034 & rs112243036 & -0.32 & $9.9 \times 10^{-16}$ & -0.17 & $3.7 \times 10^{-14}$ \\ 
-    MHC & 31391401 & rs4418214 & -0.34 & $2.4 \times 10^{-14}$ & -0.18 & $2.5 \times 10^{-12}$ \\ 
-    MHC & 31400137 & rs138130755 & -0.46 & $1 \times 10^{-12}$ & -0.26 & $2.6 \times 10^{-12}$ \\ 
-    MHC & 31400705 & rs138117378 & -0.46 & $1 \times 10^{-12}$ & -0.26 & $2.6 \times 10^{-12}$ \\ 
-    MHC & 31402358 & rs148792134 & -0.46 & $1 \times 10^{-12}$ & -0.26 & $2.6 \times 10^{-12}$ \\ 
-    MHC & 31409677 & rs140991764 & -0.46 & $1 \times 10^{-12}$ & -0.26 & $2.6 \times 10^{-12}$ \\ 
-    \hline
-    $\emph{CCR5}$ & 46531144 & rs9845968 & -0.16 & $5.6 \times 10^{-9}$ & -0.083 & $1.2 \times 10^{-7}$ \\ 
-    $\emph{CCR5}$ & 46537849 & rs867620 & -0.16 & $3.2 \times 10^{-9}$ & -0.085 & $6 \times 10^{-8}$ \\ 
-    $\emph{CCR5}$ & 46539864 & rs11130092 & -0.16 & $1.1 \times 10^{-9}$ & -0.087 & $2.6 \times 10^{-8}$ \\ 
-    $\emph{CCR5}$ & 46541147 & rs7430431 & -0.17 & $9.2 \times 10^{-10}$ & -0.088 & $2.3 \times 10^{-8}$ \\ 
-    $\emph{CCR5}$ & 46556835 & rs6808142 & 0.15 & $8.3 \times 10^{-8}$ & 0.082 & $3.3 \times 10^{-7}$ \\ 
-    MHC & 31274380 & rs9264942 & -0.21 & $4.5 \times 10^{-13}$ & -0.12 & $3.7 \times 10^{-13}$ \\ 
-    MHC & 31321919 & rs1055821 & -0.33 & $9.4 \times 10^{-13}$ & -0.19 & $1.4 \times 10^{-12}$ \\ 
-    MHC & 31367874 & rs111281598 & -0.37 & $1.5 \times 10^{-12}$ & -0.22 & $2.1 \times 10^{-12}$ \\ 
-    MHC & 31376266 & rs73400361 & -0.37 & $1.4 \times 10^{-12}$ & -0.22 & $2.1 \times 10^{-12}$ \\ 
-    MHC & 31380034 & rs112243036 & -0.32 & $9.9 \times 10^{-16}$ & -0.17 & $3.7 \times 10^{-14}$ \\ 
-   \hline
-\end{tabularx}
-\label{tab:gwas-top-associations}
-\end{table}
-
-\begin{table}[H]
-\centering
-\caption{Results comparison using three different approximate maximum likelihood HIV-1 phylogenies (see Materials and Methods).}
-\begin{tabularx}{\linewidth}{p{1.8cm}p{2cm}p{1.8cm}p{2cm}p{1.8cm}p{2cm}p{1.8cm}} % {lrrrrrr} {llclcccc}
-\hline
-& \multicolumn{2}{l}{\makecell{Estimated\\non-pathogen\\part of trait\\main tree}} & \multicolumn{2}{l}{\makecell{Estimated\\non-pathogen\\part of trait\\tree 2}} & \multicolumn{2}{l}{\makecell{Estimated\\non-pathogen\\part of trait\\tree 3}} \\ 
-  \hline
- Variant & Effect size & p-value & Effect size & p-value & Effect size & p-value \\
-  \hline
-    rs59440261 & -0.22 & $2.6 \times 10^{-10}$ & -0.22 & $1.5 \times 10^{-10}$ & -0.24 & $1.4 \times 10^{-10}$ \\ 
-    rs1015164 & 0.078 & $8.5 \times 10^{-6}$ & 0.076 & $9.5 \times 10^{-6}$ & 0.083 & $9 \times 10^{-6}$ \\ 
-   \hline
-\end{tabularx}
-\label{tab:comp-gwas-mclaren-snps-alt-trees}
-\end{table}
-
-\begin{table}[H]
-\caption{POUMM parameter estimates for QDR based on \emph{A. thaliana}-\emph{X. arboricola} data. HPD = Highest posterior density.}
-	\begin{tabularx}{\linewidth}{XXX} \hline 
-	Parameter & Posterior mean & 95\% HPD \\ \hline 
-	${g_{0}}$ & 0.40 & (0.01, 0.78) \\
-	$\theta$ & 0.39 & (0.30, 0.49) \\
-	$\sigma$ & 0.03 & (0.0, 0.06) \\
-	$\alpha$ & 0.03 & (0.0, 0.05) \\
-	$\sigma_\epsilon$ & 0.18 & (0.08, 0.27) \\ 
-	$H^2_{\bar{t}}$ & 0.33 & (0.0, 0.77) \\ \hline
-	\end{tabularx}
-	\label{tab:POUMM-parameters-our-estimates-qdr}
-\end{table}
-
-\begin{table}[H]
-\caption{Summary statistics for log spVL in previously sampled populations. $\bar{z}$ is average spVL (log copies/mL) and $\sigma^2_z$ is variance in measured spVL ( log $\textrm{copies}^2/\textrm{mL}^2$). Values from \protect\citep{Blanquart2017, Mitov2018} are empirical; values from \protect\citep{Bonhoeffer2015} were estimated by fitting a normal distribution to the data.}
-	\begin{tabularx}{\linewidth}{XXX} \hline 
-	Measurement & Value & Reference \\ \hline 
-	$\bar{z}$ & $\approx$ 4.5 & \citet{Mitov2018} \\
-	$\bar{z}$ &  4.4 & \citet{Blanquart2017} \\
-	$\bar{z}$ & $\approx$ 4.5 & \citet{Bonhoeffer2015} \\
-	$\sigma^2_z$ &  0.73 &  \citet{Mitov2018} \\
-	$\sigma^2_z$ &  0.50 & \citet{Blanquart2017} \\
-	$\sigma^2_z$ & $\approx$ 0.5 & \citet{Bonhoeffer2015} \\ \hline 
-	\end{tabularx}
-	\label{tab:spVLmeasurements}
-\end{table}
-%\todo{I guessed at bar(z) from figure in Mitov2018, search supplement for exact}
-
-\begin{table}[H]
-\caption{POUMM parameter estimates for spVL from previous studies.}
-	\begin{tabularx}{\linewidth}{llXXX}
-	\hline 
-	Parameter & Value (Uncertainty) & Reference & Notes \\
-	\hline 
-	$g_0$ & 5.54 (4.04 - 7.25) & \citet{Mitov2018} & 8,483 UK HIV cohort individuals, $pol$ tree \\
-	$\theta$ & 4.45 (4.41 - 4.49) & \citet{Mitov2018} & \\
-	$\theta$ &  4.0 (1.6 - 4.)) & \citet{Bertels2018} & 3,036 SHCS individuals, $pol$ tree \\
-	$\theta$ & 4.1 (3.5 - 4.9) & \citet{Blanquart2017} & 1,581 subtype B individuals from Europe, whole genome tree \\
-	$\alpha$ & 28.78 (16.64 - 46.93) & \citet{Mitov2018} & \\
-	$\alpha$ & 32.7 (0.03 - 57.6) & \citet{Bertels2018} & \\
-	$\alpha$ & 7.6 (1.2 - 10) & \citet{Blanquart2017} & **limited $\alpha$ to $\le$ 10 \\
-	$\sigma$ & 2.97 (1.95 - 4.37) & \citet{Mitov2018} & \\
-	$\sigma$ & 1.3 (0.66 -1.87) &  \citet{Blanquart2017} & \\
-	$\sigma_e$ & 0.77 (0.73, 0.8) & \citet{Mitov2018} & \\
-	$\sigma_e$ & 0.61 (0.54, 0.65) &  \citet{Blanquart2017} & \\
-	\hline 
-	\end{tabularx}
-	\label{tab:POUMMparams-prev-estimated}
-\end{table}
-
-\begin{table}[H]
-\caption{Number of samples for HIV-1 spVL GWAS after sequential filtering steps.}
-    \begin{tabularx}{\linewidth}{XX}
-    \hline
-    Sample filter & Number of samples remaining \\
-    \hline
-    Subtype B pol sequences & 1516 \\
-    With paired spVL measurement & 1516 \\
-    $>$ 750 characters in sequence & 1493 \\
-    Individual is of European ancestry & 1396 \\
-    Kinship coefficient $>$ 0.09375 & 1392 \\ 
-    \hline
-    \end{tabularx}
-    \label{tab:sample-filtering}
-\end{table}
-
-\begin{table}[H]
-\caption{Number of variants for HIV-1 spVL GWAS after sequential filtering steps.}
-	\begin{tabularx}{\linewidth}{XX}
-	\hline
-	Variant filter & Number of variants remaining \\
-	\hline 
-	Raw data & 76979521 \\
-	Missing genotype rate $>$ 0.05 & 11590002 \\
-	Hardy-Weinburg exact test p-value $< 5 \times 10^{-5}$ & 11589246 \\
-	Minor allele frequency $<$ 0.01 & 6228626 \\ \hline			
-	\end{tabularx}
-	\label{tab:variant-filtering}
-\end{table}
-
-\begin{table}[H]
-\caption{Number of variants for \emph{A. thaliana} QDR GWAS after sequential filtering steps. The last entry lists variants without GWAS p-values because PLINK assessed the correlation between predictor variables (the variant and the top 5 principle components of host genetic variation are predictors) to be too strong. This did not occur in the HIV-1 spVL GWAS.}
-	\begin{tabularx}{\linewidth}{XX}
-	\hline
-	Variant filter & Number of variants remaining \\
-	\hline 
-	Raw data & 12883854 \\
-	Bi-allelic variants & 11769920 \\
-	Minor allele frequency $<$ 0.1 & 1743952 \\
-	NA p-value (too-high covariate correlation) & 1070541 \\ \hline			
-	\end{tabularx}
-	\label{tab:variant-filtering-qdr}
-\end{table}
-
-\stopsection
 \end{document}
