@@ -89,6 +89,32 @@ docker run \
 --volume=`pwd`/output:/output build-tree
 ```
 
+<<<<<<< HEAD
+=======
+### Build pathogen phylogeny (BEAST2)
+* Using BEAST2 version 2.6.3
+* Used same alignment as produced for IQ-TREE tree building (output/pathogen_trimmed.fasta) except without 5 type-A outgroup sequences (output/pathogen_trimmed_no_outgroup.fasta)
+* Used tip dates
+* GTR substitution model, 4 gamma-distributed rate categories, empirical base frequencies
+* Strict clock with rate fixed to 0.00079 subs / site / year as in Stadler et al, PNAS, 2013
+* Birth-death tree prior with serial sampling implemented in BDMM package
+* Birth, death, sampling rate priors taken from Stadler et al, PNAS, 2013, table shows non-default priors
+* Ran 3 independent chains for 6 million samples each
+* Using un-bounded sampling proportion meant sampling  proportion highly correlated with become-uninfectius rate
+* Sampling proportion in all of SHCS >= 45% (Swiss HIV Cohort Study et al, International Journal of Epidemiology, 2009)
+* Sampling starts 1994 in analyzed dataset
+
+| Parameter | Prior distribution | Notes |
+| --- | --- | --- |
+| reproductive number | LogN(0.5,1) | 95% interquartile range: 0.2 - 11.7 |
+| become-uninfectious rate | LogN(-1, 1) | 95% interquartile range: 0.05 - 2.61 (20 years - 140 days) | 
+| sampling proportion | Uniform(0.35, 0.75) | Note: fixed to 0 until time 23.4 (one month prior to first sample) |
+| time of outbreak origin | LogN(3.3, 0.1)| 95% interquartile range: 22.3 - 33 years before first sample |
+
+* I had a really hard time getting this to converge, after 6 million steps the posterior was still increasing almost linearly
+
+
+>>>>>>> f5c52ef6c57fcec72f004c282ec34d4a3942543f
 ### Root the phylogeny
 
 * ```Rscript scripts/R/root_tree.R``` roots the phylogeny with type "A" sequences as the outgroup, then removes the outgroup.
@@ -121,6 +147,7 @@ docker build -t run-gwas -f Dockerfile-run-gwas .
 docker run --volume=`pwd`/output:/output run-gwas
 ```
 
+<<<<<<< HEAD
 ## Apply method to GWAS for A. thaliana genetic determinants of QDR against X. arboricola
 
 ### Data
@@ -207,3 +234,19 @@ $9 = -log($7)/log(10);
 $10 = $8 - $9
 $11 = abs($10)} 1' < gwas_results.maxmaf.txt > gwas_results.maxmaf.pvals.txt
 ```
+=======
+### Run comparative GWAS (ATOMM)
+* Format host genotype data into haplotype genotype matrices.
+```
+docker build -t plink -f Dockerfile-plink .
+# Run image interactively:
+docker run -it --rm --mount type=bind,src=$PWD/scripts,dst=/scripts --mount type=bind,src=$PWD/output,dst=/output plink
+# Run the commands in scripts/bash/get_atomm_host_genotypes.sh
+```
+* Format pathogen genotype data into haplotype genotype matrices.
+```
+Rscript get_atomm_pathogen_genotypes.R
+```
+* Format phenotype data into required tabular format
+* Run program as in demo.m, testing only marginal effects on the host side
+>>>>>>> f5c52ef6c57fcec72f004c282ec34d4a3942543f
