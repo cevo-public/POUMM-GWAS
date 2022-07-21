@@ -64,7 +64,7 @@ Data cannot be published due to privacy protections. See the [Swiss HIV Cohort S
 
   * HLA genotypes imputed with SNP2HLA (spVL.shcs.rs.hla.bed, spVL.shcs.rs.hla.bim, spVL.shcs.rs.hla.fam)
 
-* SHCS cohort scores along top principal components from genotype matrix of merged SHCS and HapMap data. Provided by Christian Thorball.
+* SHCS cohort scores along top principal components from genotype matrix of merged SHCS and HapMap data.
 
 * Viral load measurements and other clinical data provided by the SHCS.
 
@@ -80,7 +80,6 @@ Data cannot be published due to privacy protections. See the [Swiss HIV Cohort S
 
 ### Build pathogen phylogeny (IQ-TREE)
 * Build container, mount volume with prepared sequence data, run container.
-* This is done locally because I don't have sudo permissions to run Docker on the server where the data lives.
 * The script generates an alignment, trims characters after position 1505, and constructs and approximate maximum-likelihood tree.
 ``` 
 docker build -t build-tree -f Dockerfile-build-tree .
@@ -101,7 +100,7 @@ docker run \
 Note: results in `output_revisions` are from fitting the POUMM and correcting trait values based on a different approximate ML tree output by IQ-TREE using the `-wt` parameter.
 
 ### Prepare human genotype data
-* `scripts/R/filter_gwas_individuals.R` generates a list of SHCS individuals of European descent carrying subtype B HIV.
+* `scripts/R/filter_gwas_individuals.R` generates a list of SHCS individuals of European descent infected with subtype B HIV.
 * Filter the host genotype files based on individuals to keep, variant thresholds.
 * Summarize allele frequencies, missingness in filtered human genotype data.
 ```
